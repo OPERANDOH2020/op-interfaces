@@ -1,0 +1,121 @@
+swagger: '2.0'
+info:
+  title: USER DEVICE ENFORCEMENT API
+  description: User Device Enformcement API
+  version: 0.0.1
+schemes:
+  - https
+  - http
+basePath: /v1
+produces:
+  - application/json
+  - application/xml
+paths:
+  /getPrivacySettings:
+    get:
+      summary: Get Privacy Settings
+      description: |
+        The UDE endpoint returns the current privacy settings for all social
+        networks. It is called by Watchdog when it requests to get current
+        settings
+      parameters:
+        - name: user_id
+          in: query
+          description: Unique identifier representing a specific user or service
+          type: string
+          required: true
+          format: uuid
+        - name: osp_list
+          in: body
+          description: OSP_list
+          schema: 
+            $ref: '#/definitions/OSP'
+      tags: 
+        - PrivacySettings
+      responses:
+        '200':
+          description: An array of privacy settings
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PrivacySettings'
+        default:
+            description: Unexpected error
+            schema:
+              $ref: '#/definitions/Error'
+  /applyPrivacySettings:
+    get:
+      summary: Apply Privacy Settings
+      description: Called by OSE when it wants to update user’s settings
+      parameters:
+        - name: user_id
+          in: query
+          description: Unique identifier representing a specific user or service
+          type: string
+          required: true
+          format: uuid 
+        - name: osp_id  
+          in: query
+          description: OSP unique identifier
+          type: string
+          required: true
+      tags: 
+        - PrivacySettings    
+      responses:
+        '200':
+          description: Privacy Setting were successfully applied
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Status'
+
+definitions:
+  PrivacySettings:
+    type: object
+    properties:
+      id:
+        type: string
+        description: PrivacySetting Unique Identifier
+      description:
+        type: string
+        description : Description of the setting
+      name:
+        type: string
+        description: Short name of the setting
+      setting_target:
+        type: string
+        description: Targeted setting key
+      setting_value:
+        type: string
+        description: Targeted setting value   
+  OSP:
+    type: object
+    properties: 
+      id:
+        type: string
+        description: OSP Unique Identifier
+      description:
+        type: string
+        description : Description of the OSP
+      name:
+        type: string
+        description: Short name of the OSP
+  Status:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Request status success or error
+      message:
+        type: string
+        description: Status message 
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
