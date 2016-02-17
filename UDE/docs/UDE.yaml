@@ -3,10 +3,13 @@ info:
   title: USER DEVICE ENFORCEMENT API
   description: User Device Enformcement API
   version: 0.0.1
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
 schemes:
   - https
   - http
-host: localhost:8080
+host: 'localhost:8080'
 produces:
   - application/json
 paths:
@@ -27,9 +30,9 @@ paths:
         - name: osp_list
           in: body
           description: OSP_list
-          schema: 
+          schema:
             $ref: '#/definitions/OSP'
-      tags: 
+      tags:
         - PrivacySettings
         - GET
       responses:
@@ -40,9 +43,9 @@ paths:
             items:
               $ref: '#/definitions/PrivacySettings'
         default:
-            description: Unexpected error
-            schema:
-              $ref: '#/definitions/Error'
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /applyPrivacySettings:
     post:
       summary: Apply Privacy Settings
@@ -53,25 +56,25 @@ paths:
           description: Unique identifier representing a specific user or service
           type: string
           required: true
-          format: uuid 
-        - name: osp_id  
+          format: uuid
+        - name: osp_id
           in: query
           description: OSP unique identifier
           type: string
           required: true
-      tags: 
-        - PrivacySettings  
+      tags:
+        - PrivacySettings
         - POST
       responses:
         '200':
           description: Privacy Setting were successfully applied
           schema:
-             $ref: '#/definitions/Status'
+            $ref: '#/definitions/Status'
   /getOffers:
     get:
       summary: Get website offers
       description: Extension sends request to PfB service to get a list of offers for the website when signup page is detected
-      parameters: 
+      parameters:
         - name: user_id
           in: query
           description: Unique identifier representing a specific user from the UDE service
@@ -80,7 +83,7 @@ paths:
           format: uuid
         - name: website
           in: query
-          description: Website address 
+          description: Website address
           type: string
           required: true
       tags:
@@ -89,13 +92,13 @@ paths:
       responses:
         '200':
           description: An array containing all available offers for the requested website
-          schema: 
+          schema:
             type: array
-            items:  
-              $ref : '#/definitions/Offer'
+            items:
+              $ref: '#/definitions/Offer'
   /requestOffer:
     post:
-      description : Triggered by the extension to PfB service to indicate that the user has chosen to accept the offer (i.e. initiated login with Social Network button)
+      description: Triggered by the extension to PfB service to indicate that the user has chosen to accept the offer (i.e. initiated login with Social Network button)
       tags:
         - PrivacyForBenefits
         - POST
@@ -113,15 +116,14 @@ paths:
           required: true
           format: uuid
       responses:
-        200:
+        '200':
           description: Successfull request
           schema:
             $ref: '#/definitions/Status'
-        500:
+        '500':
           description: Failed request
           schema:
             $ref: '#/definitions/Status'
-  
   /getPendingDeals:
     get:
       description: Extension requests from PfB service the list of all pending deal requests for a user
@@ -136,32 +138,30 @@ paths:
           required: true
           format: uuid
       responses:
-        200:  
+        '200':
           description: A list of offers
           schema:
             type: array
             items:
               $ref: '#/definitions/Offer'
-  
   /getOfferStatus:
     get:
       description: Get offer status
       tags:
         - PrivacyForBenefits
         - GET
-      parameters: 
+      parameters:
         - name: offer_id
           in: query
           description: Unique identifier for an offer
           type: string
           required: true
           format: uuid
-      responses: 
-        200:
-          description: Get offer status (active | inactive)
+      responses:
+        '200':
+          description: 'Get offer status (active | inactive)'
           schema:
-            $ref: '#/definitions/Status'		  
-
+            $ref: '#/definitions/Status'
 definitions:
   PrivacySettings:
     type: object
@@ -171,7 +171,7 @@ definitions:
         description: PrivacySetting Unique Identifier
       description:
         type: string
-        description : Description of the setting
+        description: Description of the setting
       name:
         type: string
         description: Short name of the setting
@@ -180,16 +180,16 @@ definitions:
         description: Targeted setting key
       setting_value:
         type: string
-        description: Targeted setting value   
+        description: Targeted setting value
   OSP:
     type: object
-    properties: 
+    properties:
       id:
         type: string
         description: OSP Unique Identifier
       description:
         type: string
-        description : Description of the OSP
+        description: Description of the OSP
       name:
         type: string
         description: Short name of the OSP
@@ -203,10 +203,9 @@ definitions:
       title:
         type: string
         description: The offer title
-      description  :
+      description:
         type: string
         description: The offer description
-
   Status:
     type: object
     properties:
@@ -215,7 +214,7 @@ definitions:
         description: Request status success or error
       message:
         type: string
-        description: Status message 
+        description: Status message
   Error:
     type: object
     properties:
