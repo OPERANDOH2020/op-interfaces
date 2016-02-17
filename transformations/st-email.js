@@ -13,10 +13,10 @@ module.exports.st-email = {
 
         }
     },
-    sendEmailWithAttachement:{
-        method : 'delete',
+    sendEmailWithAttachments:{
+            method : 'put',
             params: ["userId", "__to","__cc", "__bcc","__subject", "__content", "__attachments"],
-            path   : '/removeIdentity/$userId/$identity',
+            path   : '/sendEmailWithAttachments/$userId',
             code:function(userId, __to,__cc, __bcc,__subject, __content, __attachments){
 
         }
