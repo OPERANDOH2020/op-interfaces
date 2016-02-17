@@ -1,0 +1,254 @@
+swagger: '2.0'
+info:
+  title: EMAIL SERVICES API
+  description: Email Services API
+  version: 0.0.1
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+schemes:
+  - https
+  - http
+host: 'localhost:8080'
+produces:
+  - application/json
+paths:
+  /sendEmail/{userId}:
+    put:
+      summary: Interface used to send an email
+      parameters:
+        - name: userId
+          in: path
+          description: Unique identifier representing a specific user
+          type: string
+          format: uuid
+          required: true
+        - name: to
+          in: body
+          required: true
+          description: Recipient unique identifier
+          schema:
+              $ref: '#/definitions/Email'
+      tags:
+        - SendEmail Interface
+      responses:
+        250:
+          description: Request was successfully completed
+          schema:
+              $ref: '#/definitions/Status'
+        420:       
+          description: Timeout connection problem
+          schema:
+            $ref: '#/definitions/Status'
+        500:
+          description: Invalid command
+          schema:
+            $ref: '#/definitions/Error'
+          
+        501:
+          description: Invalid parameters args
+          schema:
+            $ref: '#/definitions/Error'
+        523:
+          description: The total size of your mailing exceeds the recipient server's limits.
+          schema: 
+            $ref: '#/definitions/Error'
+  /sendEmailWithAttachments/{userId}:
+    put:
+      summary: Interface used to send an email
+      parameters:
+        - name: userId
+          in: path
+          description: Unique identifier representing a specific user
+          type: string
+          format: uuid
+          required: true
+        - name: to
+          in: body
+          required: true
+          description: Recipient unique identifier
+          schema:
+              $ref: '#/definitions/Email'
+      tags:
+        - SendEmail Interface
+      responses:
+        250:
+          description: Request was successfully completed
+          schema:
+              $ref: '#/definitions/Status'
+        420:       
+          description: Timeout connection problem
+          schema:
+            $ref: '#/definitions/Status'
+        500:
+          description: Invalid command
+          schema:
+            $ref: '#/definitions/Error'
+          
+        501:
+          description: Invalid parameters args
+          schema:
+            $ref: '#/definitions/Error'
+        523:
+          description: The total size of your mailing exceeds the recipient server's limits.
+          schema: 
+            $ref: '#/definitions/Error'
+  
+  /generateIdentity/{userId}:
+    put:
+      summary: Generate a new identity for an user
+      parameters:
+        - name: userId
+          in: path
+          description: Unique identifier representing a specific user
+          type: string
+          format: uuid
+          required: true
+      tags:
+        - Identities Manager
+      responses:
+        200:
+          description: Get the created identiy object
+          schema:
+            $ref: '#/definitions/Identity'
+        500:
+          description: Unexpected error
+          schema: 
+            $ref: '#/definitions/Error'
+  /removeIdentity/{userId}/{identityId}:
+    delete:
+      summary: Remove a certain identity
+      parameters:
+        - name: userId
+          in: path
+          description: Unique identifier representing a specific user
+          type: string
+          format: uuid
+          required: true
+        - name: identityId
+          in: path
+          description: Unique identifier representing a specific identity
+          type: string
+          format: uuid
+          required: true
+      tags:
+        - Identities Manager    
+      responses:
+        200:
+          description: Identity successfully removed from system
+          schema: 
+            $ref: '#/definitions/Status'
+        500:
+          description: Unexpected error
+          schema: 
+            $ref: '#/definitions/Error'
+  /listIdentities/{userId}:
+    get:
+      summary: Get user identities
+      parameters: 
+      - name: userId
+        in: path
+        description: Unique identifier representing a specific user
+        type: string
+        format: uuid
+        required: true
+      tags:
+        - Identities Manager    
+      responses:
+        200:
+          description: Get all user identities
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Identity'  
+        500:
+          description: Unexpected error
+          schema: 
+            $ref: '#/definitions/Error'      
+        
+definitions:
+  Email:
+    type: object
+    properties:
+      sender:
+        type: string
+        description : Sender unique identifier
+      to:
+        description : Recipients
+        type: array
+        items:
+          properties:
+            userId:
+              type: string
+              description : Recipient unique identifier
+      cc:
+        description : Carbon Copy  recipients
+        type: array
+        items:
+          properties:
+            userId:
+              type: string
+              description : Carbon copy recipient unique identifier
+           
+      bcc:
+        description : Blind Carbon Copy recipients
+        type: array
+        items:
+          properties:
+            userId:
+              type: string
+              description: Blind carbon copy recipient unique identifier
+      content:
+        description: Email content
+        type: string
+      hasAttachements:
+        type: boolean
+        description: Indicates if this email has at least one attachement
+      attachments:
+        description: Email attchments
+        type: array
+        items:
+          $ref: '#/definitions/Attachment'
+  Attachment:
+    type: object
+    properties:
+      title: 
+        type: string
+        description: Filename
+      path: 
+        type: string
+        description: File path on the file system or temp folder
+  Identity:
+    type: object
+    properties:
+      identityId:
+        type: string
+        description: This is a generated field
+      username:
+        type: string
+        description: Generated username
+      email:
+        type: string
+        description: Generated email
+      password:
+        type: string
+        description: Generated password
+  Status:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Request status success or error
+      message:
+        type: string
+        description: Status message
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
