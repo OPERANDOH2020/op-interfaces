@@ -1,6 +1,8 @@
 swagger: '2.0'
 info:
   title: EMAIL SERVICES API
+  contact:
+    email: raf@rms.ro
   description: Email Services API
   version: 0.0.1
   license:

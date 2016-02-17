@@ -1,0 +1,740 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>EMAIL SERVICES API</title>
+    <style type="text/css">
+      body { 
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+	display: none;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+    </style>
+  </head>
+  <body>
+  <h1>EMAIL SERVICES API</h1>
+    <div class="app-desc">Email Services API</div>
+    
+    <div class="app-desc">Contact Info: <a href="raf@rms.ro">raf@rms.ro</a></div>
+    <div class="app-desc">Version: 0.0.1</div>
+    <div class="license-info">MIT</div>
+    <div class="license-url">http://opensource.org/licenses/MIT</div>
+  <h2>Access</h2>
+  
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  
+  <h2>Table of Contents </h2>
+  <div class="method-summary"></div>
+  
+  <ol>
+  
+  
+  
+  <li><a href="#generateIdentityUserIdPut"><code><span class="http-method">put</span> /generateIdentity/{userId}</code></a></li>
+  
+  <li><a href="#listIdentitiesUserIdGet"><code><span class="http-method">get</span> /listIdentities/{userId}</code></a></li>
+  
+  <li><a href="#removeIdentityUserIdIdentityIdDelete"><code><span class="http-method">delete</span> /removeIdentity/{userId}/{identityId}</code></a></li>
+  
+  <li><a href="#sendEmailUserIdPut"><code><span class="http-method">put</span> /sendEmail/{userId}</code></a></li>
+  
+  <li><a href="#sendEmailWithAttachmentsUserIdPut"><code><span class="http-method">put</span> /sendEmailWithAttachments/{userId}</code></a></li>
+  
+  
+  
+  </ol>
+  
+
+  
+  
+  
+  
+  <div class="method"><a name="generateIdentityUserIdPut"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="put"><code class="huge"><span class="http-method">put</span> /generateIdentity/{userId}</code></pre></div>
+    <div class="method-summary">Generate a new identity for an user (<span class="nickname">generateIdentityUserIdPut</span>)</div>
+    
+    <div class="method-notes"></div>
+
+    
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">userId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Unique identifier representing a specific user </div>
+    </div>  <!-- field-items -->
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#Identity">Identity</a>
+      
+    </div>
+    
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    
+
+    
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+    
+      <li><code>application/json</code></li>
+    
+    </ul>
+    
+
+    <h3 class="field-label">Responses</h3>
+    
+    <h4 class="field-label">200</h4>
+    Get the created identiy object
+    
+    
+    <h4 class="field-label">500</h4>
+    Unexpected error
+    
+    
+  </div> <!-- method -->
+  <hr/>
+  
+  <div class="method"><a name="listIdentitiesUserIdGet"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /listIdentities/{userId}</code></pre></div>
+    <div class="method-summary">Get user identities (<span class="nickname">listIdentitiesUserIdGet</span>)</div>
+    
+    <div class="method-notes"></div>
+
+    
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">userId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Unique identifier representing a specific user </div>
+    </div>  <!-- field-items -->
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#Identity">Identity</a>]
+      
+    </div>
+    
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    
+
+    
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+    
+      <li><code>application/json</code></li>
+    
+    </ul>
+    
+
+    <h3 class="field-label">Responses</h3>
+    
+    <h4 class="field-label">200</h4>
+    Get all user identities
+    
+    
+    <h4 class="field-label">500</h4>
+    Unexpected error
+    
+    
+  </div> <!-- method -->
+  <hr/>
+  
+  <div class="method"><a name="removeIdentityUserIdIdentityIdDelete"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /removeIdentity/{userId}/{identityId}</code></pre></div>
+    <div class="method-summary">Remove a certain identity (<span class="nickname">removeIdentityUserIdIdentityIdDelete</span>)</div>
+    
+    <div class="method-notes"></div>
+
+    
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">userId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Unique identifier representing a specific user </div><div class="param">identityId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Unique identifier representing a specific identity </div>
+    </div>  <!-- field-items -->
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#Status">Status</a>
+      
+    </div>
+    
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    
+
+    
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+    
+      <li><code>application/json</code></li>
+    
+    </ul>
+    
+
+    <h3 class="field-label">Responses</h3>
+    
+    <h4 class="field-label">200</h4>
+    Identity successfully removed from system
+    
+    
+    <h4 class="field-label">500</h4>
+    Unexpected error
+    
+    
+  </div> <!-- method -->
+  <hr/>
+  
+  <div class="method"><a name="sendEmailUserIdPut"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="put"><code class="huge"><span class="http-method">put</span> /sendEmail/{userId}</code></pre></div>
+    <div class="method-summary">Interface used to send an email (<span class="nickname">sendEmailUserIdPut</span>)</div>
+    
+    <div class="method-notes"></div>
+
+    
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">userId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Unique identifier representing a specific user </div>
+    </div>  <!-- field-items -->
+    
+
+    
+
+    
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">to (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; Recipient unique identifier </div>
+    </div>  <!-- field-items -->
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#Status">Status</a>
+      
+    </div>
+    
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    
+
+    
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+    
+      <li><code>application/json</code></li>
+    
+    </ul>
+    
+
+    <h3 class="field-label">Responses</h3>
+    
+    <h4 class="field-label">250</h4>
+    Request was successfully completed
+    
+    
+    <h4 class="field-label">420</h4>
+    Timeout connection problem
+    
+    
+    <h4 class="field-label">500</h4>
+    Invalid command
+    
+    
+    <h4 class="field-label">501</h4>
+    Invalid parameters args
+    
+    
+    <h4 class="field-label">523</h4>
+    The total size of your mailing exceeds the recipient server&#39;s limits.
+    
+    
+  </div> <!-- method -->
+  <hr/>
+  
+  <div class="method"><a name="sendEmailWithAttachmentsUserIdPut"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="put"><code class="huge"><span class="http-method">put</span> /sendEmailWithAttachments/{userId}</code></pre></div>
+    <div class="method-summary">Interface used to send an email (<span class="nickname">sendEmailWithAttachmentsUserIdPut</span>)</div>
+    
+    <div class="method-notes"></div>
+
+    
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">userId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Unique identifier representing a specific user </div>
+    </div>  <!-- field-items -->
+    
+
+    
+
+    
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">to (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; Recipient unique identifier </div>
+    </div>  <!-- field-items -->
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#Status">Status</a>
+      
+    </div>
+    
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    
+
+    
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+    
+      <li><code>application/json</code></li>
+    
+    </ul>
+    
+
+    <h3 class="field-label">Responses</h3>
+    
+    <h4 class="field-label">250</h4>
+    Request was successfully completed
+    
+    
+    <h4 class="field-label">420</h4>
+    Timeout connection problem
+    
+    
+    <h4 class="field-label">500</h4>
+    Invalid command
+    
+    
+    <h4 class="field-label">501</h4>
+    Invalid parameters args
+    
+    
+    <h4 class="field-label">523</h4>
+    The total size of your mailing exceeds the recipient server&#39;s limits.
+    
+    
+  </div> <!-- method -->
+  <hr/>
+  
+  
+  
+  
+
+  <div class="up"><a href="#__Models">Up</a></div>
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h2>Table of Contents</h2>
+  <ol>
+  
+  
+    <li><a href="#Email"><code>Email</code></a></li>
+  
+  
+  
+    <li><a href="#Attachment"><code>Attachment</code></a></li>
+  
+  
+  
+    <li><a href="#Identity"><code>Identity</code></a></li>
+  
+  
+  
+    <li><a href="#Status"><code>Status</code></a></li>
+  
+  
+  
+    <li><a href="#Error"><code>Error</code></a></li>
+  
+  
+  
+    <li><a href="#Email_to"><code>Email_to</code></a></li>
+  
+  
+  
+    <li><a href="#Email_cc"><code>Email_cc</code></a></li>
+  
+  
+  
+    <li><a href="#Email_bcc"><code>Email_bcc</code></a></li>
+  
+  
+  </ol>
+
+  
+  
+  <div class="model">
+    <h3 class="field-label"><a name="Email">Email</a> <a class="up" href="#__Models">Up</a></h3>
+    <div class="field-items">
+      <div class="param">sender </div><div class="param-desc"><span class="param-type">String</span> Sender unique identifier</div>
+      
+      <div class="param">to </div><div class="param-desc"><span class="param-type">array[Email_to]</span> Recipients</div>
+      
+      <div class="param">cc </div><div class="param-desc"><span class="param-type">array[Email_cc]</span> Carbon Copy  recipients</div>
+      
+      <div class="param">bcc </div><div class="param-desc"><span class="param-type">array[Email_bcc]</span> Blind Carbon Copy recipients</div>
+      
+      <div class="param">content </div><div class="param-desc"><span class="param-type">String</span> Email content</div>
+      
+      <div class="param">hasAttachements </div><div class="param-desc"><span class="param-type">Boolean</span> Indicates if this email has at least one attachement</div>
+      
+      <div class="param">attachments </div><div class="param-desc"><span class="param-type">array[Attachment]</span> Email attchments</div>
+      
+      
+    </div>  <!-- field-items -->
+  </div>
+  
+  
+  
+  <div class="model">
+    <h3 class="field-label"><a name="Attachment">Attachment</a> <a class="up" href="#__Models">Up</a></h3>
+    <div class="field-items">
+      <div class="param">title </div><div class="param-desc"><span class="param-type">String</span> Filename</div>
+      
+      <div class="param">path </div><div class="param-desc"><span class="param-type">String</span> File path on the file system or temp folder</div>
+      
+      
+    </div>  <!-- field-items -->
+  </div>
+  
+  
+  
+  <div class="model">
+    <h3 class="field-label"><a name="Identity">Identity</a> <a class="up" href="#__Models">Up</a></h3>
+    <div class="field-items">
+      <div class="param">identityId </div><div class="param-desc"><span class="param-type">String</span> This is a generated field</div>
+      
+      <div class="param">username </div><div class="param-desc"><span class="param-type">String</span> Generated username</div>
+      
+      <div class="param">email </div><div class="param-desc"><span class="param-type">String</span> Generated email</div>
+      
+      <div class="param">password </div><div class="param-desc"><span class="param-type">String</span> Generated password</div>
+      
+      
+    </div>  <!-- field-items -->
+  </div>
+  
+  
+  
+  <div class="model">
+    <h3 class="field-label"><a name="Status">Status</a> <a class="up" href="#__Models">Up</a></h3>
+    <div class="field-items">
+      <div class="param">status </div><div class="param-desc"><span class="param-type">String</span> Request status success or error</div>
+      
+      <div class="param">message </div><div class="param-desc"><span class="param-type">String</span> Status message</div>
+      
+      
+    </div>  <!-- field-items -->
+  </div>
+  
+  
+  
+  <div class="model">
+    <h3 class="field-label"><a name="Error">Error</a> <a class="up" href="#__Models">Up</a></h3>
+    <div class="field-items">
+      <div class="param">code </div><div class="param-desc"><span class="param-type">Integer</span> </div>
+      
+      <div class="param">message </div><div class="param-desc"><span class="param-type">String</span> </div>
+      
+      <div class="param">fields </div><div class="param-desc"><span class="param-type">String</span> </div>
+      
+      
+    </div>  <!-- field-items -->
+  </div>
+  
+  
+  
+  <div class="model">
+    <h3 class="field-label"><a name="Email_to">Email_to</a> <a class="up" href="#__Models">Up</a></h3>
+    <div class="field-items">
+      <div class="param">userId </div><div class="param-desc"><span class="param-type">String</span> Recipient unique identifier</div>
+      
+      
+    </div>  <!-- field-items -->
+  </div>
+  
+  
+  
+  <div class="model">
+    <h3 class="field-label"><a name="Email_cc">Email_cc</a> <a class="up" href="#__Models">Up</a></h3>
+    <div class="field-items">
+      <div class="param">userId </div><div class="param-desc"><span class="param-type">String</span> Carbon copy recipient unique identifier</div>
+      
+      
+    </div>  <!-- field-items -->
+  </div>
+  
+  
+  
+  <div class="model">
+    <h3 class="field-label"><a name="Email_bcc">Email_bcc</a> <a class="up" href="#__Models">Up</a></h3>
+    <div class="field-items">
+      <div class="param">userId </div><div class="param-desc"><span class="param-type">String</span> Blind carbon copy recipient unique identifier</div>
+      
+      
+    </div>  <!-- field-items -->
+  </div>
+  
+  
+  </body>
+</html>
