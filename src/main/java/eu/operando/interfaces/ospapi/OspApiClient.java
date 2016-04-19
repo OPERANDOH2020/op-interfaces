@@ -20,11 +20,11 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.common.reflect.TypeToken;
 
-import eu.operando.OperandoApiModuleClient;
+import eu.operando.ClientOperandoModuleApi;
 
-public class OspApiClient extends OperandoApiModuleClient
+public class OspApiClient extends ClientOperandoModuleApi
 {
-	private String protocolAndHostBigDataAnalytics = "";
+	private String protocolAndHostBigDataAnalytics = ""; //TODO - implement
 	private String protocolAndHostPrivacyForBenefit = "";
 
 	public OspApiClient(String protocolAndHostAuthenticationService, String protocolAndHostReportGenerator, String protocolAndHostLogDb,
@@ -52,10 +52,10 @@ public class OspApiClient extends OperandoApiModuleClient
 		//Turn the JSON into a deal.
 		@SuppressWarnings("serial")
 		Type type = new TypeToken<PfbDeal>(){}.getType();
-		PfbDeal deal = getStringJsonFollowingOperandoConventions(strJson, type);
+		PfbDeal deal = getObjectFromJsonFollowingOperandoConventions(strJson, type);
 		return deal;
 	}
-	public void createPfbDealAcknowldgement(int dealId, int ospId, int offerId, int token)
+	public void createPfbDealAcknowledgement(int dealId, int ospId, int offerId, int token)
 	{
 		//Create a web target for the correct url.
 		WebTarget target = getClient().target(protocolAndHostPrivacyForBenefit);
@@ -77,9 +77,7 @@ public class OspApiClient extends OperandoApiModuleClient
 
 		//Send off a request to the web target with the offer encoded in JSON.
 		Builder requestBuilder = target.request();
-		//Since the names of an offer's variables vary depending on whether we're in Java or in Swagger,
-		//the JSON needs to be created explicitly.
-		requestBuilder.post(Entity.entity(getStringJsonFollowingOperandoConventions(offer), MediaType.TEXT_PLAIN));
+		requestBuilder.post(createEntityStringJsonFromObject(offer));
 	}
 	public void getPfbOffer(int offerId)
 	{
@@ -101,7 +99,7 @@ public class OspApiClient extends OperandoApiModuleClient
 
 		//Send off a request to update the offer.
 		Builder requestBuilder = target.request();
-		requestBuilder.put(Entity.entity(getStringJsonFollowingOperandoConventions(offer), MediaType.APPLICATION_JSON));
+		requestBuilder.put(createEntityStringJsonFromObject(offer));
 	}
 	public void getOspDeals(int ospId)
 	{

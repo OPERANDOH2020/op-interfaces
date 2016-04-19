@@ -13,6 +13,13 @@ package eu.operando.interfaces.ospapi;
 
 import java.util.Date;
 
+/**
+ * A wrapper class for a the offer of a deal by OSPs as part of the privacy for benefit function of OPERANDO.
+ * 
+ * It is used to make the JSON objects that are passed between modules;
+ * it is okay that the fields are unused. 
+ */
+@SuppressWarnings("unused")
 public class PfbOffer
 {
 	private static final Date DATE_START_OF_TIME = new Date(0);
@@ -44,81 +51,4 @@ public class PfbOffer
 	{
 		return id;
 	}
-
-	public void setId(int id)
-	{
-		this.id = id;
-	}
-
-	public int getOspId()
-	{
-		return ospId;
-	}
-
-	public void setOspId(int ospId)
-	{
-		this.ospId = ospId;
-	}
-
-	public String getTitle()
-	{
-		return title;
-	}
-
-	public void setTitle(String title)
-	{
-		this.title = title;
-	}
-
-	public String getDescription()
-	{
-		return description;
-	}
-
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
-
-	public String getServiceWebsite()
-	{
-		return serviceWebsite;
-	}
-
-	public void setServiceWebsite(String serviceWebsite)
-	{
-		this.serviceWebsite = serviceWebsite;
-	}
-
-	public boolean isEnabled()
-	{
-		return isEnabled;
-	}
-
-	public void setEnabled(boolean isEnabled)
-	{
-		this.isEnabled = isEnabled;
-	}
-
-	public String getOspCallbackUrl()
-	{
-		return ospCallbackUrl;
-	}
-
-	public void setOspCallbackUrl(String ospCallbackUrl)
-	{
-		this.ospCallbackUrl = ospCallbackUrl;
-	}
-
-	public Date getExpirationDate()
-	{
-		return expirationDate;
-	}
-
-	public void setExpirationDate(Date expirationDate)
-	{
-		this.expirationDate = expirationDate;
-	}
-	
-	
 }

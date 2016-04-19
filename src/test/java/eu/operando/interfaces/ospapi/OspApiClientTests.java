@@ -31,9 +31,9 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Test;
 
-import eu.operando.OperandoApiModuleClientTests;
+import eu.operando.ClientOperandoModuleApiTests;
 
-public class OspApiClientTests extends OperandoApiModuleClientTests
+public class OspApiClientTests extends ClientOperandoModuleApiTests
 {
 	private OspApiClient client = new OspApiClient(PROTOCOL_AND_HOST, PROTOCOL_AND_HOST,
 			PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST);
@@ -81,7 +81,8 @@ public class OspApiClientTests extends OperandoApiModuleClientTests
 		PfbDeal dealActual = client.getPfbDeal(id);
 		
 		//Verify
-		assertTrue("The client did not correctly interpret the deal JSON", EqualsBuilder.reflectionEquals(dealExpected,dealActual));
+		boolean isDealActualEqualToDealExpected = EqualsBuilder.reflectionEquals(dealExpected,dealActual);
+		assertTrue("The client did not correctly interpret the deal JSON", isDealActualEqualToDealExpected);
 	}
 	@Test
 	public void testCreatePfbDealAcknowledgement_CorrectHttpRequest()
@@ -96,7 +97,7 @@ public class OspApiClientTests extends OperandoApiModuleClientTests
 				.willReturn(aResponse()));
 		
 		//Exercise
-		client.createPfbDealAcknowldgement(dealId, ospId, offerId, token);
+		client.createPfbDealAcknowledgement(dealId, ospId, offerId, token);
 		
 		//Verify
 		getWireMockRule().verify(postRequestedFor(urlPathEqualTo(endpoint))
@@ -183,5 +184,23 @@ public class OspApiClientTests extends OperandoApiModuleClientTests
 	public void testGetReport_TwoOptionalParameters_CorrectHttpRequest()
 	{
 		testGetReport_TwoOptionalParameters_CorrectHttpRequest(client);
+	}
+	
+	/**
+	 * Authentication API
+	 */
+	@Test
+	public void testAuthoriseOsp_CorrectHttpRequest()
+	{
+		testAuthoriseOsp_CorrectHttpRequest(client);
+	}
+	
+	/**
+	 * Log DB
+	 */
+	@Test
+	public void testLogActivity_CorrectHttpRequest()
+	{
+		testLogActivity_CorrectHttpRequest(client);
 	}
 }

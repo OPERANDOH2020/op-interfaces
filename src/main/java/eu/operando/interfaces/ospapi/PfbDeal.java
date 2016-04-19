@@ -13,9 +13,13 @@ package eu.operando.interfaces.ospapi;
 
 import java.util.Date;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
+/**
+ * A wrapper class for the acceptance of a deal offered by OSPs as part of the privacy for benefit function of OPERANDO.
+ * 
+ * It is used to make the JSON objects that are passed between modules;
+ * it is okay that the fields are unused. 
+ */
+@SuppressWarnings("unused")
 public class PfbDeal
 {
 	private static final Date DATE_BEGINNING_OF_TIME = new Date(0);
