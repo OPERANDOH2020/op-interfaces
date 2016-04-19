@@ -11,13 +11,14 @@
  */
 package eu.operando.interfaces.regulatorapi;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Represents the Privacy Regulation object which is passed from the regulator to the
  * OPERANDO platform via the Regulator API.
+ * 
+ * It is used to make the JSON objects that are used in HTTP messaging;
+ * it is okay that the fields are unused. 
  */
-@XmlRootElement
+@SuppressWarnings("unused")
 public class PrivacyRegulation
 {
 	private long regId = -1; //long since API defines it as int64.
@@ -26,72 +27,20 @@ public class PrivacyRegulation
 	private String privateInformationType = "";
 	private String action = "";
 	private String requiredConsent = "";
-	
-	/**
-	 * Zero argument constructor for JAXB.
-	 */
-	public PrivacyRegulation()
-	{
-		
-	}
 
 	public PrivacyRegulation(long regId, String legislationSector, String privateInformationSource, String privateInformationType,
 			String action, String requiredConsent)
 	{
-		this.setRegId(regId);
+		this.regId = regId;
 		this.legislationSector = legislationSector;
 		this.privateInformationSource = privateInformationSource;
 		this.privateInformationType = privateInformationType;
 		this.action = action;
 		this.requiredConsent = requiredConsent;
 	}
-
+	
 	public long getRegId()
 	{
 		return regId;
-	}
-	public void setRegId(long regId)
-	{
-		this.regId = regId;
-	}
-	public String getLegislationSector()
-	{
-		return legislationSector;
-	}
-	public void setLegislationSector(String legislationSector)
-	{
-		this.legislationSector = legislationSector;
-	}
-	public String getPrivateInformationSource()
-	{
-		return privateInformationSource;
-	}
-	public void setPrivateInformationSource(String privateInformationSource)
-	{
-		this.privateInformationSource = privateInformationSource;
-	}
-	public String getPrivateInformationType()
-	{
-		return privateInformationType;
-	}
-	public void setPrivateInformationType(String privateInformationType)
-	{
-		this.privateInformationType = privateInformationType;
-	}
-	public String getAction()
-	{
-		return action;
-	}
-	public void setAction(String action)
-	{
-		this.action = action;
-	}
-	public String getRequiredConsent()
-	{
-		return requiredConsent;
-	}
-	public void setRequiredConsent(String requiredConsent)
-	{
-		this.requiredConsent = requiredConsent;
 	}
 }

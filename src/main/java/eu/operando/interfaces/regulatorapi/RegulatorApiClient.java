@@ -11,13 +11,11 @@
  */
 package eu.operando.interfaces.regulatorapi;
 
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import eu.operando.OperandoApiModuleClient;
+import eu.operando.ClientOperandoModuleApi;
 
 /**
  * This component of the Regulator API handles all requests for information that
@@ -28,7 +26,7 @@ import eu.operando.OperandoApiModuleClient;
  * somewhere else, to an appropriate HTTP request message (using JAX-RS).
  * The response message is converted back to an appropriate object (using JAX-RS).
  */
-public class RegulatorApiClient extends OperandoApiModuleClient
+public class RegulatorApiClient extends ClientOperandoModuleApi
 {
 	private String protocolAndHostPolicyDb = "";
 	private String protocolAndHostPolicyComputation = "";
@@ -52,7 +50,7 @@ public class RegulatorApiClient extends OperandoApiModuleClient
 
 		//Send the request with the regulation encoded as JSON in the body.
 		Builder requestBuilder = target.request();
-		Response response = requestBuilder.post(createEntityStringJsonRegulation(regulation));
+		Response response = requestBuilder.post(createEntityStringJsonFromObject(regulation));
 		return readPrivacyRegulationFromResponse(response);
 	}
 	public PrivacyRegulation updateExistingRegulationOnPolicyDb(PrivacyRegulation regulation)
@@ -64,7 +62,7 @@ public class RegulatorApiClient extends OperandoApiModuleClient
 
 		//Send the request with the regulation encoded as JSON in the body.
 		Builder requestBuilder = target.request();
-		Response response = requestBuilder.put(createEntityStringJsonRegulation(regulation));
+		Response response = requestBuilder.put(createEntityStringJsonFromObject(regulation));
 		return readPrivacyRegulationFromResponse(response);
 	}
 
@@ -89,7 +87,7 @@ public class RegulatorApiClient extends OperandoApiModuleClient
 
 		//Send the request with the regulation encoded as JSON in the body.
 		Builder requestBuilder = target.request();
-		requestBuilder.post(createEntityStringJsonRegulation(regulation));
+		requestBuilder.post(createEntityStringJsonFromObject(regulation));
 	}
 	public void sendExistingRegulationToPolicyComputation(int regulationId, PrivacyRegulation regulation)
 	{
@@ -100,7 +98,7 @@ public class RegulatorApiClient extends OperandoApiModuleClient
 
 		//Send the request with the regulation encoded as JSON in the body.
 		Builder requestBuilder = target.request();
-		requestBuilder.put(createEntityStringJsonRegulation(regulation));
+		requestBuilder.put(createEntityStringJsonFromObject(regulation));
 	}
 	
 	/**
@@ -115,7 +113,7 @@ public class RegulatorApiClient extends OperandoApiModuleClient
 
 		//Send the request with the regulation encoded as JSON in the body.
 		Builder requestBuilder = target.request();
-		requestBuilder.post(createEntityStringJsonRegulation(regulation));
+		requestBuilder.post(createEntityStringJsonFromObject(regulation));
 	}
 	public void sendExistingRegulationToOspEnforcement(int regulationId, PrivacyRegulation regulation)
 	{
@@ -126,16 +124,6 @@ public class RegulatorApiClient extends OperandoApiModuleClient
 
 		//Send the request with the regulation encoded as JSON in the body.
 		Builder requestBuilder = target.request();
-		requestBuilder.put(createEntityStringJsonRegulation(regulation));
-	}
-	
-	/**
-	 * Helper
-	 */
-	private Entity<String> createEntityStringJsonRegulation(PrivacyRegulation regulation)
-	{
-		String jsonRegulation = getStringJsonFollowingOperandoConventions(regulation);
-		Entity<String> entityStringJsonRegulation = Entity.entity(jsonRegulation, MediaType.TEXT_PLAIN);
-		return entityStringJsonRegulation;
+		requestBuilder.put(createEntityStringJsonFromObject(regulation));
 	}
 }

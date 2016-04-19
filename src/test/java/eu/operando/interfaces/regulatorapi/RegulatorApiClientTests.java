@@ -23,9 +23,9 @@ import static org.junit.Assert.assertTrue;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Test;
 
-import eu.operando.OperandoApiModuleClientTests;
+import eu.operando.ClientOperandoModuleApiTests;
 
-public class RegulatorApiClientTests extends OperandoApiModuleClientTests
+public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 {
 	private RegulatorApiClient client = new RegulatorApiClient(PROTOCOL_AND_HOST, PROTOCOL_AND_HOST,
 			PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST);
@@ -214,5 +214,14 @@ public class RegulatorApiClientTests extends OperandoApiModuleClientTests
 	public void testGetReport_TwoOptionalParameters_CorrectHttpRequest()
 	{
 		testGetReport_TwoOptionalParameters_CorrectHttpRequest(client);
+	}
+	
+	/**
+	 * Authentication API
+	 */
+	@Test
+	public void testAuthoriseOsp_CorrectHttpRequest()
+	{
+		testAuthoriseOsp_CorrectHttpRequest(client);
 	}
 }
