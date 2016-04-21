@@ -11,22 +11,12 @@
  */
 package eu.operando.interfaces.ospapi;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.HashMap;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.HttpMethod;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Test;
@@ -37,7 +27,6 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 {
 	private OspApiClient client = new OspApiClient(PROTOCOL_AND_HOST, PROTOCOL_AND_HOST,
 			PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST);
-	
 	/**
 	 * PfB
 	 */
@@ -47,14 +36,13 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		//Set Up
 		int dealId = 1;
 		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_DEALS_VARIABLE_DEAL_ID, dealId);
-		getWireMockRule().stubFor(get(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
+		stub(HttpMethod.GET, endpoint);
 		
 		//Exercise
 		client.getPfbDeal(dealId);
 		
 		//Verify
-		getWireMockRule().verify(getRequestedFor(urlPathEqualTo(endpoint)));
+		verify(HttpMethod.GET, endpoint);
 	}
 	@Test
 	public void testGetPfbDeal_ResponseHandledCorrectly()
@@ -69,13 +57,10 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		Date canceledAt = new Date(0);
 		
 		PfbDeal dealExpected = new PfbDeal(id, userId, offerId, createdAt, canceledAt);
-		String strJson = getStringJsonFollowingOperandoConventions(dealExpected);
+		String strJsonDeal = getStringJsonFollowingOperandoConventions(dealExpected);
 				
 		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_DEALS_VARIABLE_DEAL_ID, id);
-		getWireMockRule().stubFor(get(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()
-						.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-						.withBody(strJson)));
+		stub(HttpMethod.GET, endpoint, strJsonDeal);
 		
 		//Exercise
 		PfbDeal dealActual = client.getPfbDeal(id);
@@ -92,59 +77,48 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		int ospId = 2;
 		int offerId = 3;
 		int token = 4;
-		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_DEALS_VARIABLE_DEAL_ID_ACKNOWLEDGEMENT, dealId);
-		getWireMockRule().stubFor(post(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
 		
 		//Exercise
 		client.createPfbDealAcknowledgement(dealId, ospId, offerId, token);
 		
 		//Verify
-		getWireMockRule().verify(postRequestedFor(urlPathEqualTo(endpoint))
-				.withQueryParam("osp_id", equalTo("" + ospId))
-				.withQueryParam("offer_id", equalTo("" + offerId))
-				.withQueryParam("token", equalTo("" + token))); //TODO - what should the token be?
+		HashMap<String, String> queriesParamToValue = new HashMap<String, String>();
+		queriesParamToValue.put("osp_id", "" + ospId);
+		queriesParamToValue.put("offer_id", "" + offerId);
+		queriesParamToValue.put("token", "" + token); //TODO - what should the token be?
+		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_DEALS_VARIABLE_DEAL_ID_ACKNOWLEDGEMENT, dealId);
+		verifyWithoutBody(HttpMethod.POST, endpoint, queriesParamToValue);
 	}
 	@Test
 	public void testCreateOffer_CorrectHttpRequest()
 	{
-		//Set Up
-		getWireMockRule().stubFor(post(urlPathEqualTo(ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS))
-				.willReturn(aResponse()));
-		
+		//Set Up		
 		PfbOffer offer = new PfbOffer(1, 2, "title", "description", "serviceWebsite", true, "ospCallbackUrl", new Date());
 		
 		//Exercise
 		client.createPfbOffer(offer);
 		
 		//Verify
-		String strJson = getStringJsonFollowingOperandoConventions(offer);
-		getWireMockRule().verify(postRequestedFor(urlPathEqualTo(ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS))
-				.withRequestBody(equalToJson(strJson)));
+		verifyWithoutQueryParams(HttpMethod.POST, ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS, offer);
 	}
 	@Test
 	public void testGetOffer_CorrectHttpRequest()
 	{
 		//Set Up
 		int offerId = 1;
-		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS_VARIABLE_OFFER_ID, offerId);
-		getWireMockRule().stubFor(get(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
 
 		//Exercise
 		client.getPfbOffer(offerId);
 
 		//Verify
-		getWireMockRule().verify(getRequestedFor(urlPathEqualTo(endpoint)));
+		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS_VARIABLE_OFFER_ID, offerId);
+		verify(HttpMethod.GET, endpoint);
 	}
 	@Test
 	public void testUpdateOffer_CorrectHttpRequest()
 	{
 		//Set Up
 		int offerId = 1;
-		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS_VARIABLE_OFFER_ID, offerId);
-		getWireMockRule().stubFor(put(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
 		
 		PfbOffer offer = new PfbOffer(offerId, 2, "title", "description", "serviceWebsite", true, "ospCallbackUrl", new Date());
 		
@@ -152,24 +126,21 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		client.updatePfbOffer(offer);
 		
 		//Verify
-		String strJson = getStringJsonFollowingOperandoConventions(offer);
-		getWireMockRule().verify(putRequestedFor(urlPathEqualTo(endpoint))
-				.withRequestBody(equalToJson(strJson)));
+		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS_VARIABLE_OFFER_ID, offerId);
+		verifyWithoutQueryParams(HttpMethod.PUT, endpoint, offer);
 	}
 	@Test
 	public void testGetOspDeals_CorrectHttpRequest()
 	{
 		//Set Up
 		int ospId = 1;
-		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OSPS_VARIABLE_OSP_ID_DEALS, ospId);
-		getWireMockRule().stubFor(put(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
 
 				//Exercise
 		client.getOspDeals(ospId);
 
 		//Verify
-		getWireMockRule().verify(getRequestedFor(urlPathEqualTo(endpoint)));
+		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OSPS_VARIABLE_OSP_ID_DEALS, ospId);
+		verify(HttpMethod.GET, endpoint);
 	}
 	
 	/**

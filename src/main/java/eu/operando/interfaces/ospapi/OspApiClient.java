@@ -16,7 +16,6 @@ import java.lang.reflect.Type;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 
 import com.google.common.reflect.TypeToken;
 
@@ -67,7 +66,7 @@ public class OspApiClient extends ClientOperandoModuleApi
 
 		Builder requestBuilder = target.request();
 		//This is a pretty horrible workaround to post with an empty body. See https://java.net/jira/browse/JERSEY-2370.
-		requestBuilder.post(Entity.entity(null, "foo/bar"));		
+		requestBuilder.post(Entity.entity(null, "foo/bar"));
 	}
 	public void createPfbOffer(PfbOffer offer)
 	{
