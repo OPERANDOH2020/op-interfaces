@@ -11,14 +11,9 @@
  */
 package eu.operando.interfaces.regulatorapi;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.junit.Assert.assertTrue;
+
+import javax.ws.rs.HttpMethod;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Test;
@@ -38,8 +33,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	{
 		//Set up
 		String endpoint = ENDPOINT_POLICY_DB_REGULATIONS;
-		getWireMockRule().stubFor(post(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
+		stub(HttpMethod.POST, endpoint);
 
 		PrivacyRegulation regulation = new PrivacyRegulation(-1, "sector", "source", "type", "action", "consent");
 
@@ -47,7 +41,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		client.createNewRegulationOnPolicyDb(regulation);
 
 		//Verify
-		verifyPostToEndpointWithBodyJsonForRegulation(endpoint, regulation);
+		verifyWithoutQueryParams(HttpMethod.POST, endpoint, regulation);
 	}
 	@Test
 	public void testCreateNewRegulationOnPolicyDb_ResponseHandledCorrectly()
@@ -56,12 +50,9 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		PrivacyRegulation regulationToPost = new PrivacyRegulation(-1, "sector", "source", "type", "action", "consent");
 		PrivacyRegulation regulationReturnedExpected = new PrivacyRegulation(1, "sector", "source", "type", "action", "consent");
 		String endpoint = ENDPOINT_POLICY_DB_REGULATIONS;
-		String json = getStringJsonFollowingOperandoConventions(regulationReturnedExpected);
-		getWireMockRule().stubFor(post(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()
-						.withBody(json)));
+		String jsonRegulation = getStringJsonFollowingOperandoConventions(regulationReturnedExpected);
+		stub(HttpMethod.POST, endpoint, jsonRegulation);
 
-		
 		//Exercise
 		PrivacyRegulation regulationReturnedActual = client.createNewRegulationOnPolicyDb(regulationToPost);
 
@@ -74,17 +65,16 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	{
 		//Set up
 		int regulationId = 1;
-		String endpoint = String.format(ENDPOINT_POLICY_DB_REGULATIONS_VARIABLE_REG_ID, regulationId);
-		getWireMockRule().stubFor(post(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
-
 		PrivacyRegulation regulation = new PrivacyRegulation(regulationId, "sector", "source", "type", "action", "consent");
+
+		String endpoint = String.format(ENDPOINT_POLICY_DB_REGULATIONS_VARIABLE_REG_ID, regulationId);
+		stub(HttpMethod.PUT, endpoint);
 
 		//Exercise
 		client.updateExistingRegulationOnPolicyDb(regulation);
 
 		//Verify
-		verifyPutToEndpointWithBodyJsonForRegulation(endpoint, regulation);
+		verifyWithoutQueryParams(HttpMethod.PUT, endpoint, regulation);
 	}
 	@Test
 	public void testUpdateExistingRegulationOnPolicyDb_ResponseHandledCorrectly()
@@ -92,13 +82,11 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		//Set up
 		int regulationId = 1;
 		PrivacyRegulation regulationToPut = new PrivacyRegulation(regulationId, "sector", "source", "type", "action", "consent");
-		PrivacyRegulation regulationReturnedExpected = regulationToPut;
+		
 		String endpoint = String.format(ENDPOINT_POLICY_DB_REGULATIONS_VARIABLE_REG_ID, regulationId);
-		String json = getStringJsonFollowingOperandoConventions(regulationReturnedExpected);
-		getWireMockRule().stubFor(put(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()
-						.withBody(json)));
-
+		PrivacyRegulation regulationReturnedExpected = regulationToPut;
+		String jsonRegulation = getStringJsonFollowingOperandoConventions(regulationReturnedExpected);
+		stub(HttpMethod.PUT, endpoint, jsonRegulation);
 
 		//Exercise
 		PrivacyRegulation regulationReturnedActual = client.updateExistingRegulationOnPolicyDb(regulationToPut);
@@ -116,9 +104,6 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	{
 		//Set up
 		int regulationId = 1;
-		String endpoint = String.format(ENDPOINT_POLICY_COMPUTATION_REGULATIONS_VARIABLE_REG_ID, regulationId);
-		getWireMockRule().stubFor(post(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
 		
 		PrivacyRegulation regulation = new PrivacyRegulation(regulationId, "sector", "source", "type", "action", "consent");
 		
@@ -126,24 +111,22 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		client.sendNewRegulationToPolicyComputation(regulation);
 		
 		//Verify
-		verifyPostToEndpointWithBodyJsonForRegulation(endpoint, regulation);
+		String endpoint = String.format(ENDPOINT_POLICY_COMPUTATION_REGULATIONS_VARIABLE_REG_ID, regulationId);
+		verifyWithoutQueryParams(HttpMethod.POST, endpoint, regulation);
 	}
 	@Test
 	public void testSendExistingRegulationToPolicyComputation_CorrectHttpRequest()
 	{
 		//Set up
-		int regulationId = 1;
-		String endpoint = String.format(ENDPOINT_POLICY_COMPUTATION_REGULATIONS_VARIABLE_REG_ID, regulationId);
-		getWireMockRule().stubFor(put(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
-		
+		int regulationId = 1;		
 		PrivacyRegulation regulation = new PrivacyRegulation(regulationId, "sector", "source", "type", "action", "consent");
 		
 		//Exercise
 		client.sendExistingRegulationToPolicyComputation(regulationId, regulation);
 		
 		//Verify
-		verifyPutToEndpointWithBodyJsonForRegulation(endpoint, regulation);
+		String endpoint = String.format(ENDPOINT_POLICY_COMPUTATION_REGULATIONS_VARIABLE_REG_ID, regulationId);
+		verifyWithoutQueryParams(HttpMethod.PUT, endpoint, regulation);
 	}
 	
 	/**
@@ -154,52 +137,28 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	{
 		//Set up
 		int regulationId = 1;
-		String endpoint = String.format(ENDPOINT_OSP_ENFORCEMENT_REGULATIONS_VARIABLE_REG_ID, regulationId);
-		getWireMockRule().stubFor(post(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
-		
+		String endpoint = String.format(ENDPOINT_OSP_ENFORCEMENT_REGULATIONS_VARIABLE_REG_ID, regulationId);		
 		PrivacyRegulation regulation = new PrivacyRegulation(1, "sector", "source", "type", "action", "consent");
 		
 		//Exercise
 		client.sendNewRegulationToOspEnforcement(regulation);
 		
 		//Verify
-		verifyPostToEndpointWithBodyJsonForRegulation(endpoint, regulation);
+		verifyWithoutQueryParams(HttpMethod.POST, endpoint, regulation);
 	}
 	@Test
 	public void testSendExistingRegulationToOspEnforcement_CorrectHttpRequest()
 	{
 		//Set up
 		int regulationId = 1;
-		String endpoint = String.format(ENDPOINT_OSP_ENFORCEMENT_REGULATIONS_VARIABLE_REG_ID, regulationId);
-		getWireMockRule().stubFor(put(urlPathEqualTo(endpoint))
-				.willReturn(aResponse()));
-		
+		String endpoint = String.format(ENDPOINT_OSP_ENFORCEMENT_REGULATIONS_VARIABLE_REG_ID, regulationId);		
 		PrivacyRegulation regulation = new PrivacyRegulation(regulationId, "sector", "source", "type", "action", "consent");
 		
 		//Exercise
 		client.sendExistingRegulationToOspEnforcement(regulationId, regulation);
 		
 		//Verify
-		verifyPutToEndpointWithBodyJsonForRegulation(endpoint, regulation);
-	}
-	
-	/**
-	 * Helpers
-	 */
-	private void verifyPostToEndpointWithBodyJsonForRegulation(String endpoint, PrivacyRegulation regulation)
-	{
-		String jsonRegulation = getStringJsonFollowingOperandoConventions(regulation);
-		
-		getWireMockRule().verify(postRequestedFor(urlPathEqualTo(endpoint))
-				.withRequestBody(equalToJson(jsonRegulation)));
-	}
-	private void verifyPutToEndpointWithBodyJsonForRegulation(String endpoint, PrivacyRegulation regulation)
-	{
-		String jsonRegulation = getStringJsonFollowingOperandoConventions(regulation);
-		
-		getWireMockRule().verify(putRequestedFor(urlPathEqualTo(endpoint))
-				.withRequestBody(equalToJson(jsonRegulation)));
+		verifyWithoutQueryParams(HttpMethod.PUT, endpoint, regulation);
 	}
 	
 	/**

@@ -72,7 +72,7 @@ public class RegulatorApiClient extends ClientOperandoModuleApi
 	private PrivacyRegulation readPrivacyRegulationFromResponse(Response response)
 	{
 		String strJson = response.readEntity(String.class);
-		return getStringJsonFollowingOperandoConventions(strJson, PrivacyRegulation.class);
+		return getObjectFromJsonFollowingOperandoConventions(strJson, PrivacyRegulation.class);
 	}
 	
 	/**
