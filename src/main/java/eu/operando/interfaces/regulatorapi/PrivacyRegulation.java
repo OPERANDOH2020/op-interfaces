@@ -11,6 +11,10 @@
  */
 package eu.operando.interfaces.regulatorapi;
 
+import javax.ws.rs.core.Response;
+
+import eu.operando.ClientOperandoModule;
+
 /**
  * Represents the Privacy Regulation object which is passed from the regulator to the
  * OPERANDO platform via the Regulator API.
@@ -42,5 +46,15 @@ public class PrivacyRegulation
 	public long getRegId()
 	{
 		return regId;
+	}
+
+	/**
+	 * Converts a response which contains a Privacy Regulation encoded in JSON in its body
+	 * to a PrivacyRegulation Java object.
+	 */
+	public static PrivacyRegulation readPrivacyRegulationFromHttpResponse(Response response)
+	{
+		String strJson = response.readEntity(String.class);
+		return ClientOperandoModule.getObjectFromJsonFollowingOperandoConventions(strJson, PrivacyRegulation.class);
 	}
 }

@@ -22,8 +22,8 @@ import eu.operando.ClientOperandoModuleApiTests;
 
 public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 {
-	private RegulatorApiClient client = new RegulatorApiClient(PROTOCOL_AND_HOST, PROTOCOL_AND_HOST,
-			PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST);
+	private RegulatorApiClient client = new RegulatorApiClient(PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST,
+			PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST);
 	
 	/**
 	 * Policy DB

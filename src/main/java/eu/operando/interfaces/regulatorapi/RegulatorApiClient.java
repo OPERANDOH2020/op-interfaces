@@ -31,10 +31,10 @@ public class RegulatorApiClient extends ClientOperandoModuleApi
 	private String protocolAndHostPolicyDb = "";
 	private String protocolAndHostPolicyComputation = "";
 
-	public RegulatorApiClient(String protocolAndHostAuthenticationService, String protocolAndHostOspEnforcement, String protocolAndHostReportGenerator, String protocolAndHostLogDb, 
+	public RegulatorApiClient(String protocolAndHostAuthenticationApi, String protocolAndHostOspEnforcement, String protocolAndHostReportGenerator, String protocolAndHostLogDb, 
 			 String protocolAndHostPolicyDb, String protocolAndHostPolicyComputation)
 	{
-		super(protocolAndHostAuthenticationService, protocolAndHostOspEnforcement, protocolAndHostReportGenerator, protocolAndHostLogDb);
+		super(protocolAndHostAuthenticationApi, protocolAndHostOspEnforcement, protocolAndHostReportGenerator, protocolAndHostLogDb);
 		this.protocolAndHostPolicyDb = protocolAndHostPolicyDb;
 		this.protocolAndHostPolicyComputation = protocolAndHostPolicyComputation;
 	}
@@ -51,7 +51,7 @@ public class RegulatorApiClient extends ClientOperandoModuleApi
 		//Send the request with the regulation encoded as JSON in the body.
 		Builder requestBuilder = target.request();
 		Response response = requestBuilder.post(createEntityStringJsonFromObject(regulation));
-		return readPrivacyRegulationFromResponse(response);
+		return PrivacyRegulation.readPrivacyRegulationFromHttpResponse(response);
 	}
 	public PrivacyRegulation updateExistingRegulationOnPolicyDb(PrivacyRegulation regulation)
 	{
@@ -63,16 +63,7 @@ public class RegulatorApiClient extends ClientOperandoModuleApi
 		//Send the request with the regulation encoded as JSON in the body.
 		Builder requestBuilder = target.request();
 		Response response = requestBuilder.put(createEntityStringJsonFromObject(regulation));
-		return readPrivacyRegulationFromResponse(response);
-	}
-
-	/**
-	 * Helper
-	 */
-	private PrivacyRegulation readPrivacyRegulationFromResponse(Response response)
-	{
-		String strJson = response.readEntity(String.class);
-		return getObjectFromJsonFollowingOperandoConventions(strJson, PrivacyRegulation.class);
+		return PrivacyRegulation.readPrivacyRegulationFromHttpResponse(response);
 	}
 	
 	/**
