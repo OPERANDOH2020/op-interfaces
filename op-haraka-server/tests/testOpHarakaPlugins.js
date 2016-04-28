@@ -84,7 +84,6 @@ function performTests() {
             text: 'Oh my Demigod!'
         };
 
-
         transporter.sendMail(mailOptions, function (err, info) {
             if (err) {
                 console.log(err);
@@ -93,5 +92,6 @@ function performTests() {
             }
         })
     }
+
     test1();
 }
