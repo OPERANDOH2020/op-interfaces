@@ -1,0 +1,16 @@
+Received: from pc167.rms.intern (localhost.localdomain [127.0.0.1])
+	by pc167.rms.intern (Haraka/2.8.0-alpha.9) with ESMTP id A10B6FFC-9D7A-48C8-85AF-E1057434034F.1
+	envelope-from <facebook@facebook.com>;
+	Thu, 28 Apr 2016 11:17:50 +0300
+Content-Type: text/plain
+From: Facebook <facebook@facebook.com>
+To: web_demigod@operando.com
+Subject: Hello
+Message-Id: <1461831470159-72e62fe2-10157a49-8e13bf42@facebook.com>
+X-Mailer: nodemailer (2.3.2; +http://nodemailer.com/;
+ SMTP/2.4.2[client:2.3.2])
+Content-Transfer-Encoding: 7bit
+Date: Thu, 28 Apr 2016 08:17:50 +0000
+MIME-Version: 1.0
+
+Oh my Demigod!
