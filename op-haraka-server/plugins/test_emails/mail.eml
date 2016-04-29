@@ -1,16 +1,12 @@
 Received: from pc167.rms.intern (localhost.localdomain [127.0.0.1])
-	by pc167.rms.intern (Haraka/2.8.0-alpha.9) with ESMTP id C38F106E-1156-4B3E-8F9A-8DAF2E2DFF49.1
-	envelope-from <facebook@facebook.com>;
-	Thu, 28 Apr 2016 17:37:45 +0300
-Content-Type: text/plain
-From: Facebook <facebook@facebook.com>
-To: web_demigod@operando.com
-Subject: Hello
-Message-Id: <1461854265145-845448aa-bef6024b-2e70a5a6@facebook.com>
-X-Mailer: nodemailer (2.3.2; +http://nodemailer.com/;
- SMTP/2.4.2[client:2.3.2])
-Content-Transfer-Encoding: 7bit
-Date: Thu, 28 Apr 2016 14:37:45 +0000
-MIME-Version: 1.0
+	by pc167.rms.intern (Haraka/2.8.0-alpha.9) with ESMTP id 6E70A3AB-608A-4372-B55E-5DED7F90EF4B.1
+	envelope-from <web_demigod@operando.com>;
+	Fri, 29 Apr 2016 14:30:28 +0300
+Date: Fri, 29 Apr 2016 14:30:28 +0300
+To: eyJ1c2VyQWxpYXMiOiJ3ZWJfZGVtaWdvZEBvcGVyYW5kby5jb20iLCJzZW5kZXIiOiI8ZmFjZWJvb2tAZmFjZWJvb2suY29tPiIsImlzQW5BbGlhcyI6dHJ1ZX0=@operando.com
+From: someone@somewhere.com
+Subject: test Fri, 29 Apr 2016 14:30:28 +0300
+X-Mailer: swaks v20130209.0 jetmore.org/john/code/swaks/
 
-Oh my Demigod!
+This is a test mailing
+
