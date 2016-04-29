@@ -1,12 +1,17 @@
 Received: from pc167.rms.intern (localhost.localdomain [127.0.0.1])
-	by pc167.rms.intern (Haraka/2.8.0-alpha.9) with ESMTP id 6E70A3AB-608A-4372-B55E-5DED7F90EF4B.1
+	by pc167.rms.intern (Haraka/2.8.0-alpha.9) with ESMTP id 7399ED85-892B-41E1-91F0-9B668B60A88F.1
 	envelope-from <web_demigod@operando.com>;
-	Fri, 29 Apr 2016 14:30:28 +0300
-Date: Fri, 29 Apr 2016 14:30:28 +0300
-To: eyJ1c2VyQWxpYXMiOiJ3ZWJfZGVtaWdvZEBvcGVyYW5kby5jb20iLCJzZW5kZXIiOiI8ZmFjZWJvb2tAZmFjZWJvb2suY29tPiIsImlzQW5BbGlhcyI6dHJ1ZX0=@operando.com
-From: someone@somewhere.com
-Subject: test Fri, 29 Apr 2016 14:30:28 +0300
-X-Mailer: swaks v20130209.0 jetmore.org/john/code/swaks/
+	Fri, 29 Apr 2016 14:53:03 +0300
+Content-Type: text/plain
+From: refael@operando.com
+To:
+ eyJ1c2VyQWxpYXMiOiJ3ZWJfZGVtaWdvZEBvcGVyYW5kby5jb20iLCJzZW5kZXIiOiI8ZmFjZWJvb2tAZmFjZWJvb2suY29tPiIsImlzQW5BbGlhcyI6dHJ1ZX0=@operando.com
+Subject: Response
+Message-Id: <1461930783375-4081dced-16a02dad-87b3647a@operando.com>
+X-Mailer: nodemailer (2.3.2; +http://nodemailer.com/;
+ SMTP/2.4.2[client:2.3.2])
+Content-Transfer-Encoding: 7bit
+Date: Fri, 29 Apr 2016 11:53:03 +0000
+MIME-Version: 1.0
 
-This is a test mailing
-
+Yes, petty human!

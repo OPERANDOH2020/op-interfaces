@@ -25,7 +25,7 @@ var tests = []
 
 haraka_server.stdout.on("data",function(data){
     data = data.toString();
-    console.log(data);
+    //console.log(data);
 
 
 
@@ -45,7 +45,7 @@ haraka_server.stdout.on("data",function(data){
             //if test passes remove it from the tests
             var passed = runTest(test,data);
             if(passed){
-                console.log("\n\n\nTest ",test," passed\n\n\n")
+                console.log("Test ",test," passed")
             }
             return !passed;
         })
@@ -53,7 +53,7 @@ haraka_server.stdout.on("data",function(data){
 
     function runTest(test,data) {
         if(!test.expectedOutput){
-            console.error("\n\n\nTest",test," does not provide expected output\n\n\n")
+            console.error("Test",test," does not provide expected output")
             return false;
         }
         var passed = data.match(test.expectedOutput);
@@ -84,24 +84,47 @@ function performTests() {
     function test1(){
 
         tests.push({
-            expectedOutput:"User with alias web_demigod@operando.com is rafael@operando.com"
+            expectedOutput:"Forwarding mail to alias web_demigod@operando.com towards rafael@operando.com"
+        })
+        tests.push({
+            expectedOutput:"Add Reply-To eyJ1c2VyQWxpYXMiOiJ3ZWJfZGVtaWdvZEBvcGVyYW5kby5jb20iLCJzZW5kZXIiOiI8ZmFjZWJvb2tAZmFjZWJvb2suY29tPiIsImlzQW5BbGlhcyI6dHJ1ZX0=@operando.com"
         })
 
         var mailOptions = {
             from: ' "Facebook" <facebook@facebook.com>',
             to: 'web_demigod@operando.com',
-            subject: 'Hello',
+            subject: 'Test',
             text: 'Oh my Demigod!'
         };
 
         transporter.sendMail(mailOptions, function (err, info) {
             if (err) {
                 console.log(err);
-            } else {
-                console.log("Message sent:", info.response);
             }
         })
     }
-
     test1();
+    setTimeout(test2,500);
+    function test2(){
+
+        tests.push({
+            expectedOutput:'Intended destination:<facebook@facebook.com>'
+        })
+        tests.push({
+            expectedOutput:'Alias towards that destination:web_demigod@operando.com'
+        })
+
+        var mailOptions = {
+            from: ' "rafael@operando.com',
+            to: 'eyJ1c2VyQWxpYXMiOiJ3ZWJfZGVtaWdvZEBvcGVyYW5kby5jb20iLCJzZW5kZXIiOiI8ZmFjZWJvb2tAZmFjZWJvb2suY29tPiIsImlzQW5BbGlhcyI6dHJ1ZX0=@operando.com',
+            subject: 'Response',
+            text: 'Yes, petty human!'
+        };
+
+        transporter.sendMail(mailOptions, function (err, info) {
+            if (err) {
+                console.log(err);
+            }
+        })
+    }
 }

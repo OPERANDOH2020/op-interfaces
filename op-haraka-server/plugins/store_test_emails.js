@@ -16,7 +16,6 @@ var util = require('util');
 var tempDir = __dirname+"/test_emails";
 
 exports.hook_queue = function(next, connection) {
-    this.loginfo("\n\n\n\n",util.inspect(connection.transaction));
     var ws = fs.createWriteStream(tempDir + '/mail.eml');
     ws.once('close', function () {
         return next(OK);

@@ -47,25 +47,20 @@ function loadAliases(){
 
 exports.register = function(){
     var plugin = this;
-    //plugin.register_hook('rcpt','addReplyToField');
-    //plugin.register_hook('rcpt','forwardToRealUser');
+    plugin.register_hook('rcpt','addReplyToField');
+    plugin.register_hook('rcpt','forwardToRealUser');
     plugin.register_hook('rcpt','deliverToIntendedDestination');
-
 }
 
 exports.deliverToIntendedDestination = function (next, connection, params) {
     //this.loginfo("\n\n\ndeliverToIntendedDestination\n\n\n\n",util.inspect(connection.transaction));
-
     try{
         var maybeIsAliasOfDestination =connection.transaction.rcpt_to[0].user;
         maybeIsAliasOfDestination = new Buffer(maybeIsAliasOfDestination,'base64');
         maybeIsAliasOfDestination = JSON.parse(maybeIsAliasOfDestination);
-        this.loginfo("\n\n\n\nMaybe is an alias\n\n",maybeIsAliasOfDestination);
         if(maybeIsAliasOfDestination['isAnAlias'] === true){
             connection.transaction.rcpt_to.pop();
             connection.transaction.rcpt_to.push(new address(maybeIsAliasOfDestination['sender']));
-
-
             var userAlias = maybeIsAliasOfDestination['userAlias'];
             connection.transaction.mail_from.original = '<'+userAlias+'>';
             connection.transaction.mail_from.user = userAlias.split('@')[0];
@@ -75,6 +70,9 @@ exports.deliverToIntendedDestination = function (next, connection, params) {
                 connection.transaction.results.conn.relaying = true;
             }
 
+            this.loginfo("Intended destination:",maybeIsAliasOfDestination['sender']);
+            this.loginfo("Alias towards that destination:",maybeIsAliasOfDestination['userAlias']);
+
 
             //FOR TESTS SWITCH RECIPIENT HOST TO operando.com because we will not route them just yet
             if(maybeIsAliasOfDestination['sender'].split("@")[1]!=="operando.com"){
@@ -83,48 +81,43 @@ exports.deliverToIntendedDestination = function (next, connection, params) {
                 connection.transaction.rcpt_to.pop();
                 connection.transaction.rcpt_to.push(new address(newRecipient));
             }
-
         }
-        this.loginfo("\n\n\ndeliveredToIntendedDestination\n\n\n\n",util.inspect(connection));
-
         if(connection.transaction.results.conn.relaying === true){
             outbound.send_email(connection.transaction, next);
         }
         next();
     }
     catch(e){
-        this.loginfo(util.inspect(e));
         //the JSON parse thing threw an error...
         next();
     }
 }
 
 exports.addReplyToField = function (next, connection, params) {
-    this.loginfo("\n\n\n\naddReplyToField\n\n\n",util.inspect(connection.transaction));
     var recipientAlias = params[0].user+"@"+params[0].host;
-    if(!aliasToUser[recipientAlias]){
-        next();
+
+    if(aliasToUser[recipientAlias]) {
+        var aliasOfSender = new Buffer(JSON.stringify({
+                'userAlias': recipientAlias,
+                'sender': connection.transaction.mail_from.original,
+                'isAnAlias': true
+            })).toString('base64') + "@operando.com";
+        connection.transaction.header.add("Reply-To", aliasOfSender);
+        this.loginfo("\n\n\n\n\n\n\nAdd Reply-To " + aliasOfSender);
     }
-    var aliasOfSender = new Buffer(JSON.stringify({
-            'userAlias':recipientAlias,
-            'sender':connection.transaction.mail_from.original,
-            'isAnAlias':true
-        })).toString('base64')+"@operando.com";
-    connection.transaction.header.add("Reply-To",aliasOfSender);
     next();
 }
 
 exports.forwardToRealUser = function (next, connection, params) {
-    this.loginfo("\n\n\nforwardToRealUser\n\n\n\n",util.inspect(connection.transaction));
     var recipientAlias = params[0].user+"@"+params[0].host;
-    if(!aliasToUser[recipientAlias]){
-        next();
+
+    if(aliasToUser[recipientAlias]) {
+        var toAddress = aliasToUser[recipientAlias]
+        var userAddress = new address("<" + toAddress + ">");
+        this.loginfo("\n\n\n\n\n\n\nForwarding mail to alias " + recipientAlias + " towards " + toAddress);
+        connection.transaction.rcpt_to.pop();
+        connection.transaction.rcpt_to.push(userAddress);
     }
-    var toAddress   = aliasToUser[recipientAlias]
-    var userAddress = new address("<"+toAddress+">");
-    this.loginfo("\n\n\n\n\n\nForwarding mail to alias "+recipientAlias+" towards "+toAddress);
-    connection.transaction.rcpt_to.pop();
-    connection.transaction.rcpt_to.push(userAddress);
     next();
 }
 
