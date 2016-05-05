@@ -1,0 +1,232 @@
+swagger: '2.0'
+info:
+  title: USER DEVICE ENFORCEMENT API
+  description: User Device Enformcement API
+  version: 0.0.1
+  license:
+    name: MIT
+    url: 'http://opensource.org/licenses/MIT'
+schemes:
+  - https
+  - http
+host: 'localhost:8080'
+produces:
+  - application/json
+paths:
+  /getPrivacySettings:
+    get:
+      summary: Get Privacy Settings
+      description: |
+        The UDE endpoint returns the current privacy settings for all social
+        networks. It is called by Watchdog when it requests to get current
+        settings
+      parameters:
+        - name: user_id
+          in: query
+          description: Unique identifier representing a specific user or service
+          type: string
+          required: true
+          format: uuid
+        - name: osp_list
+          in: body
+          description: OSP_list
+          schema:
+            $ref: '#/definitions/OSP'
+      tags:
+        - PrivacySettings
+        - GET
+        - UDE
+      responses:
+        '200':
+          description: An array of privacy settings
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PrivacySettings'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /applyPrivacySettings:
+    post:
+      summary: Apply Privacy Settings
+      description: Called by OSE when it wants to update user’s settings
+      parameters:
+        - name: user_id
+          in: query
+          description: Unique identifier representing a specific user or service
+          type: string
+          required: true
+          format: uuid
+        - name: osp_id
+          in: query
+          description: OSP unique identifier
+          type: string
+          required: true
+      tags:
+        - PrivacySettings
+        - POST
+        - UDE
+      responses:
+        200:
+          description: Privacy Setting were successfully applied
+          schema:
+            $ref: '#/definitions/Status'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+          
+  /getRequiredSettings:
+    get:
+      summary: Called by watchdog when it requests the settings last applied by OSE
+      parameters:
+        - name: user_id
+          in: query
+          description: Unique identifier representing a specific user
+          type: string
+          required: true
+          format: uuid
+        - name: osp_id
+          in: query
+          description: OSP unique identifier
+          type: string
+          required: true
+      tags:
+        - PrivacySettings
+        - GET 
+        - OSE
+      responses:
+        200:
+          description: An array containing required settings
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PrivacySettings'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /changeDetectedSetting:
+    post:
+      summary: Called by watchdog when it detects change in user’s privacy settings
+      parameters:
+        - name: user_id
+          in: query
+          description: Unique identifier representing a specific user
+          type: string
+          required: true
+          format: uuid
+        - name: osp_id
+          in: query
+          description: OSP unique identifier
+          type: string
+          required: true
+        - name: settings
+          in: body
+          required: true
+          schema: 
+            type: array
+            items: 
+              $ref: '#/definitions/PrivacySettings'
+      tags:
+        - PrivacySettings
+        - POST            
+        - OSE
+      responses:
+        200:
+          description: Current setting were successfully submitted
+          schema:
+            $ref: '#/definitions/Status'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /changeDetectedPolicy:
+    post:
+      summary: Called by watchdog when it detects change in OSP privacy policy(ies)
+      parameters:
+        - name: policies
+          in: body
+          required: true
+          schema: 
+            type: array
+            items: 
+              $ref: '#/definitions/PolicyChange'
+      tags:
+        - PrivacySettings
+        - POST            
+        - OSE
+      responses:
+        200:
+          description: Request successfully sent
+          schema:
+            $ref: '#/definitions/Status'  
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'  
+      
+  
+definitions:
+  PrivacySettings:
+    type: object
+    properties:
+      id:
+        type: string
+        description: PrivacySetting Unique Identifier
+      description:
+        type: string
+        description: Description of the setting
+      name:
+        type: string
+        description: Short name of the setting
+      setting_target:
+        type: string
+        description: Targeted setting key
+      setting_value:
+        type: string
+        description: Targeted setting value
+  OSP:
+    type: object
+    properties:
+      id:
+        type: string
+        description: OSP Unique Identifier
+      description:
+        type: string
+        description: Description of the OSP
+      name:
+        type: string
+        description: Short name of the OSP
+  Status:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Request status success or error
+      message:
+        type: string
+        description: Status message
+  PolicyChange:
+    type: object
+    properties:
+      type: 
+        type: string
+        description : PolycyChange type (e.g. security change)
+      settingsAffected:
+        type: array
+        items:
+            $ref: '#/definitions/PrivacySettings'    
+        description: Settings affected    
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

@@ -1,0 +1,152 @@
+swagger: '2.0'
+info:
+  title: PfB API
+  description: Privacy for Benefits API
+  version: 0.0.1
+  license:
+    name: MIT
+    url: 'http://opensource.org/licenses/MIT'
+schemes:
+  - https
+  - http
+host: 'localhost:8080'
+produces:
+  - application/json
+paths:
+  /getOffers:
+    get:
+      summary: Get website offers
+      description: Extension sends request to PfB service to get a list of offers for the website when signup page is detected
+      parameters:
+        - name: user_id
+          in: query
+          description: Unique identifier representing a specific user from the UDE service
+          type: string
+          required: true
+          format: uuid
+        - name: website
+          in: query
+          description: Website address
+          type: string
+          required: true
+      tags:
+        - PrivacyForBenefits
+        - GET
+      responses:
+        200:
+          description: An array containing all available offers for the requested website
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Offer'
+        500:
+          description: Failed request
+          schema:
+            $ref: '#/definitions/Status'	  
+  /requestOffer:
+    post:
+      description: Triggered by the extension to PfB service to indicate that the user has chosen to accept the offer (i.e. initiated login with Social Network button)
+      tags:
+        - PrivacyForBenefits
+        - POST
+      parameters:
+        - name: user_id
+          in: query
+          description: Unique identifier representing a specific user from the UDE service
+          type: string
+          required: true
+          format: uuid
+        - name: offer_id
+          in: query
+          description: Unique identifier for an offer
+          type: string
+          required: true
+          format: uuid
+      responses:
+        200:
+          description: Successfull request
+          schema:
+            $ref: '#/definitions/Status'
+        500:
+          description: Failed post
+          schema:
+            $ref: '#/definitions/Status'
+  /getPendingDeals:
+    get:
+      description: Extension requests from PfB service the list of all pending deal requests for a user
+      tags:
+        - PrivacyForBenefits
+        - GET
+      parameters:
+        - name: user_id
+          in: query
+          description: Unique identifier representing a specific user from the UDE service
+          type: string
+          required: true
+          format: uuid
+      responses:
+        200:
+          description: A list of offers
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Offer'
+        500:
+          description: Failed request
+          schema:
+            $ref: '#/definitions/Status'	  
+  /getOfferStatus:
+    get:
+      description: Get offer status
+      tags:
+        - PrivacyForBenefits
+        - GET
+      parameters:
+        - name: offer_id
+          in: query
+          description: Unique identifier for an offer
+          type: string
+          required: true
+          format: uuid
+      responses:
+        200:
+          description: 'Get offer status (active | inactive)'
+          schema:
+            $ref: '#/definitions/Status'
+        500:
+          description: Unexpected error
+          schema: 
+            $ref: '#/definitions/Error'
+definitions:
+  Offer:
+    type: object
+    properties:
+      offer_id:
+        type: integer
+        format: int32
+        description: Offer unique identifier
+      title:
+        type: string
+        description: The offer title
+      description:
+        type: string
+        description: The offer description
+  Status:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Request status success or error
+      message:
+        type: string
+        description: Status message
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
