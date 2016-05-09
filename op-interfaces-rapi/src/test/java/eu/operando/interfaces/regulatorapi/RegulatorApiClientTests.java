@@ -41,7 +41,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		client.createNewRegulationOnPolicyDb(regulation);
 
 		//Verify
-		verifyWithoutQueryParams(HttpMethod.POST, endpoint, regulation);
+		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.POST, endpoint, regulation);
 	}
 	@Test
 	public void testCreateNewRegulationOnPolicyDb_ResponseHandledCorrectly()
@@ -50,8 +50,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		PrivacyRegulation regulationToPost = new PrivacyRegulation(-1, "sector", "source", "type", "action", "consent");
 		PrivacyRegulation regulationReturnedExpected = new PrivacyRegulation(1, "sector", "source", "type", "action", "consent");
 		String endpoint = ENDPOINT_POLICY_DB_REGULATIONS;
-		String jsonRegulation = getStringJsonFollowingOperandoConventions(regulationReturnedExpected);
-		stub(HttpMethod.POST, endpoint, jsonRegulation);
+		stub(HttpMethod.POST, endpoint, regulationReturnedExpected);
 
 		//Exercise
 		PrivacyRegulation regulationReturnedActual = client.createNewRegulationOnPolicyDb(regulationToPost);
@@ -74,7 +73,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		client.updateExistingRegulationOnPolicyDb(regulation);
 
 		//Verify
-		verifyWithoutQueryParams(HttpMethod.PUT, endpoint, regulation);
+		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.PUT, endpoint, regulation);
 	}
 	@Test
 	public void testUpdateExistingRegulationOnPolicyDb_ResponseHandledCorrectly()
@@ -85,8 +84,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		
 		String endpoint = String.format(ENDPOINT_POLICY_DB_REGULATIONS_VARIABLE_REG_ID, regulationId);
 		PrivacyRegulation regulationReturnedExpected = regulationToPut;
-		String jsonRegulation = getStringJsonFollowingOperandoConventions(regulationReturnedExpected);
-		stub(HttpMethod.PUT, endpoint, jsonRegulation);
+		stub(HttpMethod.PUT, endpoint, regulationReturnedExpected);
 
 		//Exercise
 		PrivacyRegulation regulationReturnedActual = client.updateExistingRegulationOnPolicyDb(regulationToPut);
@@ -112,7 +110,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		
 		//Verify
 		String endpoint = String.format(ENDPOINT_POLICY_COMPUTATION_REGULATIONS_VARIABLE_REG_ID, regulationId);
-		verifyWithoutQueryParams(HttpMethod.POST, endpoint, regulation);
+		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.POST, endpoint, regulation);
 	}
 	@Test
 	public void testSendExistingRegulationToPolicyComputation_CorrectHttpRequest()
@@ -126,7 +124,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		
 		//Verify
 		String endpoint = String.format(ENDPOINT_POLICY_COMPUTATION_REGULATIONS_VARIABLE_REG_ID, regulationId);
-		verifyWithoutQueryParams(HttpMethod.PUT, endpoint, regulation);
+		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.PUT, endpoint, regulation);
 	}
 	
 	/**
@@ -144,7 +142,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		client.sendNewRegulationToOspEnforcement(regulation);
 		
 		//Verify
-		verifyWithoutQueryParams(HttpMethod.POST, endpoint, regulation);
+		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.POST, endpoint, regulation);
 	}
 	@Test
 	public void testSendExistingRegulationToOspEnforcement_CorrectHttpRequest()
@@ -158,7 +156,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		client.sendExistingRegulationToOspEnforcement(regulationId, regulation);
 		
 		//Verify
-		verifyWithoutQueryParams(HttpMethod.PUT, endpoint, regulation);
+		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.PUT, endpoint, regulation);
 	}
 	
 	/**
@@ -182,5 +180,14 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	public void testAuthoriseOsp_CorrectHttpRequest()
 	{
 		testAuthoriseOsp_CorrectHttpRequest(client);
+	}
+
+	/**
+	 * Log DB
+	 */
+	@Test
+	public void testLogActivity_CorrectHttpRequest()
+	{
+		testLogActivity_CorrectHttpRequest(client);
 	}
 }
