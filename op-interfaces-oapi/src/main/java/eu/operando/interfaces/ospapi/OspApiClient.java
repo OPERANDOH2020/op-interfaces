@@ -11,13 +11,9 @@
  */
 package eu.operando.interfaces.ospapi;
 
-import java.lang.reflect.Type;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
-
-import com.google.common.reflect.TypeToken;
 
 import eu.operando.ClientOperandoModuleApi;
 
@@ -26,16 +22,16 @@ public class OspApiClient extends ClientOperandoModuleApi
 	private String protocolAndHostBigDataAnalytics = ""; //TODO - implement
 	private String protocolAndHostPrivacyForBenefit = "";
 
-	public OspApiClient(String protocolAndHostAuthenticationService, String protocolAndHostReportGenerator, String protocolAndHostLogDb,
+	public OspApiClient(String protocolAndHostAuthenticationApi, String protocolAndHostReportGenerator, String protocolAndHostLogDb,
 			 String protocolAndHostOspEnforcement, String protocolAndHostBigDataAnalytics, String protocolAndHostPrivacyForBenefit)
 	{
-		super(protocolAndHostAuthenticationService, protocolAndHostOspEnforcement, protocolAndHostReportGenerator, protocolAndHostLogDb);
+		super(protocolAndHostAuthenticationApi, protocolAndHostOspEnforcement, protocolAndHostReportGenerator, protocolAndHostLogDb);
 		this.protocolAndHostBigDataAnalytics = protocolAndHostBigDataAnalytics;
 		this.protocolAndHostPrivacyForBenefit = protocolAndHostPrivacyForBenefit;
 	}
 	
 	/**
-	 * PfB
+	 * Privacy for Benefit
 	 */
 	public PfbDeal getPfbDeal(int dealId)
 	{
@@ -49,9 +45,7 @@ public class OspApiClient extends ClientOperandoModuleApi
 		String strJson = requestBuilder.get(String.class);
 		
 		//Turn the JSON into a deal.
-		@SuppressWarnings("serial")
-		Type type = new TypeToken<PfbDeal>(){}.getType();
-		PfbDeal deal = getObjectFromJsonFollowingOperandoConventions(strJson, type);
+		PfbDeal deal = getObjectFromJsonFollowingOperandoConventions(strJson, PfbDeal.class);
 		return deal;
 	}
 	public void createPfbDealAcknowledgement(int dealId, int ospId, int offerId, int token)
@@ -61,8 +55,6 @@ public class OspApiClient extends ClientOperandoModuleApi
 		String path = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_DEALS_VARIABLE_DEAL_ID_ACKNOWLEDGEMENT, dealId);
 		target = target.path(path);
 		target = target.queryParam("osp_id", ospId);
-		target = target.queryParam("offer_id", offerId);
-		target = target.queryParam("token", token);
 
 		Builder requestBuilder = target.request();
 		//This is a pretty horrible workaround to post with an empty body. See https://java.net/jira/browse/JERSEY-2370.
@@ -105,6 +97,21 @@ public class OspApiClient extends ClientOperandoModuleApi
 		//Create a web target for the correct url.
 		WebTarget target = getClient().target(protocolAndHostPrivacyForBenefit);
 		String path = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OSPS_VARIABLE_OSP_ID_DEALS, ospId);
+		target = target.path(path);
+
+		//Send off a request to get the deals.
+		Builder requestBuilder = target.request();
+		requestBuilder.get();
+	}
+	
+	/**
+	 * Big Data Analytics
+	 */
+	public void getBdaReport(int ospId)
+	{
+		//Create a web target for the correct url.
+		WebTarget target = getClient().target(protocolAndHostBigDataAnalytics);
+		String path = String.format(ENDPOINT_BIG_DATA_ANALYTICS_REPORTS_VARIABLE_REPORT_ID, ospId);
 		target = target.path(path);
 
 		//Send off a request to get the deals.

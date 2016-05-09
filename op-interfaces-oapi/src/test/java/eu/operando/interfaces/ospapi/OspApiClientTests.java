@@ -25,10 +25,10 @@ import eu.operando.ClientOperandoModuleApiTests;
 
 public class OspApiClientTests extends ClientOperandoModuleApiTests
 {
-	private OspApiClient client = new OspApiClient(PROTOCOL_AND_HOST, PROTOCOL_AND_HOST,
-			PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST, PROTOCOL_AND_HOST);
+	private OspApiClient client = new OspApiClient(PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST,
+			PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST);
 	/**
-	 * PfB
+	 * Privacy for Benefit
 	 */
 	@Test
 	public void testGetPfbDeal_CorrectHttpRequest()
@@ -37,12 +37,12 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		int dealId = 1;
 		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_DEALS_VARIABLE_DEAL_ID, dealId);
 		stub(HttpMethod.GET, endpoint);
-		
+
 		//Exercise
 		client.getPfbDeal(dealId);
-		
+
 		//Verify
-		verify(HttpMethod.GET, endpoint);
+		verifyCorrectHttpRequest(HttpMethod.GET, endpoint);
 	}
 	@Test
 	public void testGetPfbDeal_ResponseHandledCorrectly()
@@ -55,18 +55,17 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		int offerId = 3;
 		Date createdAt =  new Date(0);
 		Date canceledAt = new Date(0);
-		
+
 		PfbDeal dealExpected = new PfbDeal(id, userId, offerId, createdAt, canceledAt);
-		String strJsonDeal = getStringJsonFollowingOperandoConventions(dealExpected);
-				
+
 		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_DEALS_VARIABLE_DEAL_ID, id);
-		stub(HttpMethod.GET, endpoint, strJsonDeal);
-		
+		stub(HttpMethod.GET, endpoint, dealExpected);
+
 		//Exercise
 		PfbDeal dealActual = client.getPfbDeal(id);
-		
+
 		//Verify
-		boolean isDealActualEqualToDealExpected = EqualsBuilder.reflectionEquals(dealExpected,dealActual);
+		boolean isDealActualEqualToDealExpected = EqualsBuilder.reflectionEquals(dealExpected, dealActual);
 		assertTrue("The client did not correctly interpret the deal JSON", isDealActualEqualToDealExpected);
 	}
 	@Test
@@ -77,29 +76,27 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		int ospId = 2;
 		int offerId = 3;
 		int token = 4;
-		
+
 		//Exercise
 		client.createPfbDealAcknowledgement(dealId, ospId, offerId, token);
-		
+
 		//Verify
 		HashMap<String, String> queriesParamToValue = new HashMap<String, String>();
 		queriesParamToValue.put("osp_id", "" + ospId);
-		queriesParamToValue.put("offer_id", "" + offerId);
-		queriesParamToValue.put("token", "" + token); //TODO - what should the token be?
 		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_DEALS_VARIABLE_DEAL_ID_ACKNOWLEDGEMENT, dealId);
-		verifyWithoutBody(HttpMethod.POST, endpoint, queriesParamToValue);
+		verifyCorrectHttpRequestWithoutBody(HttpMethod.POST, endpoint, queriesParamToValue);
 	}
 	@Test
 	public void testCreateOffer_CorrectHttpRequest()
 	{
 		//Set Up		
 		PfbOffer offer = new PfbOffer(1, 2, "title", "description", "serviceWebsite", true, "ospCallbackUrl", new Date());
-		
+
 		//Exercise
 		client.createPfbOffer(offer);
-		
+
 		//Verify
-		verifyWithoutQueryParams(HttpMethod.POST, ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS, offer);
+		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.POST, ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS, offer);
 	}
 	@Test
 	public void testGetOffer_CorrectHttpRequest()
@@ -112,22 +109,22 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 
 		//Verify
 		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS_VARIABLE_OFFER_ID, offerId);
-		verify(HttpMethod.GET, endpoint);
+		verifyCorrectHttpRequest(HttpMethod.GET, endpoint);
 	}
 	@Test
 	public void testUpdateOffer_CorrectHttpRequest()
 	{
 		//Set Up
 		int offerId = 1;
-		
+
 		PfbOffer offer = new PfbOffer(offerId, 2, "title", "description", "serviceWebsite", true, "ospCallbackUrl", new Date());
-		
+
 		//Exercise
 		client.updatePfbOffer(offer);
-		
+
 		//Verify
 		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS_VARIABLE_OFFER_ID, offerId);
-		verifyWithoutQueryParams(HttpMethod.PUT, endpoint, offer);
+		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.PUT, endpoint, offer);
 	}
 	@Test
 	public void testGetOspDeals_CorrectHttpRequest()
@@ -135,14 +132,31 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		//Set Up
 		int ospId = 1;
 
-				//Exercise
+		//Exercise
 		client.getOspDeals(ospId);
 
 		//Verify
 		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OSPS_VARIABLE_OSP_ID_DEALS, ospId);
-		verify(HttpMethod.GET, endpoint);
+		verifyCorrectHttpRequest(HttpMethod.GET, endpoint);
 	}
-	
+
+	/**
+	 * Big Data Analytics
+	 */
+	@Test
+	public void testGetBdaReport_CorrectHttpRequest()
+	{
+		//Set Up
+		int ospId = 1;
+
+		//Exercise
+		client.getBdaReport(ospId);
+
+		//Verify
+		String endpoint = String.format(ENDPOINT_BIG_DATA_ANALYTICS_REPORTS_VARIABLE_REPORT_ID, ospId);
+		verifyCorrectHttpRequest(HttpMethod.GET, endpoint);
+	}
+
 	/**
 	 * Report Generator
 	 */
@@ -156,7 +170,7 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 	{
 		testGetReport_TwoOptionalParameters_CorrectHttpRequest(client);
 	}
-	
+
 	/**
 	 * Authentication API
 	 */
@@ -165,7 +179,7 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 	{
 		testAuthoriseOsp_CorrectHttpRequest(client);
 	}
-	
+
 	/**
 	 * Log DB
 	 */
