@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This web.xml file is not required when using Servlet 3.0 container,
+     see implementation details http://jersey.java.net/nonav/documentation/latest/jax-rs.html -->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <servlet>
+    <servlet-name>Jersey Web Application</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>eu.operando.pdr.gatekeeper</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Jersey Web Application</servlet-name>
+    <url-pattern>/gatekeeper/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>Toy</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>toyexamples</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Toy</servlet-name>
+    <url-pattern>/toy-examples/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>AuthenticationService</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>eu.operando.server.authenticationservice</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AuthenticationService</servlet-name>
+    <url-pattern>/authentication-service/*</url-pattern>
+  </servlet-mapping>
+</web-app>
+<!--
+<context-param>
+    <param-name>HostAuthenticationService</param-name>
+    <param-value>localhost:8080</param-value>
+  </context-param>
+  <context-param>
+    <param-name>HostRightsManagement</param-name>
+    <param-value>localhost:8080</param-value>
+  </context-param>
+  <context-param>
+    <param-name>HostDataAccessNode</param-name>
+    <param-value>localhost:8080</param-value>
+  </context-param>
+  <context-param>
+    <param-name>HostLogDb</param-name>
+    <param-value>localhost:8080</param-value>
+  </context-param> 
+-->
+<!--
+
+
+	
+  <servlet>
+    <servlet-name>AuthenticationService</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>eu.operando.server.authenticationservice</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AuthenticationService</servlet-name>
+    <url-pattern>/authentication-service/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>RightsManagement</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>eu.operando.server.rightsmanagement</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RightsManagement</servlet-name>
+    <url-pattern>/rights-management/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>DataAccessNode</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>eu.operando.server.dataaccessnode</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DataAccessNode</servlet-name>
+    <url-pattern>/data-access-node/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>LogDb</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>eu.operando.server.logdb</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LogDb</servlet-name>
+    <url-pattern>/log-db/*</url-pattern>
+  </servlet-mapping>
+-->
