@@ -1,0 +1,221 @@
+# OPERANDO YAML Based on Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping (which use to be a nightmare).
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "0.0.1"
+  title: eu.operando.interfaces.aapi
+  description: Operando's AS interfaces
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+host: localhost:8080
+schemes:
+- http
+basePath: /operando/interfaces/authentication
+produces:
+- application/json
+# Describe your paths here
+paths:
+  # TicketCtrl.
+  /tickets:
+    # This is a HTTP operation
+    post:
+      # Describe this verb here. Note: you can use markdown
+      description:   
+         Login to AS and issue a session ticket (tgt)
+      parameters:
+        -
+          name: userCredentials 
+          in: body
+          description: user's username,password
+          schema:
+            $ref: "#/definitions/UserCredentials"
+          required: true
+      responses:
+        # Response code
+        "201":
+          description: ticket granting ticket (TGT) created
+          schema:
+            Type: string
+        "500":
+          description: Internal Server Error #TODO: Error msg definition is needed
+  /tickets/{TGT}:
+    # This is a HTTP operation
+    post:
+      # Describe this verb here. Note: you can use markdown
+      description:   
+         Request a service ticket (ST) for the service with id serviceId
+      parameters:
+        -
+          name: TGT 
+          in: path
+          description: user's session ticket (TGT)
+          schema:
+            type: string
+          required: true
+        -
+          name: serviceId 
+          in: body
+          description: Service's ID
+          schema:
+            type: string
+          required: true          
+      responses:
+        # Response code
+        "201":
+          description: service ticket (ST) created
+          schema:
+            Type: string
+        "500":
+          description: Internal Server Error #TODO: Error msg definition is needed
+  /tickets/{ST}/validate:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description:   
+         Validate the service ticket (ST)
+      parameters:
+      -
+        name: ST 
+        in: path
+        description: service ticket (ST)
+        required: true
+        schema:
+          type: string
+      responses:
+        # Response code
+        "200":
+          description: service ticket (ST) is valid
+        "400":
+          description: service ticket (ST) is invalid          
+        "500":
+          description: Internal Server Error #TODO: Error msg definition is needed
+  # UserCtrl.
+  /user/register:
+    # This is a HTTP operation
+    post:
+      # Describe this verb here. Note: you can use markdown
+      description:   
+         This operation registers a user to AS.
+      parameters:
+      -
+        name: user 
+        in: body
+        description: User description
+        required: true
+        schema:
+          $ref: "#/definitions/User"        
+      responses:
+        # Response code
+        "201":
+          description: User created
+          schema:
+            $ref: "#/definitions/User"
+        "500":
+          description: Internal Server Error #TODO: Error msg definition is needed
+  /user/{username}:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description:   
+         Returns AS's registed user with corresponding username
+      parameters:
+        -
+          name: username 
+          in: path
+          description: User's username
+          required: true
+          type: string
+      responses:
+        # Response code
+        "200":
+          description: User created
+          schema:
+            $ref: "#/definitions/User"
+        "500":
+          description: Internal Server Error #TODO: Error msg definition is needed
+    put:
+      # Describe this verb here. Note: you can use markdown
+      description:   
+         Updates the content of AS's registed user with corresponding username
+      parameters:
+        -
+          name: username 
+          in: path
+          description: User's username
+          required: true
+          type: string
+        -
+          name: user 
+          in: body
+          description: user's description
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        # Response code
+        "202":
+          description: user updated
+          schema:
+            $ref: "#/definitions/User"
+        "500":
+          description: Internal Server Error #TODO: Error msg definition is needed
+    delete:
+      # Describe this verb here. Note: you can use markdown
+      description:   
+         Delete AS's registed user with corresponding username
+      parameters:
+        -
+          name: username 
+          in: path
+          description: User's username
+          required: true
+          type: string
+        
+      responses:
+        # Response code
+        "202":
+          description: user deleted
+          schema:
+            $ref: "#/definitions/User"
+        "500":
+          description: Internal Server Error #TODO: Error msg definition is needed
+          
+definitions:
+  User:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+      required_attrs:
+        type: object
+        items:
+          $ref: "#/definitions/Attribute"
+      optional_attrs:
+        type: object
+        items:
+          $ref: "#/definitions/Attribute"
+      privacy_settings:
+        type: object
+        items:
+          $ref: "#/definitions/Attribute"
+  Attribute:
+    type: object
+    properties:
+      attr_name:
+        type: string
+      attr_value:
+        type: string
+  UserCredentials:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+        
