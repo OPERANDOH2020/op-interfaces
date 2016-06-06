@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *  # Copyright (c) 2016 {UPRC}.
  *  # All rights reserved. This program and the accompanying materials
  *  # are made available under the terms of the The MIT License (MIT).
@@ -57,7 +57,7 @@ import io.swagger.annotations.ApiResponses;
 public class TicketController {
 	
 	private static String SSO_MSG_TEMPLATE = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\"><html><head><title>201 Created</title></head><body>TGT:$TGT$</body></html>";
-	private static final String CAS_HOSTNAME = "snf-701265.vm.okeanos.grnet.gr";
+	private static final String CAS_HOSTNAME = "snf-706921.vm.okeanos.grnet.gr";
 
 	CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -104,7 +104,7 @@ public class TicketController {
 		HttpPost httpPost=null;
 		CloseableHttpResponse response=null;
 		try{		
-			httpPost = new HttpPost("https://" + CAS_HOSTNAME + ":8443/casv415/v1/tickets");
+                       httpPost = new HttpPost("https://" + CAS_HOSTNAME + ":8443/casv415/v1/tickets");
 
 			List <NameValuePair> nvps = new ArrayList <NameValuePair>();
 			nvps.add(new BasicNameValuePair("username", userCredential.getUsername()));

@@ -29,14 +29,23 @@ import io.swagger.annotations.ApiOperation;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.naming.Context;
+import javax.naming.NamingEnumeration;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
 
 @RestController
 @RequestMapping(value = "/aapi/user")
@@ -66,8 +75,19 @@ public class UserController {
 	@RequestMapping(value="/{username}", method = RequestMethod.GET)
 	@ApiOperation(value = "getUser", notes = "This operation returns the OPERANDO's registed user with given username")
 	public ResponseEntity<User> getUser(@PathVariable("username") String username) throws UserException {
-
-		return new ResponseEntity<User>(new User(), HttpStatus.OK);
+            User currentUser = new User();
+            try {
+                currentUser = getUserFromLdap(username, getSearchControls());
+            } catch (IOException ex) {
+                System.out.println("Error");
+            }
+            
+            if(currentUser!=null){
+                return new ResponseEntity<User>(currentUser, HttpStatus.OK);
+            }else{
+                return new ResponseEntity<User>(currentUser, HttpStatus.NOT_FOUND);
+            }
+		
 	}
 
 	@RequestMapping(value="/{username}", method = RequestMethod.PUT)
@@ -175,5 +195,122 @@ public class UserController {
                 
             }
             return requiredAttributesAsString;
+        }
+        
+         
+        
+        //
+        private User getUserFromLdap(String username, SearchControls searchControls) throws IOException{
+            InputStream inputStream = null;
+            User currentUser = new User();
+            try {
+                //Get the properties file with the ldap connection info
+                Properties prop = new Properties();
+                String propFileName = "my.properties";
+
+                inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+
+                if (inputStream != null) {
+                        prop.load(inputStream);
+                } else {
+                        throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
+                }
+                        
+                
+                //Make the connection with LDAP
+                Hashtable env = new Hashtable();
+                env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
+                //LDAP URL
+                env.put(Context.PROVIDER_URL, prop.getProperty("ldap.URL"));
+                //Type of Authentication
+                env.put(Context.SECURITY_AUTHENTICATION,"simple");
+                //admin username
+                env.put(Context.SECURITY_PRINCIPAL,prop.getProperty("ldap.username")); // specify the username
+                //admin psw - TO BE FIXED - in config file
+                env.put(Context.SECURITY_CREDENTIALS,prop.getProperty("ldap.password"));           // specify the password
+                //init the connection
+                
+                env.put(Context.REFERRAL, "follow");
+                
+                LdapContext ctx = new InitialLdapContext(env, null);
+                
+               
+                NamingEnumeration<SearchResult> answer = ctx.search("dc=nodomain", "cn=" + username, searchControls);
+                if (answer.hasMore()) {
+                    Attributes attrs = answer.next().getAttributes();
+                    
+                    List<Attribute> myOptionalAttrsList = new ArrayList();
+                    String optAsString = attrs.get("departmentNumber").toString();
+                    String[] optionalRows = optAsString.split(";;");
+                    for(int i=0; i<optionalRows.length;i++){
+                        String[] optAttrParts = optionalRows[i].split("::");
+                        Attribute optAttr = new Attribute();
+                        optAttr.setAttrName(optAttrParts[0].split(":")[1].trim());
+                        optAttr.setAttrValue(optAttrParts[1]);
+                        myOptionalAttrsList.add(optAttr);
+                    }
+                   
+                    Attribute[] myOptionalAttrsArr = new Attribute[myOptionalAttrsList.size()];
+                    myOptionalAttrsArr = myOptionalAttrsList.toArray(myOptionalAttrsArr);
+                    currentUser.setOptionalAttrs(myOptionalAttrsArr);
+                    
+                    List<PrivacySetting> myPrivAttrsList = new ArrayList();
+                    String privAsString = attrs.get("employeeNumber").toString();
+                    String[] privRows = privAsString.split(";;");
+                    for(int i=0; i<privRows.length;i++){
+                        String[] privAttrParts = privRows[i].split("::");
+                        PrivacySetting privAttr = new PrivacySetting();
+                        privAttr.setSettingName(privAttrParts[0].split(":")[1].trim());
+                        privAttr.setSettingValue(privAttrParts[1]);
+                        myPrivAttrsList.add(privAttr);
+                    }
+                   
+                    PrivacySetting[] myPrivAttrsArr = new PrivacySetting[myPrivAttrsList.size()];
+                    myPrivAttrsArr = myPrivAttrsList.toArray(myPrivAttrsArr);
+                    currentUser.setPrivacySettings(myPrivAttrsArr);
+                    
+                    
+                    List<Attribute> myReqAttrsList = new ArrayList();
+                    String reqAsString = attrs.get("employeeType").toString();
+                    String[] reqRows = reqAsString.split(";;");
+                    for(int i=0; i<reqRows.length;i++){
+                        String[] reqAttrParts = reqRows[i].split("::");
+                        Attribute reqAttr = new Attribute();
+                        reqAttr.setAttrName(reqAttrParts[0].split(":")[1].trim());
+                        reqAttr.setAttrValue(reqAttrParts[1]);
+                        myReqAttrsList.add(reqAttr);
+                    }
+                   
+                    Attribute[] myReqAttrsArr = new Attribute[myReqAttrsList.size()];
+                    myReqAttrsArr = myReqAttrsList.toArray(myReqAttrsArr);
+                    currentUser.setRequiredAttrs(myReqAttrsArr);
+                   
+                   
+
+                } else {
+                    System.out.println("user not found.");
+                     return null;
+                }
+                        
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+                
+            }finally{
+                inputStream.close();
+            }
+            
+            currentUser.setUsername(username);
+            currentUser.setPassword("******");
+            return currentUser;
+        }
+        
+        private SearchControls getSearchControls() {
+            SearchControls cons = new SearchControls();
+            cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
+            String[] attrIDs = {"departmentNumber", "employeeNumber", "employeeType"};
+            cons.setReturningAttributes(attrIDs);
+            return cons;
         }
 }
