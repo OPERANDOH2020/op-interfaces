@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  *  # Copyright (c) 2016 {UPRC}.
  *  # All rights reserved. This program and the accompanying materials
  *  # are made available under the terms of the The MIT License (MIT).
