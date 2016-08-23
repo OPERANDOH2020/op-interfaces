@@ -43,7 +43,7 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 	public Response regulationsPost(RegulationBody regulationBody)
 	{
 		// The status code to return to the caller.
-		int statusCode = -1;
+		Status statusCode = null;
 
 		// Check that the caller is authenticated with the platform.
 		String serviceTicket = regulationBody.getServiceTicket();
@@ -75,25 +75,25 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 				if (successfulRequestToPc && successfulRequestToOse)
 				{
 					// Let regulator know that all modules have been informed.
-					statusCode = Status.ACCEPTED.getStatusCode();
+					statusCode = Status.ACCEPTED;
 				}
 				else
 				{
 					// Let regulator know that the service is currently unavailable, but may be made available soon.
-					statusCode = Status.SERVICE_UNAVAILABLE.getStatusCode();
+					statusCode = Status.SERVICE_UNAVAILABLE;
 				}
 
 			}
 			else
 			{
 				// Let regulator know that the service is currently unavailable, but may be made available soon.
-				statusCode = Status.SERVICE_UNAVAILABLE.getStatusCode(); 
+				statusCode = Status.SERVICE_UNAVAILABLE; 
 			}
 		}
 		else
 		{
 			// Let regulator know that they are currently not authorised with the PSP.
-			statusCode = Status.UNAUTHORIZED.getStatusCode();
+			statusCode = Status.UNAUTHORIZED;
 		}
 
 		// Return the response.

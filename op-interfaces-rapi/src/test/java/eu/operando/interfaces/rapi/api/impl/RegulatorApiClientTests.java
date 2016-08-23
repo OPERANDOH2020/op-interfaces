@@ -59,7 +59,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		PrivacyRegulationInput regulationToPost =
 				new PrivacyRegulationInput("sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
 		String endpoint = ENDPOINT_POLICY_DB_REGULATIONS;
-		stub(HttpMethod.POST, endpoint, "", Status.INTERNAL_SERVER_ERROR.getStatusCode());
+		stub(HttpMethod.POST, endpoint, "", Status.INTERNAL_SERVER_ERROR);
 		
 		// Exercise
 		client.createNewRegulationOnPolicyDb(regulationToPost);
@@ -145,7 +145,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	{
 		// Set up
 		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		stub(HttpMethod.POST, ENDPOINT_POLICY_COMPUTATION_REGULATIONS, "", Status.NOT_FOUND.getStatusCode());
+		stub(HttpMethod.POST, ENDPOINT_POLICY_COMPUTATION_REGULATIONS, "", Status.NOT_FOUND);
 
 		// Exercise
 		boolean success = client.sendNewRegulationToPolicyComputation(regulation);
@@ -159,7 +159,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	{
 		// Set up
 		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		stub(HttpMethod.POST, ENDPOINT_POLICY_COMPUTATION_REGULATIONS, "", Status.ACCEPTED.getStatusCode());
+		stub(HttpMethod.POST, ENDPOINT_POLICY_COMPUTATION_REGULATIONS, "", Status.ACCEPTED);
 
 		// Exercise
 		boolean success = client.sendNewRegulationToPolicyComputation(regulation);
@@ -207,7 +207,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	{
 		// Set up
 		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		stub(HttpMethod.POST, ENDPOINT_OSP_ENFORCEMENT_REGULATIONS, "", Status.NOT_FOUND.getStatusCode());
+		stub(HttpMethod.POST, ENDPOINT_OSP_ENFORCEMENT_REGULATIONS, "", Status.NOT_FOUND);
 
 		// Exercise
 		boolean success = client.sendNewRegulationToOspEnforcement(regulation);
@@ -221,7 +221,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	{
 		// Set up
 		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		stub(HttpMethod.POST, ENDPOINT_OSP_ENFORCEMENT_REGULATIONS, "", Status.ACCEPTED.getStatusCode());
+		stub(HttpMethod.POST, ENDPOINT_OSP_ENFORCEMENT_REGULATIONS, "", Status.ACCEPTED);
 
 		// Exercise
 		boolean success = client.sendNewRegulationToOspEnforcement(regulation);
