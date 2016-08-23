@@ -4,14 +4,13 @@ import java.util.Objects;
 
 import javax.ws.rs.core.Response;
 
-import org.apache.http.HttpStatus;
+import org.apache.http.HttpException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import eu.operando.ClientOperandoModule;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.http.HttpException;
 
 /**
  * A privacy rule that reflects a given privacy legislation as described by a
