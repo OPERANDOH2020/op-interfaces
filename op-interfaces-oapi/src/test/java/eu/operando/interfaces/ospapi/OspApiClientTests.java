@@ -25,8 +25,8 @@ import eu.operando.ClientOperandoModuleApiTests;
 
 public class OspApiClientTests extends ClientOperandoModuleApiTests
 {
-	private OspApiClient client = new OspApiClient(PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST,
-			PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST, PROTOCOL_AND_HOST_HTTP_LOCALHOST);
+	private OspApiClient client = new OspApiClient(ORIGIN_WIREMOCK, ORIGIN_WIREMOCK,
+			ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK);
 	/**
 	 * Privacy for Benefit
 	 */
@@ -74,11 +74,10 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		//Set Up
 		int dealId = 1;
 		int ospId = 2;
-		int offerId = 3;
-		int token = 4;
+		int token = 2;
 
 		//Exercise
-		client.createPfbDealAcknowledgement(dealId, ospId, offerId, token);
+		client.createPfbDealAcknowledgement(dealId, ospId, token);
 
 		//Verify
 		HashMap<String, String> queriesParamToValue = new HashMap<String, String>();
@@ -96,7 +95,7 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 		client.createPfbOffer(offer);
 
 		//Verify
-		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.POST, ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS, offer);
+		verifyCorrectHttpRequestNoQueryParams(HttpMethod.POST, ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS, offer);
 	}
 	@Test
 	public void testGetOffer_CorrectHttpRequest()
@@ -124,7 +123,7 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 
 		//Verify
 		String endpoint = String.format(ENDPOINT_PRIVACY_FOR_BENEFIT_OFFERS_VARIABLE_OFFER_ID, offerId);
-		verifyCorrectHttpRequestWithoutQueryParams(HttpMethod.PUT, endpoint, offer);
+		verifyCorrectHttpRequestNoQueryParams(HttpMethod.PUT, endpoint, offer);
 	}
 	@Test
 	public void testGetOspDeals_CorrectHttpRequest()
@@ -177,7 +176,7 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 	@Test
 	public void testAuthoriseOsp_CorrectHttpRequest()
 	{
-		testAuthoriseOsp_CorrectHttpRequest(client);
+		testIsOspAuthenticated_CorrectHttpRequest(client);
 	}
 
 	/**
