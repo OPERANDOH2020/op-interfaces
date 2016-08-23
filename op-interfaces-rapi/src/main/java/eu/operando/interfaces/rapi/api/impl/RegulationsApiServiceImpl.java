@@ -4,7 +4,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.http.HttpException;
-import org.apache.http.HttpStatus;
+import javax.ws.rs.core.Response.Status;
 
 import eu.operando.Utils;
 import eu.operando.interfaces.rapi.api.ApiResponseMessage;
@@ -75,25 +75,25 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 				if (successfulRequestToPc && successfulRequestToOse)
 				{
 					// Let regulator know that all modules have been informed.
-					statusCode = HttpStatus.SC_ACCEPTED;
+					statusCode = Status.ACCEPTED.getStatusCode();
 				}
 				else
 				{
 					// Let regulator know that the service is currently unavailable, but may be made available soon.
-					statusCode = HttpStatus.SC_SERVICE_UNAVAILABLE;
+					statusCode = Status.SERVICE_UNAVAILABLE.getStatusCode();
 				}
 
 			}
 			else
 			{
 				// Let regulator know that the service is currently unavailable, but may be made available soon.
-				statusCode = HttpStatus.SC_SERVICE_UNAVAILABLE; 
+				statusCode = Status.SERVICE_UNAVAILABLE.getStatusCode(); 
 			}
 		}
 		else
 		{
 			// Let regulator know that they are currently not authorised with the PSP.
-			statusCode = HttpStatus.SC_UNAUTHORIZED;
+			statusCode = Status.UNAUTHORIZED.getStatusCode();
 		}
 
 		// Return the response.

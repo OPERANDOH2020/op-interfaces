@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpException;
-import org.apache.http.HttpStatus;
+import javax.ws.rs.core.Response.Status;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -55,7 +55,7 @@ public class RegulationsApiServiceImplTests
 
 		// Verify
 		int statusCodeResponse = responseToRegulator.getStatus();
-		assertEquals("If the OSP is not authenticated, the RAPI should return an unauthorised code.", HttpStatus.SC_UNAUTHORIZED, statusCodeResponse);
+		assertEquals("If the OSP is not authenticated, the RAPI should return an unauthorised code.", Status.UNAUTHORIZED.getStatusCode(), statusCodeResponse);
 	}
 
 	@Test
@@ -96,7 +96,7 @@ public class RegulationsApiServiceImplTests
 		int statusCodeResponse = responseToRegulator.getStatus();
 
 		// Verify
-		assertEquals("When posting to the PDB is unsuccessful, an unavailable status should be set on the response.", HttpStatus.SC_SERVICE_UNAVAILABLE, statusCodeResponse);
+		assertEquals("When posting to the PDB is unsuccessful, an unavailable status should be set on the response.", Status.SERVICE_UNAVAILABLE.getStatusCode(), statusCodeResponse);
 	}
 
 	@Test
@@ -125,7 +125,7 @@ public class RegulationsApiServiceImplTests
 
 		// Verify
 		int status = response.getStatus();
-		assertEquals("When neither PC nor OSE returns a success code, the RAPI should return an unavailable status code.", HttpStatus.SC_SERVICE_UNAVAILABLE, status);
+		assertEquals("When neither PC nor OSE returns a success code, the RAPI should return an unavailable status code.", Status.SERVICE_UNAVAILABLE.getStatusCode(), status);
 	}
 	
 	@Test
@@ -139,7 +139,7 @@ public class RegulationsApiServiceImplTests
 
 		// Verify
 		int status = response.getStatus();
-		assertEquals("When the PC does not return a success code, the RAPI should return an unavailable status code.", HttpStatus.SC_SERVICE_UNAVAILABLE, status);
+		assertEquals("When the PC does not return a success code, the RAPI should return an unavailable status code.", Status.SERVICE_UNAVAILABLE.getStatusCode(), status);
 	}
 
 	@Test
@@ -153,7 +153,7 @@ public class RegulationsApiServiceImplTests
 
 		// Verify
 		int status = response.getStatus();
-		assertEquals("When the OSE does not return a success code, the RAPI should return an unavailable status code.", HttpStatus.SC_SERVICE_UNAVAILABLE, status);
+		assertEquals("When the OSE does not return a success code, the RAPI should return an unavailable status code.", Status.SERVICE_UNAVAILABLE.getStatusCode(), status);
 	}
 	
 	@Test
@@ -167,7 +167,7 @@ public class RegulationsApiServiceImplTests
 
 		// Verify
 		int status = response.getStatus();
-		assertEquals("When all modules return success codes, the RAPI should return an accepted status code.", HttpStatus.SC_ACCEPTED, status);
+		assertEquals("When all modules return success codes, the RAPI should return an accepted status code.", Status.ACCEPTED.getStatusCode(), status);
 	}
 	
 	private void setUpResponsesFromOtherModulesNewRegulation(boolean ospAuthenticated, boolean pdbSuccessful, boolean successFromPc, boolean successFromOse) throws HttpException

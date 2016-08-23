@@ -16,7 +16,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpException;
-import org.apache.http.HttpStatus;
+import javax.ws.rs.core.Response.Status;
 
 import eu.operando.ClientOperandoModuleApi;
 import eu.operando.interfaces.rapi.model.PrivacyRegulation;
@@ -58,7 +58,7 @@ public class RegulatorApiClient extends ClientOperandoModuleApi
 		Response response = requestBuilder.post(createEntityStringJsonFromObject(privacyReulationInput));
 		
 		// Only try to interpret the response if the status code is a success code.
-		if (response.getStatus() != HttpStatus.SC_OK)
+		if (response.getStatus() != Status.OK.getStatusCode())
 		{
 			throw new HttpException();
 		}
@@ -99,7 +99,7 @@ public class RegulatorApiClient extends ClientOperandoModuleApi
 		
 		// Return a boolean to indicate whether the request was successful.
 		int statusCodeFromPc = responseFromPc.getStatus();
-		boolean requestWasSuccessful = statusCodeFromPc == HttpStatus.SC_ACCEPTED;
+		boolean requestWasSuccessful = statusCodeFromPc == Status.ACCEPTED.getStatusCode();
 		return requestWasSuccessful;
 	}
 
@@ -135,7 +135,7 @@ public class RegulatorApiClient extends ClientOperandoModuleApi
 		
 		// Return a boolean to indicate whether the request was successful.
 		int statusCodeFromOse = responseFromOse.getStatus();
-		boolean requestWasSuccessful = statusCodeFromOse == HttpStatus.SC_ACCEPTED;
+		boolean requestWasSuccessful = statusCodeFromOse == Status.ACCEPTED.getStatusCode();
 		return requestWasSuccessful;
 	}
 
