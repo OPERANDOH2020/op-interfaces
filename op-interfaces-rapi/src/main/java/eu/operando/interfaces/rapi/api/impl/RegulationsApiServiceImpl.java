@@ -1,14 +1,11 @@
 package eu.operando.interfaces.rapi.api.impl;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-
-import org.apache.http.HttpException;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.HttpException;
+
 import eu.operando.Utils;
-import eu.operando.interfaces.rapi.api.ApiResponseMessage;
-import eu.operando.interfaces.rapi.api.NotFoundException;
 import eu.operando.interfaces.rapi.api.RegulationsApiService;
 import eu.operando.interfaces.rapi.model.PrivacyRegulation;
 import eu.operando.interfaces.rapi.model.PrivacyRegulationInput;
@@ -42,8 +39,28 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 	@Override
 	public Response regulationsPost(RegulationBody regulationBody)
 	{
-		// The status code to return to the caller.
-		Status statusCode = null;
+		return checkAuthenticationThenForwardRegulation(regulationBody, null);
+	}
+
+	@Override
+	public Response regulationsRegIdPut(RegulationBody regulationBody, String regId)
+	{
+		return checkAuthenticationThenForwardRegulation(regulationBody, regId);
+	}
+
+	/**
+	 * Verifies that the caller is authenticated, then checks sends the regulation to the relevant modules.
+	 * 
+	 * @param regulationBody
+	 *            The body of the incoming HTTP request.
+	 * @param regId
+	 *            The ID of the incoming regulation. Should be null if the regulation does not yet have an ID (e.g. if it is new).
+	 * @return The HTTP response to be returned to the caller.
+	 */
+	private Response checkAuthenticationThenForwardRegulation(RegulationBody regulationBody, String regId)
+	{
+		// The status to be returned in the response.
+		Status status = null;
 
 		// Check that the caller is authenticated with the platform.
 		String serviceTicket = regulationBody.getServiceTicket();
@@ -51,59 +68,86 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 
 		if (ospAuthenticated)
 		{
+			// Send the regulation to the PDB.
+			PrivacyRegulationInput regulation = regulationBody.getRegulation();
+			PrivacyRegulation regulationFromPolicyDb = sendRegulationToPdb(regulation, regId);
 
-			// Ask the Policy DB to add the regulation.
-			PrivacyRegulation regulationFromPolicyDb = null;
-			boolean successfulRequestToPdb = true;
-			try
+			if (regulationFromPolicyDb != null)
 			{
-				PrivacyRegulationInput regulation = regulationBody.getRegulation();
-				regulationFromPolicyDb = client.createNewRegulationOnPolicyDb(regulation);
-			}
-			catch (HttpException e)
-			{
-				successfulRequestToPdb = false;
-				e.printStackTrace();
-			}
-
-			if (successfulRequestToPdb)
-			{
-				// Inform modules who want to know about new regulations.
-				boolean successfulRequestToPc = client.sendNewRegulationToPolicyComputation(regulationFromPolicyDb);
-				boolean successfulRequestToOse = client.sendNewRegulationToOspEnforcement(regulationFromPolicyDb);
+				// If the response from the PDB is good, then send the regulation to the PC and OSE, using the regId to determine if the regulation is
+				// new.
+				boolean successfulRequestToPc = false;
+				boolean successfulRequestToOse = false;
+				boolean newRegulation = regId == null;
+				if (newRegulation)
+				{
+					successfulRequestToPc = client.sendNewRegulationToPolicyComputation(regulationFromPolicyDb);
+					successfulRequestToOse = client.sendNewRegulationToOspEnforcement(regulationFromPolicyDb);
+				}
+				else
+				{
+					successfulRequestToPc = client.sendExistingRegulationToPolicyComputation(regulationFromPolicyDb);
+					successfulRequestToOse = client.sendExistingRegulationToOspEnforcement(regulationFromPolicyDb);
+				}
 
 				if (successfulRequestToPc && successfulRequestToOse)
 				{
 					// Let regulator know that all modules have been informed.
-					statusCode = Status.ACCEPTED;
+					status = Status.ACCEPTED;
 				}
 				else
 				{
 					// Let regulator know that the service is currently unavailable, but may be made available soon.
-					statusCode = Status.SERVICE_UNAVAILABLE;
+					status = Status.SERVICE_UNAVAILABLE;
 				}
-
 			}
 			else
 			{
 				// Let regulator know that the service is currently unavailable, but may be made available soon.
-				statusCode = Status.SERVICE_UNAVAILABLE; 
+				status = Status.SERVICE_UNAVAILABLE;
 			}
 		}
 		else
 		{
-			// Let regulator know that they are currently not authorised with the PSP.
-			statusCode = Status.UNAUTHORIZED;
+			status = Status.UNAUTHORIZED;
 		}
 
 		// Return the response.
-		return Response.status(statusCode).build();
+		return Response.status(status).build();
 	}
 
-	@Override
-	public Response regulationsRegIdPut(RegulationBody regulationBody, String regId)
+	/**
+	 * Send the regulation to the PDB and return the privacy regulation in the response body (or null if this is not possible).
+	 * 
+	 * @param regulationBody
+	 *            The regulation to send.
+	 * @param newRegulation
+	 *            Whether the regulation is new.
+	 * @param regId
+	 *            the ID of the regulation. Should be null if the regulation doesn't have an ID.
+	 * @return the privacy regulation in the response body, if possible.
+	 */
+	private PrivacyRegulation sendRegulationToPdb(PrivacyRegulationInput regulation, String regId)
 	{
-		// do some magic!
-		return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+		PrivacyRegulation regulationFromPolicyDb = null;
+
+		try
+		{
+			boolean isRegulationNew = regId == null;
+			if (isRegulationNew)
+			{
+				regulationFromPolicyDb = client.createNewRegulationOnPolicyDb(regulation);
+			}
+			else
+			{
+				regulationFromPolicyDb = client.updateExistingRegulationOnPolicyDb(regId, regulation);
+			}
+		}
+		catch (HttpException e)
+		{
+			e.printStackTrace();
+		}
+
+		return regulationFromPolicyDb;
 	}
 }

@@ -11,18 +11,18 @@
  */
 package eu.operando.interfaces.rapi.api.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.http.HttpException;
-import javax.ws.rs.core.Response.Status;
 import org.junit.Test;
 
 import eu.operando.ClientOperandoModuleApiTests;
-import eu.operando.interfaces.rapi.api.impl.RegulatorApiClient;
 import eu.operando.interfaces.rapi.model.DtoPrivacyRegulation.PrivateInformationTypeEnum;
 import eu.operando.interfaces.rapi.model.DtoPrivacyRegulation.RequiredConsentEnum;
 import eu.operando.interfaces.rapi.model.PrivacyRegulation;
@@ -34,216 +34,352 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 
 	/**
 	 * Policy DB
-	 * @throws HttpException 
 	 */
 	@Test
 	public void testCreateNewRegulationOnPolicyDb_CorrectHttpRequest() throws HttpException
 	{
-		// Set up
-		String endpoint = ENDPOINT_POLICY_DB_REGULATIONS;
-		stub(HttpMethod.POST, endpoint);
-
-		PrivacyRegulationInput regulationInput = new PrivacyRegulationInput("sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-
-		// Exercise
-		client.createNewRegulationOnPolicyDb(regulationInput);
-
-		// Verify
-		verifyCorrectHttpRequestNoQueryParams(HttpMethod.POST, endpoint, regulationInput);
+		testSendRegulation_CorrectHttpRequest(ModuleRapiCommunicatesWith.PDB, true);
 	}
 
-	@Test(expected=HttpException.class)
+	@Test(expected = HttpException.class)
 	public void testCreateNewRegulationOnPolicyDb_FailedPost_HttpExceptionThrown() throws HttpException
 	{
-		// Set up
-		PrivacyRegulationInput regulationToPost =
-				new PrivacyRegulationInput("sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		String endpoint = ENDPOINT_POLICY_DB_REGULATIONS;
-		stub(HttpMethod.POST, endpoint, "", Status.INTERNAL_SERVER_ERROR);
-		
-		// Exercise
-		client.createNewRegulationOnPolicyDb(regulationToPost);
-		
-		// Verify - done in test annotation.
+		testSendRegulationToPdb(true, false);
 	}
-	
+
 	@Test
 	public void testCreateNewRegulationOnPolicyDb_SuccessfulPost_ResponseBodyInterpretedCorrectly() throws HttpException
 	{
-		// Set up
-		PrivacyRegulationInput regulationToPost =
-				new PrivacyRegulationInput("sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		PrivacyRegulation regulationReturnedFromPdb = new PrivacyRegulation("1", regulationToPost.getLegislationSector(), regulationToPost.getPrivateInformationSource(),
-				regulationToPost.getPrivateInformationType(), regulationToPost.getAction(), regulationToPost.getRequiredConsent());
-		String endpoint = ENDPOINT_POLICY_DB_REGULATIONS;
-		stub(HttpMethod.POST, endpoint, regulationReturnedFromPdb);
-
-		// Exercise
-		PrivacyRegulation regulationReturnedFromClient = client.createNewRegulationOnPolicyDb(regulationToPost);
-
-		// Verify
-		assertTrue("The client did not correctly interpret the returned JSON", EqualsBuilder.reflectionEquals(regulationReturnedFromPdb, regulationReturnedFromClient));
+		testSendRegulationToPdb(true, true);
 	}
 
 	@Test
-	public void testUpdateExistingRegulationOnPolicyDb_CorrectHttpRequest()
+	public void testUpdateExistingRegulationOnPolicyDb_CorrectHttpRequest() throws HttpException
 	{
-		// Set up
-		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
+		testSendRegulation_CorrectHttpRequest(ModuleRapiCommunicatesWith.PDB, false);
+	}
 
-		String regulationId = regulation.getRegId();
-		String endpoint = ENDPOINT_POLICY_DB_REGULATIONS_VARIABLE_REG_ID.replace("{reg_id}", regulationId);
-		stub(HttpMethod.PUT, endpoint);
-
-		// Exercise
-		client.updateExistingRegulationOnPolicyDb(regulation);
-
-		// Verify
-		PrivacyRegulationInput inputObject = regulation.getInputObject();
-		verifyCorrectHttpRequestNoQueryParams(HttpMethod.PUT, endpoint, inputObject);
+	@Test(expected = HttpException.class)
+	public void testUpdateExistingRegulationOnPolicyDb_FailedPost_HttpExceptionThrown() throws HttpException
+	{
+		testSendRegulationToPdb(false, false);
 	}
 
 	@Test
-	public void testUpdateExistingRegulationOnPolicyDb_ResponseHandledCorrectly()
+	public void testUpdateExistingRegulationOnPolicyDb_SuccessfulPost_ResponseBodyInterpretedCorrectly() throws HttpException
 	{
-		// Set up
-		PrivacyRegulation regulationToPut = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-
-		String regulationId = regulationToPut.getRegId();
-		String endpoint = ENDPOINT_POLICY_DB_REGULATIONS_VARIABLE_REG_ID.replace("{reg_id}", regulationId);
-		PrivacyRegulation regulationReturnedFromPdb = regulationToPut;
-		
-		stub(HttpMethod.PUT, endpoint, regulationReturnedFromPdb);
-
-		// Exercise
-		PrivacyRegulation regulationReturnedFromClient = client.updateExistingRegulationOnPolicyDb(regulationToPut);
-
-		// Verify
-		assertTrue("The client did not correctly interpret the returned JSON", EqualsBuilder.reflectionEquals(regulationReturnedFromPdb, regulationReturnedFromClient));
+		testSendRegulationToPdb(false, true);
 	}
 
 	/**
 	 * Policy Computation
 	 */
 	@Test
-	public void testSendNewRegulationToPolicyComputation_CorrectHttpRequest()
+	public void testSendNewRegulationToPolicyComputation_CorrectHttpRequest() throws HttpException
 	{
-		// Set up
-		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-
-		// Exercise
-		client.sendNewRegulationToPolicyComputation(regulation);
-
-		// Verify
-		String endpoint = ENDPOINT_POLICY_COMPUTATION_REGULATIONS;
-		PrivacyRegulationInput inputObject = regulation.getInputObject();
-		verifyCorrectHttpRequestNoQueryParams(HttpMethod.POST, endpoint, inputObject);
-	}
-	
-	@Test
-	public void testSendNewRegulationToPolicyComputation_FailureFromPolicyComputation_FalseReturned()
-	{
-		// Set up
-		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		stub(HttpMethod.POST, ENDPOINT_POLICY_COMPUTATION_REGULATIONS, "", Status.NOT_FOUND);
-
-		// Exercise
-		boolean success = client.sendNewRegulationToPolicyComputation(regulation);
-		
-		// Verify
-		assertFalse("When PC fails to process the new regulation, the RAPI client should return false", success);
+		testSendRegulation_CorrectHttpRequest(ModuleRapiCommunicatesWith.PC, true);
 	}
 
 	@Test
-	public void testSendNewRegulationToPolicyComputation_SuccessFromPolicyComputation_TrueReturned()
+	public void testSendNewRegulationToPolicyComputation_FailureFromPolicyComputation_FalseReturned() throws HttpException
 	{
-		// Set up
-		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		stub(HttpMethod.POST, ENDPOINT_POLICY_COMPUTATION_REGULATIONS, "", Status.ACCEPTED);
-
-		// Exercise
-		boolean success = client.sendNewRegulationToPolicyComputation(regulation);
-		
-		// Verify
-		assertTrue("When PC successfully processes the new regulation, the RAPI client should return true", success);
+		testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith.PC, true, Status.NOT_FOUND, false);
 	}
-	
+
 	@Test
-	public void testSendExistingRegulationToPolicyComputation_CorrectHttpRequest()
+	public void testSendNewRegulationToPolicyComputation_SuccessFromPolicyComputation_TrueReturned() throws HttpException
 	{
-		// Set up
-		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
+		testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith.PC, true, Status.ACCEPTED, true);
+	}
 
-		// Exercise
-		client.sendExistingRegulationToPolicyComputation(regulation);
+	@Test
+	public void testSendExistingRegulationToPolicyComputation_CorrectHttpRequest() throws HttpException
+	{
+		testSendRegulation_CorrectHttpRequest(ModuleRapiCommunicatesWith.PC, false);
+	}
 
-		// Verify
-		String regulationId = regulation.getRegId();
-		String endpoint = ENDPOINT_POLICY_COMPUTATION_REGULATIONS_VARIABLE_REG_ID.replace("{reg_id}", regulationId);
-		PrivacyRegulationInput inputObject = regulation.getInputObject();
-		verifyCorrectHttpRequestNoQueryParams(HttpMethod.PUT, endpoint, inputObject);
+	@Test
+	public void testSendExistingRegulationToPolicyComputation_FailureFromPolicyComputation_FalseReturned() throws HttpException
+	{
+		testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith.PC, false, Status.NOT_FOUND, false);
+	}
+
+	@Test
+	public void testSendExistingRegulationToPolicyComputation_SuccessFromPolicyComputation_TrueReturned() throws HttpException
+	{
+		testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith.PC, false, Status.ACCEPTED, true);
 	}
 
 	/**
 	 * OSP Enforcement
 	 */
 	@Test
-	public void testSendNewRegulationToOspEnforcement_CorrectHttpRequest()
+	public void testSendNewRegulationToOspEnforcement_CorrectHttpRequest() throws HttpException
+	{
+		testSendRegulation_CorrectHttpRequest(ModuleRapiCommunicatesWith.OSE, true);
+	}
+
+	@Test
+	public void testSendNewRegulationToOspEnforcement_FailureFromOspEnforcement_FalseReturned() throws HttpException
+	{
+		testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith.OSE, true, Status.NOT_FOUND, false);
+	}
+
+	@Test
+	public void testSendNewRegulationToOspEnforcement_SuccessFromOspEnforcement_TrueReturned() throws HttpException
+	{
+		testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith.OSE, true, Status.ACCEPTED, true);
+	}
+
+	@Test
+	public void testSendExistingRegulationToOspEnforcement_CorrectHttpRequest() throws HttpException
+	{
+		testSendRegulation_CorrectHttpRequest(ModuleRapiCommunicatesWith.OSE, false);
+	}
+
+	@Test
+	public void testSendExistingRegulationToOspEnforcement_FailureFromOspEnforcement_FalseReturned() throws HttpException
+	{
+		testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith.OSE, false, Status.NOT_FOUND, false);
+	}
+
+	@Test
+	public void testSendExistingRegulationToOspEnforcement_SuccessFromOspEnforcement_TrueReturned() throws HttpException
+	{
+		testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith.OSE, false, Status.ACCEPTED, true);
+	}
+
+	/**
+	 * Test the client uses a correct HTTP request when sending a regulation to another module.
+	 * @param module
+	 * 	the module to send the regulation to.
+	 * @param newRegulation
+	 * 	whether the regulation is new.
+	 * @throws HttpException
+	 */
+	private void testSendRegulation_CorrectHttpRequest(ModuleRapiCommunicatesWith module, boolean newRegulation) throws HttpException
 	{
 		// Set up
 		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
+		String httpMethod = determineHttpMethod(newRegulation);
+		String endpointExpected = determineEndpoint(module, regulation, newRegulation);
+		stub(httpMethod, endpointExpected);
 
 		// Exercise
-		client.sendNewRegulationToOspEnforcement(regulation);
+		sendRegulation(module, regulation, newRegulation);
 
 		// Verify
-		String endpoint = ENDPOINT_OSP_ENFORCEMENT_REGULATIONS;
 		PrivacyRegulationInput inputObject = regulation.getInputObject();
-		verifyCorrectHttpRequestNoQueryParams(HttpMethod.POST, endpoint, inputObject);
+		verifyCorrectHttpRequestNoQueryParams(httpMethod, endpointExpected, inputObject);
 	}
-	
-	@Test
-	public void testSendNewRegulationToOspEnforcement_FailureFromOspEnforcement_FalseReturned()
+
+	/**
+	 * Test the client behaves correctly when sending a regulation to the PDB.
+	 * @param newRegulation
+	 * 	whether the regulation is new.
+	 * @param successfulRequest
+	 * 	whether the request should return a (stubbed) successful response.
+	 * @throws HttpException
+	 */
+	private void testSendRegulationToPdb(boolean newRegulation, boolean successfulRequest) throws HttpException
+	{
+		// Set up
+		String httpMethod = determineHttpMethod(newRegulation);
+		PrivacyRegulation regulationToSend = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
+		String endpoint = determineEndpoint(ModuleRapiCommunicatesWith.PDB, regulationToSend, newRegulation);
+		PrivacyRegulation regulationReturnedFromPdb = regulationToSend;
+		if (successfulRequest)
+		{
+			stub(httpMethod, endpoint, regulationReturnedFromPdb);
+		}
+		else
+		{
+			stub(httpMethod, endpoint, "", Status.INTERNAL_SERVER_ERROR);
+		}
+
+		// Exercise
+		PrivacyRegulation regulationReturnedFromClient = sendRegulationToPdb(regulationToSend, newRegulation);
+
+		// Verify
+		if (successfulRequest)
+		{
+			assertTrue("The client did not correctly interpret the returned JSON", EqualsBuilder.reflectionEquals(regulationReturnedFromPdb, regulationReturnedFromClient));
+		}
+	}
+
+	/**
+	 * Test that the client behaves correctly when sending a regulation to the PC or OSE.
+	 * @param module
+	 * 	the module to send the regulation to.
+	 * @param newRegulation
+	 * 	whether the regulation is new.
+	 * @param statusInResponse
+	 * 	the status to return in the (stubbed) response to the request.
+	 * @param expectedReturnValue
+	 * 	the value which is expected from the client.
+	 * @throws HttpException
+	 */
+	private void testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith module, boolean newRegulation, Status statusInResponse,
+			boolean expectedReturnValue) throws HttpException
 	{
 		// Set up
 		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		stub(HttpMethod.POST, ENDPOINT_OSP_ENFORCEMENT_REGULATIONS, "", Status.NOT_FOUND);
+		String httpMethod = determineHttpMethod(newRegulation);
+		String endpoint = determineEndpoint(module, regulation, newRegulation);
+		stub(httpMethod, endpoint, "", statusInResponse);
 
 		// Exercise
-		boolean success = client.sendNewRegulationToOspEnforcement(regulation);
+		boolean success = sendRegulation(module, regulation, newRegulation);
+
+		// Verify
+		assertEquals("When the processing module successfully processes the regulation, the RAPI client should return true", expectedReturnValue, success);
+	}
+
+	/**
+	 * Ask the client to send a regulation to another module.
+	 * @param module
+	 * 	the module to send the regulation to.
+	 * @param regulation
+	 * 	the regulation to send.
+	 * @param newRegulation
+	 * 	whether the regulation is new.
+	 * @return
+	 * 	whether the response from the module indicates success.
+	 * @throws HttpException
+	 */
+	private boolean sendRegulation(ModuleRapiCommunicatesWith module, PrivacyRegulation regulation, boolean newRegulation) throws HttpException
+	{
+		boolean success;
+
+		switch (module)
+		{
+			case PDB:
+				sendRegulationToPdb(regulation, newRegulation);
+				success = true;
+				break;
+			case PC:
+				if (newRegulation)
+				{
+					success = client.sendNewRegulationToPolicyComputation(regulation);
+				}
+				else
+				{
+					success = client.sendExistingRegulationToPolicyComputation(regulation);
+				}
+				break;
+			case OSE:
+				if (newRegulation)
+				{
+					success = client.sendNewRegulationToOspEnforcement(regulation);
+				}
+				else
+				{
+					success = client.sendExistingRegulationToOspEnforcement(regulation);
+				}
+				break;
+			default:
+				throw new NotImplementedException("This module is not supported.");
+		}
+
+		return success;
+	}
+
+	/**
+	 * Ask the client to send a regulation to the PDB.
+	 * @param regulation
+	 * 	the regulation to send.
+	 * @param newRegulation
+	 * 	whether the regulation is new.
+	 * @return
+	 * 	the regulation the PDB returns.
+	 * @throws HttpException
+	 */
+	private PrivacyRegulation sendRegulationToPdb(PrivacyRegulation regulation, boolean newRegulation) throws HttpException
+	{
+		PrivacyRegulation regulationFromPdb = null;
 		
-		// Verify
-		assertFalse("When OSE fails to process the new regulation, the RAPI client should return false", success);
-	}
-
-	@Test
-	public void testSendNewRegulationToOspEnforcement_SuccessFromOspEnforcement_TrueReturned()
-	{
-		// Set up
-		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
-		stub(HttpMethod.POST, ENDPOINT_OSP_ENFORCEMENT_REGULATIONS, "", Status.ACCEPTED);
-
-		// Exercise
-		boolean success = client.sendNewRegulationToOspEnforcement(regulation);
+		if (newRegulation)
+		{
+			regulationFromPdb = client.createNewRegulationOnPolicyDb(regulation.getInputObject());
+		}
+		else
+		{
+			regulationFromPdb = client.updateExistingRegulationOnPolicyDb(regulation.getRegId(), regulation.getInputObject());
+		}
 		
-		// Verify
-		assertTrue("When OSE successfully processes the new regulation, the RAPI client should return true", success);
+		return regulationFromPdb;
 	}
 
-	@Test
-	public void testSendExistingRegulationToOspEnforcement_CorrectHttpRequest()
+	/**
+	 * Determines what HTTP method should be used when sending a regulation to another module. 
+	 * @param newRegulation
+	 * 	whether the regulation is new.
+	 * @return
+	 */
+	private String determineHttpMethod(boolean newRegulation)
 	{
-		// Set up
-		PrivacyRegulation regulation = new PrivacyRegulation("1", "sector", "source", PrivateInformationTypeEnum.BEHAVIOURAL, "action", RequiredConsentEnum.IN);
+		String httpMethod = HttpMethod.POST;
+		if (!newRegulation)
+		{
+			httpMethod = HttpMethod.PUT;
+		}
+		return httpMethod;
+	}
 
-		// Exercise
-		client.sendExistingRegulationToOspEnforcement(regulation);
+	/**
+	 * Determines what endpoint the client should use when sending a regulation.
+	 * @param module
+	 * 	the module to send the regulation to.
+	 * @param regulation
+	 * 	the regulation to send.
+	 * @param newRegulation
+	 * 	whether the regulation is new.
+	 * @return
+	 */
+	private String determineEndpoint(ModuleRapiCommunicatesWith module, PrivacyRegulation regulation, boolean newRegulation)
+	{
+		String endpoint = "";
 
-		// Verify
-		String regulationId = regulation.getRegId();
-		String endpoint = ENDPOINT_OSP_ENFORCEMENT_REGULATIONS_VARIABLE_REG_ID.replace("{reg_id}", regulationId);
-		PrivacyRegulationInput inputObject = regulation.getInputObject();
-		verifyCorrectHttpRequestNoQueryParams(HttpMethod.PUT, endpoint, inputObject);
+		switch (module)
+		{
+			case PDB:
+				if (newRegulation)
+				{
+					endpoint = ENDPOINT_POLICY_DB_REGULATIONS;
+				}
+				else
+				{
+					String regulationId = regulation.getRegId();
+					endpoint = ENDPOINT_POLICY_DB_REGULATIONS_VARIABLE_REG_ID.replace("{reg_id}", regulationId);
+				}
+				break;
+			case PC:
+				if (newRegulation)
+				{
+					endpoint = ENDPOINT_POLICY_COMPUTATION_REGULATIONS;
+				}
+				else
+				{
+					String regulationId = regulation.getRegId();
+					endpoint = ENDPOINT_POLICY_COMPUTATION_REGULATIONS_VARIABLE_REG_ID.replace("{reg_id}", regulationId);
+				}
+				break;
+			case OSE:
+				if (newRegulation)
+				{
+					endpoint = ENDPOINT_OSP_ENFORCEMENT_REGULATIONS;
+				}
+				else
+				{
+					String regulationId = regulation.getRegId();
+					endpoint = ENDPOINT_OSP_ENFORCEMENT_REGULATIONS_VARIABLE_REG_ID.replace("{reg_id}", regulationId);
+				}
+				break;
+			default:
+				throw new NotImplementedException("This module is not supported.");
+		}
+
+		return endpoint;
 	}
 
 	/**
@@ -277,5 +413,10 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	public void testLogActivity_CorrectHttpRequest()
 	{
 		testLogActivity_CorrectHttpRequest(client);
+	}
+
+	private enum ModuleRapiCommunicatesWith
+	{
+		PDB, PC, OSE
 	}
 }

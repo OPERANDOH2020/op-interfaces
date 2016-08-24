@@ -112,15 +112,4 @@ public class PrivacyRegulation extends DtoPrivacyRegulation
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
-
-	/**
-	 * Converts a response which contains a Privacy Regulation encoded in JSON
-	 * in its body to a PrivacyRegulation Java object.
-	 * @throws HttpException 
-	 */
-	public static PrivacyRegulation readPrivacyRegulationFromHttpResponse(Response response)
-	{
-		String strJson = response.readEntity(String.class);
-		return ClientOperandoModule.getObjectFromJsonFollowingOperandoConventions(strJson, PrivacyRegulation.class);
-	}
 }
