@@ -20,6 +20,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpException;
 
 import eu.operando.ClientOperandoModuleApi;
+import eu.operando.Utils;
 import eu.operando.interfaces.rapi.model.PrivacyRegulation;
 import eu.operando.interfaces.rapi.model.PrivacyRegulationInput;
 import io.swagger.models.HttpMethod;
@@ -108,7 +109,7 @@ public class RegulatorApiClient extends ClientOperandoModuleApi
 
 		// Only try to interpret the response if the status code is a success code.
 		int statusCodeResponse = response.getStatus();
-		boolean responseSuccessful = statusCodeIsInFamily(statusCodeResponse, Status.Family.SUCCESSFUL);
+		boolean responseSuccessful = Utils.statusCodeIsInFamily(statusCodeResponse, Status.Family.SUCCESSFUL);
 		if (!responseSuccessful)
 		{
 			throw new HttpException("A response from the PDB had status code: " + statusCodeResponse);
