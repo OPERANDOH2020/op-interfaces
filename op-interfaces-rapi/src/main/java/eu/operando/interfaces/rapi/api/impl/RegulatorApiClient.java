@@ -34,9 +34,57 @@ import io.swagger.models.HttpMethod;
  */
 public class RegulatorApiClient extends ClientOperandoModuleApi
 {
+	// Location of properties file.
+	private static final String PROPERTIES_FILE_RAPI;
+
+	// Properties file property names.
+	private static final String PROPERTY_NAME_ORIGIN_AUTHENTICATION_API;
+	private static final String PROPERTY_NAME_ORIGIN_OSP_ENFORCEMENT;
+	private static final String PROPERTY_NAME_ORIGIN_REPORT_GENERATOR;
+	private static final String PROPERTY_NAME_ORIGIN_LOG_DB;
+	private static final String PROPERTY_NAME_ORIGIN_POLICY_DB;
+	private static final String PROPERTY_NAME_ORIGIN_POLICY_COMPUTATION;
+
+	// Properties file property values.
+	private static final String ORIGIN_AUTHENTICATION_API;
+	private static final String ORIGIN_OSP_ENFORCEMENT;
+	private static final String ORIGIN_REPORT_GENERATOR;
+	private static final String ORIGIN_LOG_DB;
+	private static final String ORIGIN_POLICY_DB;
+	private static final String ORIGIN_POLICY_COMPUTATION;
+
+	static
+	{
+		// Location of properties file.
+		PROPERTIES_FILE_RAPI = "config.properties";
+
+		// Properties file property names.
+		PROPERTY_NAME_ORIGIN_AUTHENTICATION_API = "originAuthenticationApi";
+		PROPERTY_NAME_ORIGIN_OSP_ENFORCEMENT = "originOspEnforcement";
+		PROPERTY_NAME_ORIGIN_REPORT_GENERATOR = "originReportGenerator";
+		PROPERTY_NAME_ORIGIN_LOG_DB = "originLogDb";
+		PROPERTY_NAME_ORIGIN_POLICY_DB = "originPolicyDb";
+		PROPERTY_NAME_ORIGIN_POLICY_COMPUTATION = "originPolicyComputation";
+
+		// Properties file property values.
+		ORIGIN_AUTHENTICATION_API = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_AUTHENTICATION_API);
+		ORIGIN_OSP_ENFORCEMENT = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_OSP_ENFORCEMENT);
+		ORIGIN_REPORT_GENERATOR = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_REPORT_GENERATOR);
+		ORIGIN_LOG_DB = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_LOG_DB);
+		ORIGIN_POLICY_DB = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_POLICY_DB);
+		ORIGIN_POLICY_COMPUTATION = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_POLICY_COMPUTATION);
+	}
+
+	public RegulatorApiClient()
+	{
+		super(ORIGIN_AUTHENTICATION_API, ORIGIN_OSP_ENFORCEMENT, ORIGIN_REPORT_GENERATOR, ORIGIN_LOG_DB);
+		this.originPolicyDb = ORIGIN_POLICY_DB;
+		this.originPolicyComputation = ORIGIN_POLICY_COMPUTATION;
+	}
+	
 	private String originPolicyDb = "";
 	private String originPolicyComputation = "";
-
+	
 	public RegulatorApiClient(String originAuthenticationApi, String originOspEnforcement, String originReportGenerator, String originLogDb, String originPolicyDb,
 			String originPolicyComputation)
 	{

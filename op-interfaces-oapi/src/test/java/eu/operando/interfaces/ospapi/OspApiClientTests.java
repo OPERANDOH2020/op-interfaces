@@ -22,6 +22,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Test;
 
 import eu.operando.ClientOperandoModuleApiTests;
+import eu.operando.OperandoCommunicationException;
 
 public class OspApiClientTests extends ClientOperandoModuleApiTests
 {
@@ -160,12 +161,12 @@ public class OspApiClientTests extends ClientOperandoModuleApiTests
 	 * Report Generator
 	 */
 	@Test
-	public void testGetReport_NoOptionalParameters_CorrectHttpRequest()
+	public void testGetReport_NoOptionalParameters_CorrectHttpRequest() throws OperandoCommunicationException
 	{
 		testGetReport_NoOptionalParameters_CorrectHttpRequest(client);
 	}
 	@Test
-	public void testGetReport_TwoOptionalParameters_CorrectHttpRequest()
+	public void testGetReport_TwoOptionalParameters_CorrectHttpRequest() throws OperandoCommunicationException
 	{
 		testGetReport_TwoOptionalParameters_CorrectHttpRequest(client);
 	}

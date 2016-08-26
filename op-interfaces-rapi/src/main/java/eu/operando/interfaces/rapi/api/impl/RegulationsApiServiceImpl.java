@@ -15,7 +15,7 @@ import eu.operando.interfaces.rapi.model.RegulationBody;
 public class RegulationsApiServiceImpl extends RegulationsApiService
 {
 	// Location of properties file.
-	private static final String PROPERTIES_FILE_GATEKEEPER = "config.properties";
+	private static final String PROPERTIES_FILE_RAPI = "config.properties";
 
 	// Properties file property names.
 	private static final String PROPERTY_NAME_ORIGIN_AUTHENTICATION_API = "originAuthenticationApi";
@@ -26,13 +26,14 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 	private static final String PROPERTY_NAME_ORIGIN_POLICY_COMPUTATION = "originPolicyComputation";
 
 	// Properties file property values.
-	private static final String ORIGIN_AUTHENTICATION_API = Utils.loadPropertyString(PROPERTIES_FILE_GATEKEEPER, PROPERTY_NAME_ORIGIN_AUTHENTICATION_API);
-	private static final String ORIGIN_OSP_ENFORCEMENT = Utils.loadPropertyString(PROPERTIES_FILE_GATEKEEPER, PROPERTY_NAME_ORIGIN_OSP_ENFORCEMENT);
-	private static final String ORIGIN_REPORT_GENERATOR = Utils.loadPropertyString(PROPERTIES_FILE_GATEKEEPER, PROPERTY_NAME_ORIGIN_REPORT_GENERATOR);
-	private static final String ORIGIN_LOG_DB = Utils.loadPropertyString(PROPERTIES_FILE_GATEKEEPER, PROPERTY_NAME_ORIGIN_LOG_DB);
-	private static final String ORIGIN_POLICY_DB = Utils.loadPropertyString(PROPERTIES_FILE_GATEKEEPER, PROPERTY_NAME_ORIGIN_POLICY_DB);
-	private static final String ORIGIN_POLICY_COMPUTATION = Utils.loadPropertyString(PROPERTIES_FILE_GATEKEEPER, PROPERTY_NAME_ORIGIN_POLICY_COMPUTATION);
+	private static final String ORIGIN_AUTHENTICATION_API = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_AUTHENTICATION_API);
+	private static final String ORIGIN_OSP_ENFORCEMENT = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_OSP_ENFORCEMENT);
+	private static final String ORIGIN_REPORT_GENERATOR = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_REPORT_GENERATOR);
+	private static final String ORIGIN_LOG_DB = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_LOG_DB);
+	private static final String ORIGIN_POLICY_DB = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_POLICY_DB);
+	private static final String ORIGIN_POLICY_COMPUTATION = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_POLICY_COMPUTATION);
 
+	// TODO - replace with no-argument constructor, with injected origins
 	private RegulatorApiClient client = new RegulatorApiClient(ORIGIN_AUTHENTICATION_API, ORIGIN_OSP_ENFORCEMENT, ORIGIN_REPORT_GENERATOR, ORIGIN_LOG_DB,
 			ORIGIN_POLICY_DB, ORIGIN_POLICY_COMPUTATION);
 

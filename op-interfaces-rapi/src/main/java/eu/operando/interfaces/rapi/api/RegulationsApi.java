@@ -46,7 +46,7 @@ public class RegulationsApi
 							code = 403,
 							message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
 							response = PrivacyRegulation.class) })
-	public Response regulationsPost(@ApiParam(value = "", required = true) RegulationBody regulationBody) throws NotFoundException
+	public Response regulationsPost(@ApiParam(value = "", required = true) RegulationBody regulationBody)
 	{
 		return delegate.regulationsPost(regulationBody);
 	}
@@ -74,8 +74,7 @@ public class RegulationsApi
 							message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
 							response = DtoPrivacyRegulation.class) })
 	public Response regulationsRegIdPut(@ApiParam(value = "", required = true) RegulationBody regulationBody,
-			@ApiParam(value = "the unique identifier of a regulation.", required = true) @PathParam("reg-id") String regId, @Context SecurityContext securityContext)
-			throws NotFoundException
+			@ApiParam(value = "the unique identifier of a regulation.", required = true) @PathParam("reg-id") String regId)
 	{
 		return delegate.regulationsRegIdPut(regulationBody, regId);
 	}

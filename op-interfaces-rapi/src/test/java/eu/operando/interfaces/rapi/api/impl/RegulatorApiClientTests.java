@@ -13,6 +13,7 @@ package eu.operando.interfaces.rapi.api.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
@@ -23,6 +24,7 @@ import org.apache.http.HttpException;
 import org.junit.Test;
 
 import eu.operando.ClientOperandoModuleApiTests;
+import eu.operando.OperandoCommunicationException;
 import eu.operando.interfaces.rapi.model.DtoPrivacyRegulation.PrivateInformationTypeEnum;
 import eu.operando.interfaces.rapi.model.DtoPrivacyRegulation.RequiredConsentEnum;
 import eu.operando.interfaces.rapi.model.PrivacyRegulation;
@@ -30,6 +32,7 @@ import eu.operando.interfaces.rapi.model.PrivacyRegulationInput;
 
 public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 {
+	// TODO - replace with no-argument constructor, with injected origins.
 	private RegulatorApiClient client = new RegulatorApiClient(ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK);
 
 	/**
@@ -151,10 +154,11 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 
 	/**
 	 * Test the client uses a correct HTTP request when sending a regulation to another module.
+	 * 
 	 * @param module
-	 * 	the module to send the regulation to.
+	 *        the module to send the regulation to.
 	 * @param newRegulation
-	 * 	whether the regulation is new.
+	 *        whether the regulation is new.
 	 * @throws HttpException
 	 */
 	private void testSendRegulation_CorrectHttpRequest(ModuleRapiCommunicatesWith module, boolean newRegulation) throws HttpException
@@ -175,10 +179,11 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 
 	/**
 	 * Test the client behaves correctly when sending a regulation to the PDB.
+	 * 
 	 * @param newRegulation
-	 * 	whether the regulation is new.
+	 *        whether the regulation is new.
 	 * @param successfulRequest
-	 * 	whether the request should return a (stubbed) successful response.
+	 *        whether the request should return a (stubbed) successful response.
 	 * @throws HttpException
 	 */
 	private void testSendRegulationToPdb(boolean newRegulation, boolean successfulRequest) throws HttpException
@@ -203,20 +208,22 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		// Verify
 		if (successfulRequest)
 		{
-			assertTrue("The client did not correctly interpret the returned JSON", EqualsBuilder.reflectionEquals(regulationReturnedFromPdb, regulationReturnedFromClient));
+			assertTrue("The client did not correctly interpret the returned JSON",
+					EqualsBuilder.reflectionEquals(regulationReturnedFromPdb, regulationReturnedFromClient));
 		}
 	}
 
 	/**
 	 * Test that the client behaves correctly when sending a regulation to the PC or OSE.
+	 * 
 	 * @param module
-	 * 	the module to send the regulation to.
+	 *        the module to send the regulation to.
 	 * @param newRegulation
-	 * 	whether the regulation is new.
+	 *        whether the regulation is new.
 	 * @param statusInResponse
-	 * 	the status to return in the (stubbed) response to the request.
+	 *        the status to return in the (stubbed) response to the request.
 	 * @param expectedReturnValue
-	 * 	the value which is expected from the client.
+	 *        the value which is expected from the client.
 	 * @throws HttpException
 	 */
 	private void testSendRegulationToProcessingModule_ReturnValue(ModuleRapiCommunicatesWith module, boolean newRegulation, Status statusInResponse,
@@ -237,14 +244,14 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 
 	/**
 	 * Ask the client to send a regulation to another module.
+	 * 
 	 * @param module
-	 * 	the module to send the regulation to.
+	 *        the module to send the regulation to.
 	 * @param regulation
-	 * 	the regulation to send.
+	 *        the regulation to send.
 	 * @param newRegulation
-	 * 	whether the regulation is new.
-	 * @return
-	 * 	whether the response from the module indicates success.
+	 *        whether the regulation is new.
+	 * @return whether the response from the module indicates success.
 	 * @throws HttpException
 	 */
 	private boolean sendRegulation(ModuleRapiCommunicatesWith module, PrivacyRegulation regulation, boolean newRegulation) throws HttpException
@@ -286,18 +293,18 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 
 	/**
 	 * Ask the client to send a regulation to the PDB.
+	 * 
 	 * @param regulation
-	 * 	the regulation to send.
+	 *        the regulation to send.
 	 * @param newRegulation
-	 * 	whether the regulation is new.
-	 * @return
-	 * 	the regulation the PDB returns.
+	 *        whether the regulation is new.
+	 * @return the regulation the PDB returns.
 	 * @throws HttpException
 	 */
 	private PrivacyRegulation sendRegulationToPdb(PrivacyRegulation regulation, boolean newRegulation) throws HttpException
 	{
 		PrivacyRegulation regulationFromPdb = null;
-		
+
 		if (newRegulation)
 		{
 			regulationFromPdb = client.createNewRegulationOnPolicyDb(regulation.getInputObject());
@@ -306,14 +313,15 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 		{
 			regulationFromPdb = client.updateExistingRegulationOnPolicyDb(regulation.getRegId(), regulation.getInputObject());
 		}
-		
+
 		return regulationFromPdb;
 	}
 
 	/**
-	 * Determines what HTTP method should be used when sending a regulation to another module. 
+	 * Determines what HTTP method should be used when sending a regulation to another module.
+	 * 
 	 * @param newRegulation
-	 * 	whether the regulation is new.
+	 *        whether the regulation is new.
 	 * @return
 	 */
 	private String determineHttpMethod(boolean newRegulation)
@@ -328,12 +336,13 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 
 	/**
 	 * Determines what endpoint the client should use when sending a regulation.
+	 * 
 	 * @param module
-	 * 	the module to send the regulation to.
+	 *        the module to send the regulation to.
 	 * @param regulation
-	 * 	the regulation to send.
+	 *        the regulation to send.
 	 * @param newRegulation
-	 * 	whether the regulation is new.
+	 *        whether the regulation is new.
 	 * @return
 	 */
 	private String determineEndpoint(ModuleRapiCommunicatesWith module, PrivacyRegulation regulation, boolean newRegulation)
@@ -386,15 +395,40 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	 * Report Generator
 	 */
 	@Test
-	public void testGetReport_NoOptionalParameters_CorrectHttpRequest()
+	public void testGetReport_NoOptionalParameters_CorrectHttpRequest() throws OperandoCommunicationException
 	{
 		testGetReport_NoOptionalParameters_CorrectHttpRequest(client);
 	}
 
 	@Test
-	public void testGetReport_TwoOptionalParameters_CorrectHttpRequest()
+	public void testGetReport_OneOptionalParameter_CorrectHttpRequest() throws OperandoCommunicationException
+	{
+		testGetReport_OneOptionalParameter_CorrectHttpRequest(client);
+	}
+
+	@Test
+	public void testGetReport_TwoOptionalParameters_CorrectHttpRequest() throws OperandoCommunicationException
 	{
 		testGetReport_TwoOptionalParameters_CorrectHttpRequest(client);
+	}
+
+	@Test
+	public void testGetReport_NotFoundFromReportGenerator_OperandoCommunicationExceptionThrownWithNotFoundError()
+	{
+		testGetReport_NotFoundFromReportGenerator_OperandoCommunicationExceptionThrownWithNotFoundError(client);
+	}
+
+	@Test
+	public void testGetReport_ServerErrorFromReportGenerator_OperandoCommunicationExceptionThrownWithErrorFromOtherModule()
+	{
+		testGetReport_ServerErrorFromReportGenerator_OperandoCommunicationExceptionThrownWithErrorFromOtherModule(client);
+	}
+
+	@Test
+	public void testGetReport_OkFromReportGenerator_ReportInterpretedCorreclty()
+	{
+		// TODO - this is yet to be implemented.
+		fail();
 	}
 
 	/**
@@ -417,6 +451,8 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 
 	private enum ModuleRapiCommunicatesWith
 	{
-		PDB, PC, OSE
+		PDB,
+		PC,
+		OSE
 	}
 }

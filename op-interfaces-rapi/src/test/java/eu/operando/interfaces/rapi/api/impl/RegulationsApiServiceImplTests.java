@@ -22,6 +22,8 @@ import eu.operando.interfaces.rapi.model.PrivacyRegulationInput;
 import eu.operando.interfaces.rapi.model.RegulationBody;
 
 @RunWith(MockitoJUnitRunner.class)
+// TODO - test that correct service ticket is sent to the AAPI
+// TODO - combine "ForNew" and "ForExisting" setup methods.
 public class RegulationsApiServiceImplTests
 {
 	@Mock

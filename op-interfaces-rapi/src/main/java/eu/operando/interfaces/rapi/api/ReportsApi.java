@@ -1,5 +1,7 @@
 package eu.operando.interfaces.rapi.api;
 
+import java.util.HashMap;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -7,8 +9,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
 
 import eu.operando.interfaces.rapi.api.factories.ReportsApiServiceFactory;
 import io.swagger.annotations.ApiParam;
@@ -44,10 +47,12 @@ public class ReportsApi
 							code = 403,
 							message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
 							response = String.class) })
-	public Response reportsReportIdGet(@ApiParam(value = "the unique identifier of a report.", required = true) @PathParam("report-id") String reportId,
+	public Response reportsReportIdGet(@ApiParam(value="", required = true) String serviceTicket,
+			@ApiParam(value = "the unique identifier of a report.", required = true) @PathParam("report-id") String reportId,
 			@ApiParam(value = "the requested format of the report (e.g. pdf, html)", required = true) @QueryParam("format") String format,
-			@Context SecurityContext securityContext) throws NotFoundException
+			@Context UriInfo uriInfo)
 	{
-		return delegate.reportsReportIdGet(reportId, format, securityContext);
+		MultivaluedMap<String, String> optionalParameters = uriInfo.getQueryParameters();
+		return delegate.reportsReportIdGet(serviceTicket, reportId, format, optionalParameters);
 	}
 }
