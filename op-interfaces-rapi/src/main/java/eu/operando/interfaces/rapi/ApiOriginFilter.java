@@ -1,4 +1,4 @@
-package eu.operando.interfaces.rapi.api;
+package eu.operando.interfaces.rapi;
 
 import java.io.IOException;
 

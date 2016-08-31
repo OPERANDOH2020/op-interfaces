@@ -1,4 +1,4 @@
-package eu.operando.interfaces.rapi.api;
+package eu.operando.interfaces.rapi;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -10,8 +10,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import eu.operando.interfaces.rapi.api.factories.RegulationsApiServiceFactory;
 import eu.operando.interfaces.rapi.model.PrivacyRegulation;
+import eu.operando.interfaces.rapi.factories.RegulationsApiServiceFactory;
 import eu.operando.interfaces.rapi.model.DtoPrivacyRegulation;
 import eu.operando.interfaces.rapi.model.RegulationBody;
 import io.swagger.annotations.ApiParam;

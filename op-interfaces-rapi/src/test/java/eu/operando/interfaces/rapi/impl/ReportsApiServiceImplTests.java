@@ -1,4 +1,4 @@
-package eu.operando.interfaces.rapi.api.impl;
+package eu.operando.interfaces.rapi.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -21,6 +21,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
+import eu.operando.interfaces.rapi.impl.RegulatorApiClient;
+import eu.operando.interfaces.rapi.impl.ReportsApiServiceImpl;
 import eu.operando.ReportOperando;
 
 @RunWith(MockitoJUnitRunner.class)

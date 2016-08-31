@@ -1,4 +1,4 @@
-package eu.operando.interfaces.rapi.api.impl;
+package eu.operando.interfaces.rapi.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -17,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import eu.operando.interfaces.rapi.impl.RegulationsApiServiceImpl;
+import eu.operando.interfaces.rapi.impl.RegulatorApiClient;
 import eu.operando.interfaces.rapi.model.PrivacyRegulation;
 import eu.operando.interfaces.rapi.model.PrivacyRegulationInput;
 import eu.operando.interfaces.rapi.model.RegulationBody;

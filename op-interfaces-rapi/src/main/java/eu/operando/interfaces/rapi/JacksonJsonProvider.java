@@ -1,4 +1,4 @@
-package eu.operando.interfaces.rapi.api;
+package eu.operando.interfaces.rapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;

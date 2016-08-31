@@ -1,6 +1,4 @@
-package eu.operando.interfaces.rapi.api;
-
-import java.util.HashMap;
+package eu.operando.interfaces.rapi;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,7 +11,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import eu.operando.interfaces.rapi.api.factories.ReportsApiServiceFactory;
+import eu.operando.interfaces.rapi.factories.ReportsApiServiceFactory;
 import io.swagger.annotations.ApiParam;
 
 @Path("/reports")

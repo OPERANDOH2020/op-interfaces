@@ -9,7 +9,7 @@
  *    Matthew Gallagher (Oxford Computer Consultants) - Creation.
  * Initially developed in the context of OPERANDO EU project www.operando.eu
  */
-package eu.operando.interfaces.rapi.api.impl;
+package eu.operando.interfaces.rapi.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -27,12 +27,13 @@ import eu.operando.ClientOperandoModuleApiTests;
 import eu.operando.OperandoCommunicationException;
 import eu.operando.interfaces.rapi.model.DtoPrivacyRegulation.PrivateInformationTypeEnum;
 import eu.operando.interfaces.rapi.model.DtoPrivacyRegulation.RequiredConsentEnum;
+import eu.operando.interfaces.rapi.impl.RegulatorApiClient;
 import eu.operando.interfaces.rapi.model.PrivacyRegulation;
 import eu.operando.interfaces.rapi.model.PrivacyRegulationInput;
 
 public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 {
-	// TODO - replace with no-argument constructor, with injected origins.
+	// TODO - the client should be replaced by static methods. Injecting origins might be a bit tricky, but it would make the source code better. 
 	private RegulatorApiClient client = new RegulatorApiClient(ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK, ORIGIN_WIREMOCK);
 
 	/**

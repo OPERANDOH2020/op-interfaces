@@ -9,7 +9,7 @@
  *    Matthew Gallagher (Oxford Computer Consultants) - Creation.
  * Initially developed in the context of OPERANDO EU project www.operando.eu
  */
-package eu.operando.interfaces.rapi.api.impl;
+package eu.operando.interfaces.rapi.impl;
 
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;

@@ -1,4 +1,4 @@
-package eu.operando.interfaces.rapi.api;
+package eu.operando.interfaces.rapi;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;

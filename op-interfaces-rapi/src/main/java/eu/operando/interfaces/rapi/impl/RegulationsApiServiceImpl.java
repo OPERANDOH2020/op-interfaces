@@ -1,4 +1,4 @@
-package eu.operando.interfaces.rapi.api.impl;
+package eu.operando.interfaces.rapi.impl;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -6,7 +6,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.http.HttpException;
 
 import eu.operando.Utils;
-import eu.operando.interfaces.rapi.api.RegulationsApiService;
+import eu.operando.interfaces.rapi.RegulationsApiService;
 import eu.operando.interfaces.rapi.model.PrivacyRegulation;
 import eu.operando.interfaces.rapi.model.PrivacyRegulationInput;
 import eu.operando.interfaces.rapi.model.RegulationBody;
@@ -53,9 +53,9 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 	 * Verifies that the caller is authenticated, then checks sends the regulation to the relevant modules.
 	 * 
 	 * @param regulationBody
-	 *            The body of the incoming HTTP request.
+	 *        The body of the incoming HTTP request.
 	 * @param regId
-	 *            The ID of the incoming regulation. Should be null if the regulation does not yet have an ID (e.g. if it is new).
+	 *        The ID of the incoming regulation. Should be null if the regulation does not yet have an ID (e.g. if it is new).
 	 * @return The HTTP response to be returned to the caller.
 	 */
 	private Response checkAuthenticationThenForwardRegulation(RegulationBody regulationBody, String regId)
@@ -91,7 +91,8 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 					successfulRequestToOse = client.sendExistingRegulationToOspEnforcement(regulationFromPolicyDb);
 				}
 
-				if (successfulRequestToPc && successfulRequestToOse)
+				if (successfulRequestToPc
+					&& successfulRequestToOse)
 				{
 					// Let regulator know that all modules have been informed.
 					status = Status.ACCEPTED;
@@ -114,18 +115,19 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 		}
 
 		// Return the response.
-		return Response.status(status).build();
+		return Response.status(status)
+			.build();
 	}
 
 	/**
 	 * Send the regulation to the PDB and return the privacy regulation in the response body (or null if this is not possible).
 	 * 
 	 * @param regulationBody
-	 *            The regulation to send.
+	 *        The regulation to send.
 	 * @param newRegulation
-	 *            Whether the regulation is new.
+	 *        Whether the regulation is new.
 	 * @param regId
-	 *            the ID of the regulation. Should be null if the regulation doesn't have an ID.
+	 *        the ID of the regulation. Should be null if the regulation doesn't have an ID.
 	 * @return the privacy regulation in the response body, if possible.
 	 */
 	private PrivacyRegulation sendRegulationToPdb(PrivacyRegulationInput regulation, String regId)

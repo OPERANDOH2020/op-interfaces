@@ -1,4 +1,4 @@
-package eu.operando.interfaces.rapi.api.impl;
+package eu.operando.interfaces.rapi.impl;
 
 import java.util.HashMap;
 
@@ -9,8 +9,8 @@ import javax.ws.rs.core.Response.Status;
 
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
+import eu.operando.interfaces.rapi.ReportsApiService;
 import eu.operando.ReportOperando;
-import eu.operando.interfaces.rapi.api.ReportsApiService;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
 public class ReportsApiServiceImpl extends ReportsApiService
@@ -31,9 +31,9 @@ public class ReportsApiServiceImpl extends ReportsApiService
 				statusToReturn = Status.OK;
 				reportToReturn = client.getReport(reportId, format, parametersOptional);
 			}
-			catch (OperandoCommunicationException e)
+			catch (OperandoCommunicationException ex)
 			{
-				statusToReturn = determineStatusToReturnFromOperandoCommunicationException(e);
+				statusToReturn = determineStatusToReturnFromOperandoCommunicationException(ex);
 			}
 		}
 		else
