@@ -1,7 +1,5 @@
 package eu.operando.interfaces.rapi.impl;
 
-import java.util.HashMap;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -9,8 +7,8 @@ import javax.ws.rs.core.Response.Status;
 
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
-import eu.operando.interfaces.rapi.ReportsApiService;
 import eu.operando.ReportOperando;
+import eu.operando.interfaces.rapi.ReportsApiService;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
 public class ReportsApiServiceImpl extends ReportsApiService
