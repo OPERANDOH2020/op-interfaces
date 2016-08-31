@@ -9,15 +9,14 @@
  *    Matthew Gallagher (Oxford Computer Consultants) - Creation.
  * Initially developed in the context of OPERANDO EU project www.operando.eu
  */
-package eu.operando.interfaces.ospapi;
+package eu.operando.interfaces.oapi.model;
 
 import java.util.Date;
 
 /**
  * A wrapper class for the acceptance of a deal offered by OSPs as part of the privacy for benefit function of OPERANDO.
  * 
- * It is used to make the JSON objects that are passed between modules;
- * it is okay that the fields are unused. 
+ * It is used to make the JSON objects that are passed between modules; it is okay that the fields are unused.
  */
 @SuppressWarnings("unused")
 public class PfbDeal
@@ -30,8 +29,10 @@ public class PfbDeal
 	private Date createdAt = DATE_BEGINNING_OF_TIME;
 	private Date canceledAt = DATE_BEGINNING_OF_TIME;
 
-	public PfbDeal(){}
-	
+	public PfbDeal()
+	{
+	}
+
 	public PfbDeal(int id, int userId, int offerId, Date createdAt, Date canceledAt)
 	{
 		this.id = id;
