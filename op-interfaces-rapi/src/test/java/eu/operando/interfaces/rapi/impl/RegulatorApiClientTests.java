@@ -436,7 +436,7 @@ public class RegulatorApiClientTests extends ClientOperandoModuleApiTests
 	 * Authentication API
 	 */
 	@Test
-	public void testAuthoriseOsp_CorrectHttpRequest()
+	public void testIsOspAuthenticated_CorrectHttpRequest()
 	{
 		testIsOspAuthenticated_CorrectHttpRequest(client);
 	}
