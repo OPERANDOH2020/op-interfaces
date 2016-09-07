@@ -5,11 +5,17 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.HttpException;
 
+import eu.operando.OperandoCommunicationException;
 import eu.operando.Utils;
+import eu.operando.api.model.PrivacyRegulation;
+import eu.operando.api.model.PrivacyRegulationInput;
 import eu.operando.interfaces.rapi.RegulationsApiService;
-import eu.operando.interfaces.rapi.model.PrivacyRegulation;
-import eu.operando.interfaces.rapi.model.PrivacyRegulationInput;
 import eu.operando.interfaces.rapi.model.RegulationBody;
+import eu.operando.moduleclients.ClientAuthenticationService;
+import eu.operando.moduleclients.ClientOspEnforcement;
+import eu.operando.moduleclients.ClientPolicyComputation;
+import eu.operando.moduleclients.ClientPolicyDb;
+import eu.operando.moduleclients.ClientReportGenerator;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
 public class RegulationsApiServiceImpl extends RegulationsApiService
@@ -20,22 +26,19 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 	// Properties file property names.
 	private static final String PROPERTY_NAME_ORIGIN_AUTHENTICATION_API = "originAuthenticationApi";
 	private static final String PROPERTY_NAME_ORIGIN_OSP_ENFORCEMENT = "originOspEnforcement";
-	private static final String PROPERTY_NAME_ORIGIN_REPORT_GENERATOR = "originReportGenerator";
-	private static final String PROPERTY_NAME_ORIGIN_LOG_DB = "originLogDb";
 	private static final String PROPERTY_NAME_ORIGIN_POLICY_DB = "originPolicyDb";
 	private static final String PROPERTY_NAME_ORIGIN_POLICY_COMPUTATION = "originPolicyComputation";
 
 	// Properties file property values.
 	private static final String ORIGIN_AUTHENTICATION_API = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_AUTHENTICATION_API);
 	private static final String ORIGIN_OSP_ENFORCEMENT = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_OSP_ENFORCEMENT);
-	private static final String ORIGIN_REPORT_GENERATOR = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_REPORT_GENERATOR);
-	private static final String ORIGIN_LOG_DB = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_LOG_DB);
 	private static final String ORIGIN_POLICY_DB = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_POLICY_DB);
 	private static final String ORIGIN_POLICY_COMPUTATION = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_POLICY_COMPUTATION);
 
-	// TODO - replace with no-argument constructor, with injected origins
-	private RegulatorApiClient client = new RegulatorApiClient(ORIGIN_AUTHENTICATION_API, ORIGIN_OSP_ENFORCEMENT, ORIGIN_REPORT_GENERATOR, ORIGIN_LOG_DB,
-			ORIGIN_POLICY_DB, ORIGIN_POLICY_COMPUTATION);
+	private ClientAuthenticationService clientAuthenticationService = new ClientAuthenticationService(ORIGIN_AUTHENTICATION_API);
+	private ClientPolicyDb clientPolicyDb = new ClientPolicyDb(ORIGIN_POLICY_DB);
+	private ClientPolicyComputation clientPolicyComputation = new ClientPolicyComputation(ORIGIN_POLICY_COMPUTATION);
+	private ClientOspEnforcement clientOspEnforcement = new ClientOspEnforcement(ORIGIN_OSP_ENFORCEMENT);
 
 	@Override
 	public Response regulationsPost(RegulationBody regulationBody)
@@ -65,7 +68,7 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 
 		// Check that the caller is authenticated with the platform.
 		String serviceTicket = regulationBody.getServiceTicket();
-		boolean ospAuthenticated = client.isOspAuthenticated(serviceTicket);
+		boolean ospAuthenticated = clientAuthenticationService.isOspAuthenticated(serviceTicket);
 
 		if (ospAuthenticated)
 		{
@@ -82,13 +85,13 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 				boolean newRegulation = regId == null;
 				if (newRegulation)
 				{
-					successfulRequestToPc = client.sendNewRegulationToPolicyComputation(regulationFromPolicyDb);
-					successfulRequestToOse = client.sendNewRegulationToOspEnforcement(regulationFromPolicyDb);
+					successfulRequestToPc = clientPolicyComputation.sendNewRegulationToPolicyComputation(regulationFromPolicyDb);
+					successfulRequestToOse = clientOspEnforcement.sendNewRegulationToOspEnforcement(regulationFromPolicyDb);
 				}
 				else
 				{
-					successfulRequestToPc = client.sendExistingRegulationToPolicyComputation(regulationFromPolicyDb);
-					successfulRequestToOse = client.sendExistingRegulationToOspEnforcement(regulationFromPolicyDb);
+					successfulRequestToPc = clientPolicyComputation.sendExistingRegulationToPolicyComputation(regulationFromPolicyDb);
+					successfulRequestToOse = clientOspEnforcement.sendExistingRegulationToOspEnforcement(regulationFromPolicyDb);
 				}
 
 				if (successfulRequestToPc
@@ -139,14 +142,14 @@ public class RegulationsApiServiceImpl extends RegulationsApiService
 			boolean isRegulationNew = regId == null;
 			if (isRegulationNew)
 			{
-				regulationFromPolicyDb = client.createNewRegulationOnPolicyDb(regulation);
+				regulationFromPolicyDb = clientPolicyDb.createNewRegulationOnPolicyDb(regulation);
 			}
 			else
 			{
-				regulationFromPolicyDb = client.updateExistingRegulationOnPolicyDb(regId, regulation);
+				regulationFromPolicyDb = clientPolicyDb.updateExistingRegulationOnPolicyDb(regId, regulation);
 			}
 		}
-		catch (HttpException e)
+		catch (OperandoCommunicationException e)
 		{
 			e.printStackTrace();
 		}

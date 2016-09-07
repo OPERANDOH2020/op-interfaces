@@ -21,9 +21,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
-import eu.operando.interfaces.rapi.impl.RegulatorApiClient;
-import eu.operando.interfaces.rapi.impl.ReportsApiServiceImpl;
-import eu.operando.ReportOperando;
+import eu.operando.api.model.ReportOperando;
+import eu.operando.moduleclients.ClientAuthenticationService;
+import eu.operando.moduleclients.ClientReportGenerator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReportsApiServiceImplTests
@@ -37,9 +37,11 @@ public class ReportsApiServiceImplTests
 	{
 		PARAMETERS_OPTIONAL.putSingle("key", "value");
 	}
-
+	
 	@Mock
-	private RegulatorApiClient client;
+	private ClientAuthenticationService clientAuthenticationService;
+	@Mock
+	private ClientReportGenerator clientReportGenerator;
 
 	@InjectMocks
 	private ReportsApiServiceImpl implementation;
@@ -51,7 +53,7 @@ public class ReportsApiServiceImplTests
 		implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
-		verify(client).isOspAuthenticated(SERVICE_TICKET);
+		verify(clientAuthenticationService).isOspAuthenticated(SERVICE_TICKET);
 	}
 
 	@Test
@@ -64,7 +66,7 @@ public class ReportsApiServiceImplTests
 		implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
-		verify(client, never()).getReport(anyString(), anyString(), any(MultivaluedMap.class));
+		verify(clientReportGenerator, never()).getReport(anyString(), anyString(), any(MultivaluedMap.class));
 	}
 
 	@Test
@@ -90,7 +92,7 @@ public class ReportsApiServiceImplTests
 		implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
-		verify(client).getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		verify(clientReportGenerator).getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 	}
 
 	@Test
@@ -165,15 +167,15 @@ public class ReportsApiServiceImplTests
 	private void setUpResponseFromOtherModules(boolean ospAuthenticated, CommunicationError errorOnOperandoCommunicationExceptionFromClient,
 			ReportOperando reportFromClient) throws OperandoCommunicationException
 	{
-		when(client.isOspAuthenticated(any(String.class))).thenReturn(ospAuthenticated);
+		when(clientAuthenticationService.isOspAuthenticated(any(String.class))).thenReturn(ospAuthenticated);
 		if (errorOnOperandoCommunicationExceptionFromClient != null)
 		{
 			OperandoCommunicationException communicationException = new OperandoCommunicationException(errorOnOperandoCommunicationExceptionFromClient);
-			when(client.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenThrow(communicationException);
+			when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenThrow(communicationException);
 		}
 		if (reportFromClient != null)
 		{
-			when(client.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenReturn(reportFromClient);
+			when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenReturn(reportFromClient);
 		}
 	}
 }

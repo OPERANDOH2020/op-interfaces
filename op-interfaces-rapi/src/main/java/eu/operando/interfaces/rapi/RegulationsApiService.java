@@ -1,7 +1,6 @@
 package eu.operando.interfaces.rapi;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 
 import eu.operando.interfaces.rapi.model.RegulationBody;
 
