@@ -1,4 +1,4 @@
-forward_to_aliases
+proxy_forwarding
 ========
 
 Describe what your plugin does here.

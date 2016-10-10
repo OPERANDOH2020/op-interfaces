@@ -11,14 +11,20 @@
  www.operando.eu
  */
 
+
 var fs = require('fs');
 var util = require('util');
 var tempDir = __dirname+"/test_emails";
+var outbound = require('./outbound');
 
 exports.hook_queue = function(next, connection) {
-    var ws = fs.createWriteStream(tempDir + '/mail.eml');
+    this.loginfo("STORING!!!")
+
+    var ws = fs.createWriteStream(tempDir + '/mail.eml',{"flags":"a"});
+
     ws.once('close', function () {
-        return next(OK);
+        outbound.send_email(connection.transaction,next);
+        //next();
     });
     connection.transaction.message_stream.pipe(ws);
 };
