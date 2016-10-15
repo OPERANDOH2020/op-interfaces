@@ -5,185 +5,179 @@ swagger: '2.0'
 
 # This is your document metadata
 info:
-  version: "0.0.1"
-  title: eu.operando.interfaces.aapi
-  description: Operando's AS interfaces
-  license:
-    name: MIT
-    url: http://opensource.org/licenses/MIT
-host: localhost:8080
+ title: 'eu.operando.interfaces.aapi'
+ description: 'Operandos AS interfaces'
+ contact:
+  name: 'Constantinos Patsakis'
+  url: ''
+  email: 'kpatsak@gmail.com'
+ license:
+  name: MIT
+  url: http://opensource.org/licenses/MIT
+ version: "0.0.1"
+host: 'localhost:8080'
+basePath: '/operando/interfaces/authentication'
 schemes:
-- http
-basePath: /operando/interfaces/authentication
-produces:
-- application/json
-# Describe your paths here
+ - https
 paths:
-  # TicketCtrl.
-  /tickets:
-    # This is a HTTP operation
-    post:
-      # Describe this verb here. Note: you can use markdown
-      description:   
-         Login to AS and issue a session ticket (tgt)
-      parameters:
-        -
-          name: userCredentials 
-          in: body
-          description: user's username,password
-          schema:
-            $ref: "#/definitions/UserCredentials"
-          required: true
-      responses:
-        # Response code
-        "201":
-          description: ticket granting ticket (TGT) created
-          schema:
-            Type: string
-        "500":
-          description: Internal Server Error #TODO: Error msg definition is needed
-  /tickets/{TGT}:
-    # This is a HTTP operation
-    post:
-      # Describe this verb here. Note: you can use markdown
-      description:   
-         Request a service ticket (ST) for the service with id serviceId
-      parameters:
-        -
-          name: TGT 
-          in: path
-          description: user's session ticket (TGT)
-          schema:
-            type: string
-          required: true
-        -
-          name: serviceId 
-          in: body
-          description: Service's ID
-          schema:
-            type: string
-          required: true          
-      responses:
-        # Response code
-        "201":
-          description: service ticket (ST) created
-          schema:
-            Type: string
-        "500":
-          description: Internal Server Error #TODO: Error msg definition is needed
-  /tickets/{ST}/validate:
-    # This is a HTTP operation
-    get:
-      # Describe this verb here. Note: you can use markdown
-      description:   
-         Validate the service ticket (ST)
-      parameters:
-      -
-        name: ST 
-        in: path
-        description: service ticket (ST)
-        required: true
-        schema:
-          type: string
-      responses:
-        # Response code
-        "200":
-          description: service ticket (ST) is valid
-        "400":
-          description: service ticket (ST) is invalid          
-        "500":
-          description: Internal Server Error #TODO: Error msg definition is needed
-  # UserCtrl.
-  /user/register:
-    # This is a HTTP operation
-    post:
-      # Describe this verb here. Note: you can use markdown
-      description:   
-         This operation registers a user to AS.
-      parameters:
-      -
-        name: user 
-        in: body
-        description: User description
-        required: true
-        schema:
-          $ref: "#/definitions/User"        
-      responses:
-        # Response code
-        "201":
-          description: User created
-          schema:
-            $ref: "#/definitions/User"
-        "500":
-          description: Internal Server Error #TODO: Error msg definition is needed
-  /user/{username}:
-    # This is a HTTP operation
-    get:
-      # Describe this verb here. Note: you can use markdown
-      description:   
-         Returns AS's registed user with corresponding username
-      parameters:
-        -
-          name: username 
-          in: path
-          description: User's username
-          required: true
-          type: string
-      responses:
-        # Response code
-        "200":
-          description: User created
-          schema:
-            $ref: "#/definitions/User"
-        "500":
-          description: Internal Server Error #TODO: Error msg definition is needed
-    put:
-      # Describe this verb here. Note: you can use markdown
-      description:   
-         Updates the content of AS's registed user with corresponding username
-      parameters:
-        -
-          name: username 
-          in: path
-          description: User's username
-          required: true
-          type: string
-        -
-          name: user 
-          in: body
-          description: user's description
-          required: true
-          schema:
-            $ref: "#/definitions/User"
-      responses:
-        # Response code
-        "202":
-          description: user updated
-          schema:
-            $ref: "#/definitions/User"
-        "500":
-          description: Internal Server Error #TODO: Error msg definition is needed
-    delete:
-      # Describe this verb here. Note: you can use markdown
-      description:   
-         Delete AS's registed user with corresponding username
-      parameters:
-        -
-          name: username 
-          in: path
-          description: User's username
-          required: true
-          type: string
-        
-      responses:
-        # Response code
-        "202":
-          description: user deleted
-          schema:
-            $ref: "#/definitions/User"
-        "500":
-          description: Internal Server Error #TODO: Error msg definition is needed
-          
+ /aapi/tickets:
+  post:
+   summary: '
+   This operation makes a request for a ticket granting ticket (TGT) to the AAPI,
+   which is the session key for the application SSO session.
+   This operation should be called the very first time for an application to be authenticated 
+   to OPERANDOs CAS server, through a login form.'
+   description: 'Login to AS and issue a session ticket (tgt)'
+   parameters:
+    - name: userCredential 
+      in: body
+      description: 'Users username, password'
+      required: true
+      schema:
+       $ref: '#/definitions/UserCredential'
+   responses:
+    '201':
+     description: 'ticket granting ticket (TGT) created'
+     schema:
+      type: 'string'
+    '400':
+     description: 'Unable to create a ticket granting ticket (TGT)'
+    '500':
+     description: 'Internal Server Error'
+     
+ /aapi/tickets/{tgt}:
+  post:
+   summary: '
+   This operation makes a request for a service ticket (ST) to the AAPI,
+   which is the authorization ticket for a specific protected service of OPERANDOs system.
+   This operation should be called each time the user tried to access a protected service'
+   description: 'Request a service ticket (ST) for the service with id serviceId'
+   parameters:
+    - name: tgt
+      in: path
+      description: 'Users session ticket (TGT)'
+      required: true
+      type: 'string'
+    - name: serviceId
+      in: body
+      description: 'Services endpoint'
+      required: true
+      schema: 
+       type: 'string'
+   responses: 
+    '201': 
+     description: 'service ticket (ST) created'
+     schema: 
+      type: string
+    '400': 
+     description: 'Unable to create a service ticket (ST)'
+    '500': 
+     description: 'Internal Server Error'
+     
+ /aapi/tickets/{st}/validate:
+  get:
+   summary: ''
+   description: 'Validate the service ticket (ST)'
+   parameters:
+    - name: st
+      in: path
+      description: service ticket (ST)
+      required: true
+      type: string
+    - name: serviceId
+      in: query
+      description: service identifier
+      required: true
+      type: string
+   responses:
+    '200':
+     description: 'service ticket (ST) is valid'
+    '400':
+     description: 'service ticket (ST) is invalid'
+    '500':
+     description: 'Internal Server Error'
+     
+ /aapi/user/register:
+  post:
+   summary: 'This operation registers a user to OPERANDOs platform.'
+   description: 'This operation registers a user to OPERANDOs platform.'
+   parameters:
+    - name: user 
+      in: body
+      description: 'User description'
+      required: true
+      schema:
+       $ref: '#/definitions/User'
+   responses:
+    '201':
+     description: 'User created'
+     schema:
+      $ref: '#/definitions/User'
+    '500':
+     description: 'Internal Server Error'
+     
+ /user/{username}:
+   get:
+    summary: 'This operation returns the OPERANDOs registed user with given username'
+    description: 'This operation returns the OPERANDOs registed user with given username'
+    parameters:
+     - name: username 
+       in: path
+       description: 'Users username'
+       required: true
+       type: string
+    responses:
+     '200':
+      description: 'User returned'
+      schema:
+       $ref: '#/definitions/User'
+     '404':
+      description: 'User not found'
+     '500':
+      description: 'Internal Server Error'
+   put:
+    summary: ''
+    description: 'Updates the content of ASs registed user with corresponding username'
+    parameters:
+     - name: username 
+       in: path
+       description: 'Users username'
+       required: true
+       type: string
+     - name: user 
+       in: body
+       description: 'Users data'
+       required: true
+       schema:
+        $ref: '#/definitions/User'
+    responses:
+     '202':
+      description: 'User updated'
+      schema:
+       $ref: '#/definitions/User'
+     '404':
+      description: 'User not found'
+     '500':
+      description: 'Internal Server Error'
+   delete:
+    summary: ''
+    description: 'Delete ASs registed user with corresponding username'
+    parameters:
+     - name: username 
+       in: path
+       description: 'Users username'
+       required: true
+       type: string
+    responses:
+     '202':
+      description: 'User deleted'
+      schema:
+       $ref: '#/definitions/User'
+     '404':
+      description: 'User not found'
+     '500':
+      description: 'Internal Server Error'
+      
 definitions:
   User:
     type: object
@@ -195,15 +189,15 @@ definitions:
       required_attrs:
         type: object
         items:
-          $ref: "#/definitions/Attribute"
+          $ref: '#/definitions/Attribute'
       optional_attrs:
         type: object
         items:
-          $ref: "#/definitions/Attribute"
+          $ref: '#/definitions/Attribute'
       privacy_settings:
         type: object
         items:
-          $ref: "#/definitions/Attribute"
+          $ref: '#/definitions/Attribute'
   Attribute:
     type: object
     properties:
@@ -211,7 +205,7 @@ definitions:
         type: string
       attr_value:
         type: string
-  UserCredentials:
+  UserCredential:
     type: object
     properties:
       username:
