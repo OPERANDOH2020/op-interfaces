@@ -1,4 +1,4 @@
-store_test_emails
+execute_action
 ========
 
 Describe what your plugin does here.

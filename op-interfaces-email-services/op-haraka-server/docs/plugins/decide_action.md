@@ -1,4 +1,4 @@
-forward_to_aliases
+decide_action
 ========
 
 Describe what your plugin does here.
