@@ -21,14 +21,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
+import eu.operando.api.impl.ReportsApiServiceImpl;
 import eu.operando.api.model.ReportOperando;
-import eu.operando.moduleclients.ClientAuthenticationService;
+import eu.operando.moduleclients.ClientAuthenticationApiOperandoService;
 import eu.operando.moduleclients.ClientReportGenerator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReportsApiServiceImplTests
 {
 	private static final String SERVICE_TICKET = "ticket-ST";
+	private static final String SERVICE_ID_GET_REPORT = "GET /regulator/reports/{report_id}";
 	private static final String REPORT_ID = "123";
 	private static final String FORMAT = "pdf";
 	private static final MultivaluedMap<String, String> PARAMETERS_OPTIONAL = new MultivaluedStringMap();
@@ -39,7 +41,7 @@ public class ReportsApiServiceImplTests
 	}
 	
 	@Mock
-	private ClientAuthenticationService clientAuthenticationService;
+	private ClientAuthenticationApiOperandoService clientAuthenticationService;
 	@Mock
 	private ClientReportGenerator clientReportGenerator;
 
@@ -47,23 +49,24 @@ public class ReportsApiServiceImplTests
 	private ReportsApiServiceImpl implementation;
 
 	@Test
-	public void testReportsReportIdGet_CorrectServiceTicketSentToAuthenticationService()
+	public void testReportsReportIdGet_CorrectParametersSentToAuthenticationService() throws OperandoCommunicationException
 	{
 		// Exercise
-		implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
-		verify(clientAuthenticationService).isOspAuthenticated(SERVICE_TICKET);
+		verify(clientAuthenticationService).isOspAuthenticatedForRequestedService(SERVICE_TICKET, SERVICE_ID_GET_REPORT);
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testReportsReportIdGet_OspNotAuthenticated_RequestNotSentToReportGenerator() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponseFromOtherModules(false, null, null);
 
 		// Exercise
-		implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		verify(clientReportGenerator, never()).getReport(anyString(), anyString(), any(MultivaluedMap.class));
@@ -75,7 +78,7 @@ public class ReportsApiServiceImplTests
 		// Set up
 		setUpResponseFromOtherModules(false, null, null);
 
-		Response responseToReturn = implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseToReturn = implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		int statusCodeResponse = responseToReturn.getStatus();
@@ -89,7 +92,7 @@ public class ReportsApiServiceImplTests
 		setUpResponseFromOtherModules(true, null, null);
 
 		// Exercise
-		implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		verify(clientReportGenerator).getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
@@ -101,7 +104,7 @@ public class ReportsApiServiceImplTests
 		// Set up
 		setUpResponseFromOtherModules(true, CommunicationError.ERROR_FROM_OTHER_MODULE, null);
 
-		Response responseToReturn = implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseToReturn = implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		int statusCodeResponse = responseToReturn.getStatus();
@@ -115,7 +118,7 @@ public class ReportsApiServiceImplTests
 		// Set up
 		setUpResponseFromOtherModules(true, CommunicationError.REQUESTED_RESOURCE_NOT_FOUND, null);
 
-		Response responseToReturn = implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseToReturn = implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		int statusCodeResponse = responseToReturn.getStatus();
@@ -130,7 +133,7 @@ public class ReportsApiServiceImplTests
 		ReportOperando report = new ReportOperando();
 		setUpResponseFromOtherModules(true, null, report);
 
-		Response responseToReturn = implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseToReturn = implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		int statusCodeResponse = responseToReturn.getStatus();
@@ -145,7 +148,7 @@ public class ReportsApiServiceImplTests
 		setUpResponseFromOtherModules(true, null, reportFromClient);
 
 		// Exercise
-		Response responseToReturn = implementation.reportsReportIdGet(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseToReturn = implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		@SuppressWarnings("unchecked")
@@ -164,10 +167,11 @@ public class ReportsApiServiceImplTests
 	 *        the report that should be returned by the client.
 	 * @throws OperandoCommunicationException
 	 */
+	@SuppressWarnings("unchecked")
 	private void setUpResponseFromOtherModules(boolean ospAuthenticated, CommunicationError errorOnOperandoCommunicationExceptionFromClient,
 			ReportOperando reportFromClient) throws OperandoCommunicationException
 	{
-		when(clientAuthenticationService.isOspAuthenticated(any(String.class))).thenReturn(ospAuthenticated);
+		when(clientAuthenticationService.isOspAuthenticatedForRequestedService(anyString(), anyString())).thenReturn(ospAuthenticated);
 		if (errorOnOperandoCommunicationExceptionFromClient != null)
 		{
 			OperandoCommunicationException communicationException = new OperandoCommunicationException(errorOnOperandoCommunicationExceptionFromClient);

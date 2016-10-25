@@ -20,18 +20,23 @@ import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.api.model.PrivacyRegulation;
 import eu.operando.api.model.PrivacyRegulationInput;
-import eu.operando.interfaces.rapi.model.RegulationBody;
-import eu.operando.moduleclients.ClientAuthenticationService;
+import eu.operando.moduleclients.ClientAuthenticationApiOperandoService;
 import eu.operando.moduleclients.ClientOspEnforcement;
 import eu.operando.moduleclients.ClientPolicyComputation;
 import eu.operando.moduleclients.ClientPolicyDb;
 
 @RunWith(MockitoJUnitRunner.class)
-// TODO - test that correct service ticket is sent to the AAPI
 public class RegulationsApiServiceImplTests
 {
+	// Variables to be tested.
+	private static final String SERVICE_ID_PROCESS_NEW_REGULATION = "POST/regulator/regulations";
+	private static final String SERVICE_ID_PROCESS_EXISTING_REGULATION = "PUT/regulator/regulations/{reg-id}";
+
+	// Dummy variables to assist testing.
+	private static final String REGULATION_ID = "123";
+
 	@Mock
-	private ClientAuthenticationService clientAuthenticationService;
+	private ClientAuthenticationApiOperandoService clientAuthenticationService;
 	@Mock
 	private ClientPolicyDb clientPolicyDb;
 	@Mock
@@ -43,13 +48,27 @@ public class RegulationsApiServiceImplTests
 	private RegulationsApiServiceImpl implementation;
 
 	@Test
-	public void testRegulationsPost_OspNotAuthenticated_RegulationNotSentToOtherModules() throws OperandoCommunicationException
+	public void testProcessNewRegulation_CorrectArgumentsToVerifyAuthentication() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(false, false, false, false);
 
 		// Exercise
-		implementation.regulationsPost(new RegulationBody());
+		String serviceTicket = "ST-1234";
+		implementation.processNewRegulation(serviceTicket, new PrivacyRegulationInput());
+
+		// Verify
+		verify(clientAuthenticationService).isOspAuthenticatedForRequestedService(serviceTicket, SERVICE_ID_PROCESS_NEW_REGULATION);
+	}
+
+	@Test
+	public void testProcessNewRegulation_OspNotAuthenticated_RegulationNotSentToOtherModules() throws OperandoCommunicationException
+	{
+		// Set up
+		setUpResponsesFromOtherModulesForNewRegulation(false, false, false, false);
+
+		// Exercise
+		implementation.processNewRegulation("ST-1234", new PrivacyRegulationInput());
 
 		// Verify
 		verify(clientPolicyDb, never()).createNewRegulationOnPolicyDb(any(PrivacyRegulationInput.class));
@@ -58,13 +77,13 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsPost_OspNotAuthenticated_UnauthorisedCodeReturned() throws OperandoCommunicationException
+	public void testProcessNewRegulation_OspNotAuthenticated_UnauthorisedCodeReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(false, false, false, false);
 
 		// Exercise
-		Response responseToRegulator = implementation.regulationsPost(new RegulationBody());
+		Response responseToRegulator = implementation.processNewRegulation("ST-1234", new PrivacyRegulationInput());
 
 		// Verify
 		int statusCodeResponse = responseToRegulator.getStatus();
@@ -72,28 +91,27 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsPost_OspAuthenticated_RegulationSentToPdb() throws OperandoCommunicationException
+	public void testProcessNewRegulation_OspAuthenticated_RegulationSentToPdb() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, false, false, false);
-		RegulationBody regulationBody = new RegulationBody();
 
 		// Exercise
-		implementation.regulationsPost(regulationBody);
+		PrivacyRegulationInput input = new PrivacyRegulationInput();
+		implementation.processNewRegulation("ST-1234", input);
 
 		// Verify
-		PrivacyRegulationInput input = regulationBody.getRegulation();
 		verify(clientPolicyDb).createNewRegulationOnPolicyDb(input);
 	}
 
 	@Test
-	public void testRegulationsPost_OspAuthenticated_PostToPdbUnsuccessful_RegulationNotSentToPcOrOse() throws OperandoCommunicationException
+	public void testProcessNewRegulation_OspAuthenticated_PostToPdbUnsuccessful_RegulationNotSentToPcOrOse() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, false, false, false);
 
 		// Exercise
-		implementation.regulationsPost(new RegulationBody());
+		implementation.processNewRegulation("ST-1234", new PrivacyRegulationInput());
 
 		// Verify
 		verify(clientPolicyComputation, never()).sendNewRegulationToPolicyComputation((any(PrivacyRegulation.class)));
@@ -101,13 +119,13 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsPost_OspAuthenticated_PostToPdbUnsuccessful_UnavailableResponseReturned() throws OperandoCommunicationException
+	public void testProcessNewRegulation_OspAuthenticated_PostToPdbUnsuccessful_UnavailableResponseReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, false, false, false);
 
 		// Exercise
-		Response responseToRegulator = implementation.regulationsPost(new RegulationBody());
+		Response responseToRegulator = implementation.processNewRegulation("ST-1234", new PrivacyRegulationInput());
 		int statusCodeResponse = responseToRegulator.getStatus();
 
 		// Verify
@@ -116,14 +134,14 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsPost_OspAuthenticated_PostToPdbSuccessful_RegulationSentToPcAndOse() throws OperandoCommunicationException
+	public void testProcessNewRegulation_OspAuthenticated_PostToPdbSuccessful_RegulationSentToPcAndOse() throws OperandoCommunicationException
 	{
 		// Set up
 		PrivacyRegulation privacyRegulationFromPdb = new PrivacyRegulation("", "", "", null, "", null);
 		setUpResponsesFromOtherModulesForNewRegulation(true, true, privacyRegulationFromPdb, false, false);
 
 		// Exercise
-		implementation.regulationsPost(new RegulationBody());
+		implementation.processNewRegulation("ST-1234", new PrivacyRegulationInput());
 
 		// Verify
 		verify(clientPolicyComputation).sendNewRegulationToPolicyComputation(privacyRegulationFromPdb);
@@ -131,13 +149,13 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsPost_OspAuthenticated_PostToPdbSuccessful_PcAndOseRejectRegulation_UnavailableResponseReturned() throws OperandoCommunicationException
+	public void testProcessNewRegulation_OspAuthenticated_PostToPdbSuccessful_PcAndOseRejectRegulation_UnavailableResponseReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, true, false, false);
 
 		// Exercise
-		Response response = implementation.regulationsPost(new RegulationBody());
+		Response response = implementation.processNewRegulation("ST-1234", new PrivacyRegulationInput());
 
 		// Verify
 		int status = response.getStatus();
@@ -146,14 +164,14 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsPost_OspAuthenticated_PostToPdbSuccessful_PcRejectsRegulation_OseAcceptsRegulation_UnavailableResponseReturned()
+	public void testProcessNewRegulation_OspAuthenticated_PostToPdbSuccessful_PcRejectsRegulation_OseAcceptsRegulation_UnavailableResponseReturned()
 			throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, true, false, true);
 
 		// Exercise
-		Response response = implementation.regulationsPost(new RegulationBody());
+		Response response = implementation.processNewRegulation("ST-1234", new PrivacyRegulationInput());
 
 		// Verify
 		int status = response.getStatus();
@@ -162,14 +180,14 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsPost_OspAuthenticated_PostToPdbSuccessful_PcAcceptsRegulation_OseRejectsRegulation_UnavailableResponseReturned()
+	public void testProcessNewRegulation_OspAuthenticated_PostToPdbSuccessful_PcAcceptsRegulation_OseRejectsRegulation_UnavailableResponseReturned()
 			throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, true, true, false);
 
 		// Exercise
-		Response response = implementation.regulationsPost(new RegulationBody());
+		Response response = implementation.processNewRegulation("ST-1234", new PrivacyRegulationInput());
 
 		// Verify
 		int status = response.getStatus();
@@ -178,13 +196,13 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsPost_OspAuthenticated_PostToPdbSuccessful_PcAndOseAcceptRegulation_AcceptResponseReturned() throws OperandoCommunicationException
+	public void testProcessNewRegulation_OspAuthenticated_PostToPdbSuccessful_PcAndOseAcceptRegulation_AcceptResponseReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, true, true, true);
 
 		// Exercise
-		Response response = implementation.regulationsPost(new RegulationBody());
+		Response response = implementation.processNewRegulation("ST-1234", new PrivacyRegulationInput());
 
 		// Verify
 		int status = response.getStatus();
@@ -228,7 +246,7 @@ public class RegulationsApiServiceImplTests
 	private void setUpResponsesFromOtherModulesForNewRegulation(boolean ospAuthenticated, boolean pdbSuccessful, PrivacyRegulation regulationFromPdb,
 			boolean successFromPc, boolean successFromOse) throws OperandoCommunicationException
 	{
-		when(clientAuthenticationService.isOspAuthenticated(any(String.class))).thenReturn(ospAuthenticated);
+		when(clientAuthenticationService.isOspAuthenticatedForRequestedService(anyString(), anyString())).thenReturn(ospAuthenticated);
 
 		if (pdbSuccessful)
 		{
@@ -245,13 +263,28 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspNotAuthenticated_RegulationNotSentToOtherModules() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_CorrectArgumentsToClientForAuthenticationVerification() throws OperandoCommunicationException
+	{
+		// Set up
+		setUpResponsesFromOtherModulesForNewRegulation(false, false, false, false);
+
+		// Exercise
+		String serviceTicket = "ST-1234";
+		implementation.processExistingRegulation(serviceTicket, new PrivacyRegulationInput(), REGULATION_ID);
+
+		// Verify
+		verify(clientAuthenticationService).isOspAuthenticatedForRequestedService(serviceTicket, SERVICE_ID_PROCESS_EXISTING_REGULATION);
+
+	}
+
+	@Test
+	public void testProcessExistingRegulation_OspNotAuthenticated_RegulationNotSentToOtherModules() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(false, false, false, false);
 
 		// Exercise
-		implementation.regulationsRegIdPut(new RegulationBody(), "123");
+		implementation.processExistingRegulation("ST-1234", new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
 		verify(clientPolicyDb, never()).updateExistingRegulationOnPolicyDb(anyString(), any(PrivacyRegulationInput.class));
@@ -260,13 +293,13 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspNotAuthenticated_UnauthorisedCodeReturned() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_OspNotAuthenticated_UnauthorisedCodeReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(false, false, false, false);
 
 		// Exercise
-		Response responseToRegulator = implementation.regulationsRegIdPut(new RegulationBody(), "123");
+		Response responseToRegulator = implementation.processExistingRegulation("ST-1234", new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
 		int statusCodeResponse = responseToRegulator.getStatus();
@@ -274,30 +307,28 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspAuthenticated_RegulationSentToPdb() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_OspAuthenticated_RegulationSentToPdb() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, false, false, false);
-		RegulationBody regulationBody = new RegulationBody();
-		String regId = "123";
-		regulationBody.setRegulation(new PrivacyRegulationInput());
+		String regId = REGULATION_ID;
 
 		// Exercise
-		implementation.regulationsRegIdPut(regulationBody, regId);
+		PrivacyRegulationInput input = new PrivacyRegulationInput();
+		implementation.processExistingRegulation("ST-1234", input, REGULATION_ID);
 
 		// Verify
-		PrivacyRegulationInput input = regulationBody.getRegulation();
 		verify(clientPolicyDb).updateExistingRegulationOnPolicyDb(regId, input);
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspAuthenticated_PutToPdbUnsuccessful_RegulationNotSentToPcOrOse() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_OspAuthenticated_PutToPdbUnsuccessful_RegulationNotSentToPcOrOse() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, false, false, false);
 
 		// Exercise
-		implementation.regulationsRegIdPut(new RegulationBody(), "123");
+		implementation.processExistingRegulation("ST-1234", new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
 		verify(clientPolicyComputation, never()).sendExistingRegulationToPolicyComputation((any(PrivacyRegulation.class)));
@@ -305,13 +336,13 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspAuthenticated_PutToPdbUnsuccessful_UnavailableResponseReturned() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_OspAuthenticated_PutToPdbUnsuccessful_UnavailableResponseReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, false, false, false);
 
 		// Exercise
-		Response responseToRegulator = implementation.regulationsRegIdPut(new RegulationBody(), "123");
+		Response responseToRegulator = implementation.processExistingRegulation("ST-1234", new PrivacyRegulationInput(), REGULATION_ID);
 		int statusCodeResponse = responseToRegulator.getStatus();
 
 		// Verify
@@ -320,14 +351,14 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspAuthenticated_PutToPdbSuccessful_RegulationSentToPcAndOse() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_OspAuthenticated_PutToPdbSuccessful_RegulationSentToPcAndOse() throws OperandoCommunicationException
 	{
 		// Set up
 		PrivacyRegulation privacyRegulationFromPdb = new PrivacyRegulation("", "", "", null, "", null);
 		setUpResponsesFromOtherModulesForExistingRegulation(true, true, privacyRegulationFromPdb, false, false);
 
 		// Exercise
-		implementation.regulationsRegIdPut(new RegulationBody(), "123");
+		implementation.processExistingRegulation("ST-1234", new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
 		verify(clientPolicyComputation).sendExistingRegulationToPolicyComputation(privacyRegulationFromPdb);
@@ -335,13 +366,13 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspAuthenticated_PutToPdbSuccessful_PcAndOseRejectRegulation_UnavailableResponseReturned() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_OspAuthenticated_PutToPdbSuccessful_PcAndOseRejectRegulation_UnavailableResponseReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, true, false, false);
 
 		// Exercise
-		Response response = implementation.regulationsRegIdPut(new RegulationBody(), "123");
+		Response response = implementation.processExistingRegulation("ST-1234", new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
 		int status = response.getStatus();
@@ -350,14 +381,14 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspAuthenticated_PutToPdbSuccessful_PcRejectsRegulation_OseAcceptsRegulation_UnavailableResponseReturned()
+	public void testProcessExistingRegulation_OspAuthenticated_PutToPdbSuccessful_PcRejectsRegulation_OseAcceptsRegulation_UnavailableResponseReturned()
 			throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, true, false, true);
 
 		// Exercise
-		Response response = implementation.regulationsRegIdPut(new RegulationBody(), "123");
+		Response response = implementation.processExistingRegulation("ST-1234", new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
 		int status = response.getStatus();
@@ -366,14 +397,14 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspAuthenticated_PutToPdbSuccessful_PcAcceptsRegulation_OseRejectsRegulation_UnavailableResponseReturned()
+	public void testProcessExistingRegulation_OspAuthenticated_PutToPdbSuccessful_PcAcceptsRegulation_OseRejectsRegulation_UnavailableResponseReturned()
 			throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, true, true, false);
 
 		// Exercise
-		Response response = implementation.regulationsRegIdPut(new RegulationBody(), "123");
+		Response response = implementation.processExistingRegulation("ST-1234", new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
 		int status = response.getStatus();
@@ -382,13 +413,13 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testRegulationsRegIdPut_OspAuthenticated_PutToPdbSuccessful_PcAndOseAcceptRegulation_AcceptResponseReturned() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_OspAuthenticated_PutToPdbSuccessful_PcAndOseAcceptRegulation_AcceptResponseReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, true, true, true);
 
 		// Exercise
-		Response response = implementation.regulationsRegIdPut(new RegulationBody(), "123");
+		Response response = implementation.processExistingRegulation("ST-1234", new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
 		int status = response.getStatus();
@@ -435,7 +466,7 @@ public class RegulationsApiServiceImplTests
 	private void setUpResponsesFromOtherModulesForExistingRegulation(boolean ospAuthenticated, boolean pdbSuccessful, PrivacyRegulation regulationFromPdb,
 			boolean successFromPc, boolean successFromOse) throws OperandoCommunicationException
 	{
-		when(clientAuthenticationService.isOspAuthenticated(any(String.class))).thenReturn(ospAuthenticated);
+		when(clientAuthenticationService.isOspAuthenticatedForRequestedService(anyString(), anyString())).thenReturn(ospAuthenticated);
 
 		if (pdbSuccessful)
 		{

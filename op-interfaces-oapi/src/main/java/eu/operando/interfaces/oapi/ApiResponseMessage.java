@@ -3,7 +3,7 @@ package eu.operando.interfaces.oapi;
 import javax.xml.bind.annotation.XmlTransient;
 
 @javax.xml.bind.annotation.XmlRootElement
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-08-31T09:45:10.086Z")
+@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
 public class ApiResponseMessage
 {
 	public static final int ERROR = 1;
@@ -25,24 +25,24 @@ public class ApiResponseMessage
 		this.code = code;
 		switch (code)
 		{
-			case ERROR:
-				setType("error");
-				break;
-			case WARNING:
-				setType("warning");
-				break;
-			case INFO:
-				setType("info");
-				break;
-			case OK:
-				setType("ok");
-				break;
-			case TOO_BUSY:
-				setType("too busy");
-				break;
-			default:
-				setType("unknown");
-				break;
+		case ERROR:
+			setType("error");
+			break;
+		case WARNING:
+			setType("warning");
+			break;
+		case INFO:
+			setType("info");
+			break;
+		case OK:
+			setType("ok");
+			break;
+		case TOO_BUSY:
+			setType("too busy");
+			break;
+		default:
+			setType("unknown");
+			break;
 		}
 		this.message = message;
 	}

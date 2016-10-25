@@ -3,6 +3,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.operando</groupId>
+	<artifactId>osp-api</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>OSP API</name>
@@ -22,18 +23,6 @@
 		</plugins>
 	</build>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.glassfish.jersey</groupId>
-				<artifactId>jersey-bom</artifactId>
-				<version>${jersey.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>eu.operando</groupId>
@@ -42,40 +31,19 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.operando</groupId>
-			<artifactId>common</artifactId>
+			<artifactId>test-dependencies</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-			<type>test-jar</type>
+			<type>pom</type>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.tomakehurst</groupId>
-			<artifactId>wiremock</artifactId>
-			<version>1.57</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<version>1.3</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.swagger</groupId>
-			<artifactId>swagger-jersey2-jaxrs</artifactId>
-			<version>1.5.9</version>
 		</dependency>
 	</dependencies>
 
 	<properties>
-		<jersey.version>2.2</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<as.baseurl>http://localhost:8080</as.baseurl>
+		<ldb.baseurl>http://localhost:8080</ldb.baseurl>
+		<rm.baseurl>http://localhost:8080</rm.baseurl>
+		<dan.baseurl>http://localhost:8080</dan.baseurl>
 	</properties>
 	<description>OPERANDO's OSP API</description>
-	<artifactId>osp-api</artifactId>
 </project>

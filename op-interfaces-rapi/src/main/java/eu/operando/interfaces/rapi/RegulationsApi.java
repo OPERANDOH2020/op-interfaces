@@ -1,5 +1,6 @@
 package eu.operando.interfaces.rapi;
 
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -10,8 +11,8 @@ import javax.ws.rs.core.Response;
 
 import eu.operando.api.model.DtoPrivacyRegulation;
 import eu.operando.api.model.PrivacyRegulation;
+import eu.operando.api.model.PrivacyRegulationInput;
 import eu.operando.interfaces.rapi.factories.RegulationsApiServiceFactory;
-import eu.operando.interfaces.rapi.model.RegulationBody;
 import io.swagger.annotations.ApiParam;
 
 @Path("/regulations")
@@ -44,9 +45,10 @@ public class RegulationsApi
 							code = 403,
 							message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
 							response = PrivacyRegulation.class) })
-	public Response regulationsPost(@ApiParam(value = "", required = true) RegulationBody regulationBody)
+	public Response regulationsPost(@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam("service-ticket") String serviceTicket,
+			@ApiParam(value = "", required = true) PrivacyRegulationInput regulation)
 	{
-		return delegate.regulationsPost(regulationBody);
+		return delegate.processNewRegulation(serviceTicket, regulation);
 	}
 
 	@PUT
@@ -71,9 +73,10 @@ public class RegulationsApi
 							code = 403,
 							message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
 							response = DtoPrivacyRegulation.class) })
-	public Response regulationsRegIdPut(@ApiParam(value = "", required = true) RegulationBody regulationBody,
+	public Response regulationsRegIdPut(@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam("service-ticket") String serviceTicket,
+			@ApiParam(value = "", required = true) PrivacyRegulationInput regulation,
 			@ApiParam(value = "the unique identifier of a regulation.", required = true) @PathParam("reg-id") String regId)
 	{
-		return delegate.regulationsRegIdPut(regulationBody, regId);
+		return delegate.processExistingRegulation(serviceTicket, regulation, regId);
 	}
 }

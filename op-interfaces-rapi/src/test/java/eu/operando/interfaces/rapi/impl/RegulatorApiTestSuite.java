@@ -3,7 +3,7 @@ package eu.operando.interfaces.rapi.impl;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import eu.operando.moduleclients.ClientAuthenticationServiceTests;
+import eu.operando.moduleclients.ClientAuthenticationApiOperandoServiceTests;
 import eu.operando.moduleclients.ClientOspEnforcementTests;
 import eu.operando.moduleclients.ClientPolicyComputationTests;
 import eu.operando.moduleclients.ClientPolicyDbTests;
@@ -14,7 +14,7 @@ import eu.operando.moduleclients.ClientReportGeneratorTests;
 ({
 	RegulationsApiServiceImplTests.class,
 	ReportsApiServiceImplTests.class,
-	ClientAuthenticationServiceTests.class,
+	ClientAuthenticationApiOperandoServiceTests.class,
 	ClientPolicyDbTests.class,
 	ClientPolicyComputationTests.class,
 	ClientOspEnforcementTests.class,
