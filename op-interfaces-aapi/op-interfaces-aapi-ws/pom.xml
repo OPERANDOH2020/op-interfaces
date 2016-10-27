@@ -28,6 +28,11 @@
 		<swagger-annotations-version>1.5.8</swagger-annotations-version>
 		<jersey-version>1.19.1</jersey-version>		
 		<jodatime-version>2.9.3</jodatime-version>				
+		<jackson-version>2.9.3</jackson-version>
+		<!--  GBE I take these from the upper module declaration -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jackson-version>2.7.0</jackson-version>
+        <junit-version>4.12</junit-version>				
 	</properties>
 
 	<dependencies>
