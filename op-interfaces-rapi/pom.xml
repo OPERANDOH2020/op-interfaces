@@ -38,7 +38,7 @@
 				<configuration>
 					<images>
 						<image>
-							<alias>eu.operando.pdr.gk</alias>
+							<alias>eu.operando.interfaces.rapi</alias>
 							<name>${docker.repository.name}:${project.version}</name>
 							<build>
 								<from>tomcat:7</from> <!-- in our case we start from tomcat image -->
