@@ -91,10 +91,6 @@
 		<docker.repository.name>${docker.registry.name}tecnalia/eu.operando.interfaces.rapi.server</docker.repository.name>
 		<docker.rapi.port>8133</docker.rapi.port>
 		<user.warName>operando#interfaces#rapi</user.warName>
-		<as.baseurl>http://localhost:8080</as.baseurl>
-		<dan.baseurl>http://localhost:8080</dan.baseurl>
-		<ldb.baseurl>http://localhost:8080</ldb.baseurl>
- 	    <rm.baseurl>http://localhost:8080</rm.baseurl>
 		<!-- end of addition -->
 	</properties>
 	
