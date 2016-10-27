@@ -154,7 +154,7 @@ exports.decideAction = function(next,connection){
     var plugin = this;
     var sender = connection.transaction.mail_from.original;
 
-    connection.relaying = true;
+    connection.relaying = false;
     sender = sender.substr(1, sender.length - 2);
     if(sender==="operando@privatesky.xyz"){
         connection.results.add(plugin,
@@ -162,6 +162,7 @@ exports.decideAction = function(next,connection){
                 "action": "noAction"
             }
         );
+        connection.relaying = true;
         next(OK);
         return;
     }
@@ -178,6 +179,7 @@ exports.decideAction = function(next,connection){
                             "replyTo":conversationUUID+"@privatesky.xyz"
                         }
                     );
+                    connection.relaying = true;
                     next(OK)
                 }else{
                     next(DENY)
@@ -202,6 +204,7 @@ exports.decideAction = function(next,connection){
                             self.loginfo("Failed to remove conversation:"+connection.transaction.rcpt_to[0].user+" from conversations database");
                         }
                     });
+                    connection.relaying = true;
                     next(OK)
                 }else{
                     plugin.loginfo("Dropping email");
