@@ -62,9 +62,9 @@
 
 decide_action
 execute_action
-
-
-
+#dkim_sign
+#queue/deliver
+#store_test_emails
 
 
 # QUEUE
@@ -74,3 +74,4 @@ execute_action
 
 # Disconnect client if they spew bad SMTP commands at us
 #max_unrecognized_commands
+

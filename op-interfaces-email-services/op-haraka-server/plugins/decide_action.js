@@ -79,119 +79,131 @@
  */
 
 
-function SwarmConnector() {
-    var adapterPort = 3000;
-    var adapterHost = "localhost";
-    var util = require("swarmcore");
-    var client = util.createClient(adapterHost, adapterPort, "BroadcastUser", "ok", "BroadcastTest", "testCtor");
-    var uuid = require('node-uuid');
+function SwarmConnector(){
+    var adapterPort  = 3000;
+    var adapterHost  = "localhost";
+    var util         = require("swarmcore");
+    var client	  = util.createClient(adapterHost, adapterPort, "BroadcastUser", "ok","BroadcastTest", "testCtor");
+    var uuid         = require('node-uuid');
 
-    this.registerConversation = function (sender, receiver, callback) {
-        var swarmHandler = client.startSwarm("emails.js", "registerConversation", sender, receiver);
-        swarmHandler.onResponse(function (swarm) {
-            if (swarm.error) {
+    this.registerConversation=function(sender,receiver,callback){
+        var swarmHandler = client.startSwarm("emails.js","registerConversation",sender,receiver);
+        swarmHandler.onResponse(function(swarm){
+            if(swarm.error){
                 callback(swarm.error);
-            } else {
-                callback(undefined, swarm.conversationUUID);
+            }else{
+                callback(undefined,swarm.conversationUUID);
             }
 
         });
     };
 
-    this.getConversation = function (conversationUUID, callback) {
-        var swarmHandler = client.startSwarm("emails.js", "getConversation", conversationUUID);
-        swarmHandler.onResponse(function (swarm) {
-            if (swarm.error) {
+    this.getConversation=function(conversationUUID,callback){
+        var swarmHandler = client.startSwarm("emails.js","getConversation",conversationUUID);
+        swarmHandler.onResponse(function(swarm){
+            if(swarm.error){
                 callback(swarm.error);
-            } else {
-                callback(undefined, swarm.conversation);
+            }else{
+                callback(undefined,swarm.conversation);
             }
         });
     };
 
-    this.removeConversation = function (conversationUUID, callback) {
-        var swarmHandler = client.startSwarm("emails.js", "removeConversation", conversationUUID);
-        swarmHandler.onResponse(function (swarm) {
-            if (swarm.error) {
+    this.removeConversation=function(conversationUUID,callback){
+        var swarmHandler = client.startSwarm("emails.js","removeConversation",conversationUUID);
+        swarmHandler.onResponse(function(swarm){
+            if(swarm.error){
                 callback(swarm.error);
-            } else {
-                callback(undefined, swarm.result);
+            }else{
+                callback(undefined,swarm.result);
             }
         });
     };
 
-    this.getRealEmail = function (userAlias, callback) {
-        var swarmHandler = client.startSwarm("identity.js", "getRealEmail", userAlias);
-        swarmHandler.onResponse(function (swarm) {
-            if (swarm.error) {
+    this.getRealEmail=function(userAlias,callback){
+        var swarmHandler = client.startSwarm("identity.js","getRealEmail",userAlias);
+        swarmHandler.onResponse(function(swarm){
+            if(swarm.error){
                 callback(swarm.error);
-            } else {
-                callback(undefined, swarm.result);
+            }else{
+                callback(undefined,swarm.result);
             }
         });
     };
 
-    this.getRealEmail = function (userAlias, callback) {
-        var swarmHandler = client.startSwarm("identity.js", "getRealEmail", userAlias);
-        swarmHandler.onResponse(function (swarm) {
-            if (swarm.error) {
+    this.getRealEmail=function(userAlias,callback){
+        var swarmHandler = client.startSwarm("identity.js","getRealEmail",userAlias);
+        swarmHandler.onResponse(function(swarm){
+            if(swarm.error){
                 callback(swarm.error);
-            } else {
-                callback(undefined, swarm.realEmail);
+            }else{
+                callback(undefined,swarm.realEmail);
             }
         });
     };
 }
 
-
 var edb = new SwarmConnector();
 
-exports.register = function () {
-    this.register_hook("rcpt", "decideAction");
+exports.register = function(){
+    this.register_hook("rcpt","decideAction");
 };
 
-exports.decideAction = function (next, connection) {
-    var alias = connection.transaction.rcpt_to[0].user + "@" + connection.transaction.rcpt_to[0].host;
+exports.decideAction = function(next,connection){
+    var alias = connection.transaction.rcpt_to[0].user+"@"+connection.transaction.rcpt_to[0].host;
     var plugin = this;
-    edb.getRealEmail(alias, function (err, realEmail) {
-        if (!err) {
-            var sender = connection.transaction.mail_from.original;
-            edb.registerConversation(sender.substr(1, sender.length - 2), alias, function (err, conversationUUID) {
-                if (!err) {
+    var sender = connection.transaction.mail_from.original;
+
+    connection.relaying = true;
+    sender = sender.substr(1, sender.length - 2);
+    if(sender==="operando@privatesky.xyz"){
+        connection.results.add(plugin,
+            {
+                "action": "noAction"
+            }
+        );
+        next(OK);
+        return;
+    }
+
+    edb.getRealEmail(alias,function(err,realEmail){
+        if(!err) {
+            edb.registerConversation(sender, alias, function (err, conversationUUID) {
+                if(!err){
                     plugin.loginfo("Delivering to user");
                     connection.results.add(plugin,
                         {
                             "action": "relayToUser",
                             "to": realEmail,
-                            "replyTo": conversationUUID + "@privatesky.xyz"
+                            "replyTo":conversationUUID+"@privatesky.xyz"
                         }
                     );
                     next(OK)
-                } else {
+                }else{
                     next(DENY)
                 }
             })
         }
-        else {
-            edb.getConversation(connection.transaction.rcpt_to[0].user, function (err, conversation) {
-                if (!err) {
+        else{
+            edb.getConversation(connection.transaction.rcpt_to[0].user,function(err,conversation){
+                if(!err) {
                     plugin.loginfo("Delivering to outside entity");
-                    plugin.loginfo("Current conversation:" + connection.transaction.rcpt_to[0].user);
-                    plugin.loginfo("Active conversations:\n", JSON.stringify(edb.getConversations(), null, 4));
+                    plugin.loginfo("Current conversation:"+connection.transaction.rcpt_to[0].user);
+                    plugin.loginfo("Active conversations:\n",JSON.stringify(edb.getConversations(),null,4));
                     connection.results.add(plugin,
                         {
-                            "action": "relayToOutsideEntity",
-                            "to": conversation['sender'],
-                            "from": conversation['receiver']
+                            "action":"relayToOutsideEntity",
+                            "to":conversation['sender'],
+                            "from":conversation['receiver']
                         }
                     );
-                    edb.removeConversation(connection.transaction.rcpt_to[0].user, function (err, result) {
-                        if (err) {
-                            self.loginfo("Failed to remove conversation:" + connection.transaction.rcpt_to[0].user + " from conversations database");
+                    edb.removeConversation(connection.transaction.rcpt_to[0].user,function(err,result){
+                        if(err){
+                            self.loginfo("Failed to remove conversation:"+connection.transaction.rcpt_to[0].user+" from conversations database");
                         }
                     });
                     next(OK)
-                } else {
+                }else{
                     plugin.loginfo("Dropping email");
                     next(DENY);
                 }
@@ -199,7 +211,3 @@ exports.decideAction = function (next, connection) {
         }
     });
 };
-
-
-
-

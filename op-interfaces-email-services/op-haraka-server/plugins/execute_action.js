@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2016 ROMSOFT.
  * All rights reserved. This program and the accompanying materials
@@ -12,11 +13,13 @@
  */
 
 var address = require("address-rfc2821").Address;
+var util = require('util');
 var outbound = require('./outbound');
 
 
 exports.register = function(){
     this.register_hook("queue","forward");
+    this.register_hook("queue_outbound","forward");
 };
 
 
@@ -24,6 +27,7 @@ exports.forward = function (next, connection) {
     var plugin = this;
     var decision = connection.results.get('decide_action');
 
+    plugin.loginfo(connection.transaction);
 
     switch (decision.action) {
         case "relayToUser" :
@@ -39,16 +43,21 @@ exports.forward = function (next, connection) {
             changeFrom(decision.from);
             addReplyTo(decision.from);
             changeTo(decision.to);
+            removeHeaders();
             break;
         }
     }
 
-    outbound.send_email(connection.transaction,next);
+    plugin.loginfo("\n\n\n\n",connection.transaction);
+    connection.relaying = true;
 
+    next();
     function changeTo(newTo) {
         plugin.loginfo("New to: "+newTo);
         connection.transaction.rcpt_to.pop();
         connection.transaction.rcpt_to.push(new address('<' + newTo + '>'));
+//        connection.transaction.header.remove('to');
+//        connection.transaction.header.add('to',newTo);
     }
 
     function changeFrom(newFrom) {
@@ -58,14 +67,23 @@ exports.forward = function (next, connection) {
         connection.transaction.mail_from.host = newFrom.split('@')[1];
         connection.transaction.header.remove('from');
         connection.transaction.header.add('from',newFrom);
-        connection.transaction.header.remove('Received');
-        connection.transaction.header.remove('X-Sender');
     }
 
     function addReplyTo(replyTo) {
         plugin.loginfo("New Reply-To :"+replyTo);
         connection.transaction.header.remove("Reply-To");
         connection.transaction.header.add("Reply-To", replyTo); //the user will send the reply to this address
-
     }
+
+    function removeHeaders(){
+        connection.transaction.header.remove('Received');
+        connection.transaction.header.remove('X-Sender');
+        connection.transaction.header.remove('DKIM-Signature');
+        connection.transaction.header.remove('DomainKey-Signature');
+    }
+
 }
+
+
+
+
