@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+	<id>${project.artifactId}</id>
+	<files>
+		<file>
+			<source>target/${user.warName}.war</source>
+			<outputDirectory>/usr/local/tomcat/webapps</outputDirectory>
+		</file>
+		<file>
+			<source>src/main/docker/docker-config.yml</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<!-- after several tries I was not able to define a context with context.xml, 
+			therefore I will name the app with the path <file> <source>src/main/resources/server.xml</source> 
+			<outputDirectory>/usr/local/tomcat/conf</outputDirectory> </file> -->
+	</files>
+</assembly>
