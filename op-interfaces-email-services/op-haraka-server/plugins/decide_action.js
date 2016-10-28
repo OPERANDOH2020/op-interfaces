@@ -12,73 +12,6 @@
  */
 
 
-/*
- function SwarmConnector(){
-
- //THIS IS A MOCKUP FOR TESTS
-
- var uuid         = require('node-uuid');
- var activeConversations = {};
- var aliases = {
- "gmail@privatesky.xyz":"ciprian.talmacel15@gmail.com",
- "yahoo@privatesky.xyz":"cprn_talmacel@yahoo.com",
- "rms@privatesky.xyz":"tac@rms.ro"
- }
-
- this.registerConversation=function(sender,receiver,callback){
- setTimeout(function(){
- try{
- var id = uuid.v1();
- activeConversations[id] = {
- "sender":sender,
- "receiver":receiver
- }
- callback(undefined,id);
- }catch(e){
- callback(e);
- }
- },500);
- };
-
- this.getConversation=function(conversationUUID,callback){
- setTimeout(function(){
- if(activeConversations[conversationUUID]){
- callback(undefined,activeConversations[conversationUUID]);
- }
- else{
- callback(new Error("Conversation: "+conversationUUID+" is unknown"));
- }
- },500);
- };
-
- this.removeConversation=function(conversationUUID,callback){
- setTimeout(function(){
- try{
- delete activeConversations[conversationUUID];
- callback();
- }catch(e){
- callback(e);
- }
- },500);
- };
- this.getRealEmail=function(userAlias,callback){
- setTimeout(function(){
- if(aliases[userAlias]){
- callback(undefined,aliases[userAlias]);
- }
- else{
- callback(new Error("Alias: "+userAlias+" is unknown"));
- }
- },500);
- };
-
- this.getConversations = function(){
- return activeConversations;
- }
- }
- */
-
-
 function SwarmConnector(){
     var adapterPort  = 3000;
     var adapterHost  = "localhost";
@@ -94,7 +27,6 @@ function SwarmConnector(){
             }else{
                 callback(undefined,swarm.conversationUUID);
             }
-
         });
     };
 
@@ -122,36 +54,29 @@ function SwarmConnector(){
 
     this.getRealEmail=function(userAlias,callback){
         var swarmHandler = client.startSwarm("identity.js","getRealEmail",userAlias);
-        swarmHandler.onResponse(function(swarm){
-            if(swarm.error){
-                callback(swarm.error);
-            }else{
-                callback(undefined,swarm.result);
-            }
-        });
-    };
-
-    this.getRealEmail=function(userAlias,callback){
-        var swarmHandler = client.startSwarm("identity.js","getRealEmail",userAlias);
-        swarmHandler.onResponse(function(swarm){
-            if(swarm.error){
-                callback(swarm.error);
-            }else{
+	       
+	swarmHandler.onResponse(function(swarm){
+	    if(swarm.realEmail){
                 callback(undefined,swarm.realEmail);
+            }else{
+                callback(swarm.error);
             }
         });
-    };
+    };	
 }
 
 var edb = new SwarmConnector();
 
 exports.register = function(){
+    plugin = this;
     this.register_hook("rcpt","decideAction");
 };
+var plugin;
+
 
 exports.decideAction = function(next,connection){
     var alias = connection.transaction.rcpt_to[0].user+"@"+connection.transaction.rcpt_to[0].host;
-    var plugin = this;
+    plugin = this;
     var sender = connection.transaction.mail_from.original;
 
     connection.relaying = false;
@@ -168,7 +93,7 @@ exports.decideAction = function(next,connection){
     }
 
     edb.getRealEmail(alias,function(err,realEmail){
-        if(!err) {
+        if(realEmail) {
             edb.registerConversation(sender, alias, function (err, conversationUUID) {
                 if(!err){
                     plugin.loginfo("Delivering to user");
@@ -182,16 +107,18 @@ exports.decideAction = function(next,connection){
                     connection.relaying = true;
                     next(OK)
                 }else{
+		    plugin.loginfo("Could not register conversation between ",sender," and ",alias,"\nError:",err)
                     next(DENY)
                 }
             })
         }
         else{
+	    plugin.loginfo("Try to get conversation ", connection.transaction.rcpt_to[0].user);
             edb.getConversation(connection.transaction.rcpt_to[0].user,function(err,conversation){
-                if(!err) {
+                if(conversation) {
                     plugin.loginfo("Delivering to outside entity");
                     plugin.loginfo("Current conversation:"+connection.transaction.rcpt_to[0].user);
-                    plugin.loginfo("Active conversations:\n",JSON.stringify(edb.getConversations(),null,4));
+                 
                     connection.results.add(plugin,
                         {
                             "action":"relayToOutsideEntity",

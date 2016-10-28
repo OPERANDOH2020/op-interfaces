@@ -27,8 +27,6 @@ exports.forward = function (next, connection) {
     var plugin = this;
     var decision = connection.results.get('decide_action');
 
-    plugin.loginfo(connection.transaction);
-
     switch (decision.action) {
         case "relayToUser" :
         {
@@ -47,9 +45,6 @@ exports.forward = function (next, connection) {
             break;
         }
     }
-
-    plugin.loginfo("\n\n\n\n",connection.transaction);
-    connection.relaying = true;
 
     next();
     function changeTo(newTo) {
