@@ -33,7 +33,7 @@ public class RemoteLog implements Runnable{
     
     @Override
     public void run() {
-        ApiClient logClient =  new ApiClient();
+        ApiClient logClient =  new ApiClient();        
         logClient.setBasePath(LOG_ENDPOINT);
         LogApi logapi = new LogApi();
         logapi.setApiClient(logClient);  

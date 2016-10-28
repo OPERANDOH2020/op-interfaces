@@ -25,11 +25,13 @@ import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,8 +56,18 @@ import io.swagger.client.model.LogRequest;
 @RequestMapping(value = "aapi/tickets")
 public class TicketController {
 
-	private static final String CAS_HOSTNAME = "snf-706921.vm.okeanos.grnet.gr";
-
+	@Value("${cas.protocol}")
+	private String casProtocol;
+	
+	@Value("${cas.host}")
+	private String casHost;
+	
+	@Value("${cas.port}")
+	private String casPort;
+	
+	@Value("${cas.webApp}")
+	private String casWebApp;	
+		
 	@Autowired
 	CloseableHttpClient httpClient;    
 	
@@ -85,7 +97,7 @@ public class TicketController {
 		HttpPost httpPost = null;
 		CloseableHttpResponse response = null;
 		try {
-			httpPost = new HttpPost("https://" + CAS_HOSTNAME + ":8443/casv415/v1/tickets");
+			httpPost = new HttpPost(casProtocol + "://" + casHost + ":" + casPort + "/" + casWebApp + "/v1/tickets");
 
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("username", userCredential.getUsername()));
@@ -153,7 +165,7 @@ public class TicketController {
 		CloseableHttpResponse response = null;
 		try {
 
-			httpPost = new HttpPost("https://" + CAS_HOSTNAME + ":8443/casv415/v1/tickets/" + tgt);
+			httpPost = new HttpPost(casProtocol + "://" + casHost + ":" + casPort + "/" + casWebApp + "/v1/tickets/" + tgt);
 
 			httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
@@ -221,20 +233,20 @@ public class TicketController {
 			
 			log.logMe(LogRequest.LogDataTypeEnum.INFO, "", String.format("Validate st %s for serviceId %s", serviceTicket, service), LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
 		}
-
-		RestClient restClient = null;
-		HttpURLConnection huc = null;
-		try{
-			restClient =  new RestClient();
-
-			String baseURL =  "https://" + CAS_HOSTNAME + ":8443" + "/casv415/serviceValidate";
-
-			//Make the connection to the rest api
-			huc =  restClient.get(baseURL + "?ticket=" + serviceTicket + "&service=" + service.replaceAll("\"","").replaceAll("'","")) ;
-
+		
+		HttpGet httpGet = null;
+		CloseableHttpResponse response = null;
+		
+		try {
+			String baseURL =  casProtocol + "://" + casHost + ":" + casPort + "/" + casWebApp + "/serviceValidate";
+			
+			httpGet = new HttpGet(baseURL + "?ticket=" + serviceTicket + "&service=" + service.replaceAll("\"","").replaceAll("'","")) ;
+			
+			response = httpClient.execute(httpGet);
+			
 			//Get the result
 			StringBuffer content=new StringBuffer();
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(huc.getInputStream()));
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
 			String line;
 
@@ -253,17 +265,25 @@ public class TicketController {
 				
 				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", content.toString(), LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
 				return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
-			} else {
+			} else if (content.toString().contains("<cas:authenticationFailure code=\'INVALID_SERVICE\'>")){
+				
+				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", content.toString(), LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
+				return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+			}else {
 				
 				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", content.toString(), LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");			
 				return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);				
-			}		
+			}
+			
 		} catch (Exception ex){
 			
 			log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", ex.getMessage(), LogRequest.LogPriorityEnum.CRITICAL.toString(), "op-interfaces-aapi");			
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}finally{
-			huc.disconnect();
+			try {
+				response.close();
+			} catch (IOException e) {
+			}
 		}
 	}
 }

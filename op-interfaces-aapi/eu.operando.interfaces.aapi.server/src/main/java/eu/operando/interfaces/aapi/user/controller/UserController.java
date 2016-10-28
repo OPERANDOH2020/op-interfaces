@@ -17,6 +17,8 @@ import eu.operando.interfaces.aapi.user.controller.exceptions.UserException;
 import eu.operando.interfaces.aapi.user.model.Attribute;
 import eu.operando.interfaces.aapi.user.model.PrivacySetting;
 import eu.operando.interfaces.aapi.user.model.User;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,7 +57,22 @@ import javax.naming.ldap.LdapContext;
 @RestController
 @RequestMapping(value = "/aapi/user")
 public class UserController {
-
+	
+	@Value("${ldap.protocol}")
+	private String ldapProtocol;
+	
+	@Value("${ldap.host}")
+	private String ldapHost;
+	
+	@Value("${ldap.port}")
+	private String ldapPort;
+	
+	@Value("${ldap.username}")
+	private String ldapUsername;
+	
+	@Value("${ldap.password}")
+	private String ldapPassword;
+	
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ApiOperation(value = "registerUser", notes = "This operation registers a user to OPERANDO's platform.")
     @ApiResponses(value = { 
@@ -136,36 +153,15 @@ public class UserController {
     }
 
     private boolean storeUserToLdap(User user) throws IOException {
-	InputStream inputStream = null;
-
+    	
 	try {
-	    // Get the properties file with the ldap connection info
-	    Properties prop = new Properties();
-	    String propFileName = "my.properties";
-
-	    inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-
-	    if (inputStream != null) {
-		prop.load(inputStream);
-	    } else {
-		throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
-	    }
-
 	    // Make the connection with LDAP
 	    Hashtable env = new Hashtable();
 	    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-	    // LDAP URL
-	    env.put(Context.PROVIDER_URL, prop.getProperty("ldap.URL"));
-	    // Type of Authentication
+	    env.put(Context.PROVIDER_URL, (ldapProtocol + "://" + ldapHost + ":" + ldapPort));
 	    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-	    // admin username
-	    env.put(Context.SECURITY_PRINCIPAL, prop.getProperty("ldap.username")); // specify
-										    // the
-										    // username
-	    // admin psw - TO BE FIXED - in config file
-	    env.put(Context.SECURITY_CREDENTIALS, prop.getProperty("ldap.password")); // specify
-										      // the
-										      // password
+	    env.put(Context.SECURITY_PRINCIPAL, ldapUsername); 
+	    env.put(Context.SECURITY_CREDENTIALS, ldapPassword);
 	    // init the connection
 
 	    DirContext ctx = new InitialDirContext(env);
@@ -189,10 +185,8 @@ public class UserController {
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    return false;
-	} finally {
-	    inputStream.close();
-	}
-
+	} 
+	
 	return true;
     }
 
@@ -238,36 +232,16 @@ public class UserController {
 
     //
     private User getUserFromLdap(String username, SearchControls searchControls) throws IOException {
-	InputStream inputStream = null;
+    	
 	User currentUser = new User();
 	try {
-	    // Get the properties file with the ldap connection info
-	    Properties prop = new Properties();
-	    String propFileName = "my.properties";
-
-	    inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-
-	    if (inputStream != null) {
-		prop.load(inputStream);
-	    } else {
-		throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
-	    }
-
 	    // Make the connection with LDAP
 	    Hashtable env = new Hashtable();
 	    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-	    // LDAP URL
-	    env.put(Context.PROVIDER_URL, prop.getProperty("ldap.URL"));
-	    // Type of Authentication
+	    env.put(Context.PROVIDER_URL, (ldapProtocol + "://" + ldapHost + ":" + ldapPort));
 	    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-	    // admin username
-	    env.put(Context.SECURITY_PRINCIPAL, prop.getProperty("ldap.username")); // specify
-										    // the
-										    // username
-	    // admin psw - TO BE FIXED - in config file
-	    env.put(Context.SECURITY_CREDENTIALS, prop.getProperty("ldap.password")); // specify
-										      // the
-										      // password
+	    env.put(Context.SECURITY_PRINCIPAL, ldapUsername);
+	    env.put(Context.SECURITY_CREDENTIALS, ldapPassword);
 	    // init the connection
 
 	    env.put(Context.REFERRAL, "follow");
@@ -332,9 +306,7 @@ public class UserController {
 	    e.printStackTrace();
 	    return null;
 
-	} finally {
-	    inputStream.close();
-	}
+	} 
 
 	currentUser.setUsername(username);
 	currentUser.setPassword("******");

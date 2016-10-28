@@ -13,10 +13,20 @@
  *******************************************************************************/
 package eu.operando.interfaces.aapi.configuration;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @ComponentScan(basePackages = "eu.operando.interfaces.aapi")
+@PropertySource("classpath:aapi-config.properties")
 class BaseConfiguration {
+
+	//To resolve ${} in @Value
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+		return new PropertySourcesPlaceholderConfigurer();
+	}
 }
