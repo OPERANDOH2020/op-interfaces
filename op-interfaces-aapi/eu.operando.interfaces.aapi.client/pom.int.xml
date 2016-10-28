@@ -23,7 +23,7 @@
 	<packaging>jar</packaging>
 	<name>Client for the aapi service</name>
 	<version>1.0.0</version>
-	  	
+
 	<properties>		
 		<swagger-annotations-version>1.5.8</swagger-annotations-version>
 		<jersey-version>1.19.1</jersey-version>		
