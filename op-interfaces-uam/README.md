@@ -3,7 +3,7 @@
 
 #Components: APS,ARS,ATE,Core,DLP,ERS,SM, UDE
 
-#Dependncies: 
+#Dependencies: 
  SwarmESB
 
 ## License
