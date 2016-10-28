@@ -5,9 +5,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>eu.operando</groupId>
-	<artifactId>op-interfaces-aapi-parent</artifactId>
+	<artifactId>eu.operando.interfaces.aapi</artifactId>
 	<packaging>pom</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,8 +16,8 @@
 	</properties>
 
 	<modules>
-		<module>op-interfaces-aapi</module>		
-		<module>core-logdb-ws</module>
+		<module>eu.operando.interfaces.aapi.server</module>		
+		<module>eu.operando.interfaces.aapi.client</module>
 	</modules>
 
 	<build>

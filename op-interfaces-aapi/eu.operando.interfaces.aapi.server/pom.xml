@@ -18,11 +18,11 @@
 
 	<parent>
 		<groupId>eu.operando</groupId>
-		<artifactId>op-interfaces-aapi-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<artifactId>eu.operando.interfaces.aapi</artifactId>
+		<version>1.0.0</version>
 	</parent>
 
-	<artifactId>op-interfaces-aapi</artifactId>
+	<artifactId>eu.operando.interfaces.aapi.server</artifactId>
 	<packaging>war</packaging>
 	<name>Operando's Authentication Service</name>
 
@@ -102,8 +102,8 @@
 		<!-- Operando modules -->
 		<dependency>
 			<groupId>eu.operando</groupId>
-			<artifactId>core-logdb-ws</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>eu.operando.core.ldb.client</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 
 	</dependencies>
