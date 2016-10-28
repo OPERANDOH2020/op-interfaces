@@ -1,0 +1,180 @@
+<!-- 
+/*******************************************************************************
+ *  # Copyright (c) 2016 {UPRC}.
+ *  # All rights reserved. This program and the accompanying materials
+ *  # are made available under the terms of the The MIT License (MIT).
+ *  # which accompanies this distribution, and is available at
+ *  # http://opensource.org/licenses/MIT
+ *
+ *  # Contributors:
+ *  #    {Constantinos Patsakis} {UPRC}
+ *  #    {Stamatis Glykos} {UPRC}
+ *  #    {Constantinos Alexandris} {UPRC}
+ *  # Initially developed in the context of OPERANDO EU project www.operando.eu 
+ *******************************************************************************/
+ -->
+ 
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>eu.operando</groupId>
+	<artifactId>eu.operando.interfaces.aapi.server</artifactId>
+	<packaging>war</packaging>
+	<name>eu.operando.interfaces.aapi.server</name>
+	<version>1.0.0</version>
+	
+	<properties>
+		<springframework.version>4.3.0.RELEASE</springframework.version>
+		<javax.version>2.0.5</javax.version>
+		<odata.version>1.2.0</odata.version>
+		<mysql.version>5.1.23</mysql.version>
+		<slf4j.version>1.7.7</slf4j.version>
+		<cxf.version>2.7.5</cxf.version>
+		<jersey.version>2.2</jersey.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<servlet-api-version>2.5</servlet-api-version>
+		<!-- added to support docker image creation -->
+		<docker.registry.name>localhost:5000/</docker.registry.name><!-- leave 
+			empty for docker hub; use e.g. "localhost:5000/" for a local docker registry -->
+		<docker.repository.name>${docker.registry.name}tecnalia/eu.operando.interfaces.aapi.server</docker.repository.name>
+		<docker.logdb.port>8135</docker.logdb.port>
+		<user.warName>operando#interfaces#aapi</user.warName>
+		<packaging.type>jar</packaging.type>
+		<!-- end of addition -->
+	</properties>
+	
+	<profiles>
+		<profile>
+			<id>jenkins-dev</id>
+			<activation>
+				<property>
+					<name>ci</name>
+				</property>
+			</activation>
+			<properties>
+
+			</properties>
+		</profile>
+	</profiles>
+	
+	<dependencies>
+		<!-- Spring Framework -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${springframework.version}</version>
+		</dependency>
+
+		<!-- JSON serializer/deserializer <dependency> <groupId>com.fasterxml.jackson.core</groupId> 
+			<artifactId>jackson-databind</artifactId> <version>${jackson-version}</version> 
+			</dependency> -->
+
+		<!-- Http Client -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.17</version>
+		</dependency>
+
+		<!-- Operando modules -->
+		<dependency>
+			<groupId>eu.operando</groupId>
+			<artifactId>eu.operando.core.ldb.client</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.operando</groupId>
+			<artifactId>eu.operando.interfaces.aapi.client</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	 <dependency>
+	  <groupId>log4j</groupId>
+	  <artifactId>log4j</artifactId>
+	  <version>1.2.17</version>
+	 </dependency>
+	</dependencies>
+
+	<build>
+	<plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<version>2.5.1</version>
+			<inherited>true</inherited>
+			<configuration>
+				<source>1.7</source>
+				<target>1.7</target>
+			</configuration>
+		</plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-war-plugin</artifactId>
+			<version>2.1.1</version>
+			<configuration>
+				<!-- added to support right path -->
+				<warName>${user.warName}</warName>
+				<!-- end of addition -->
+			</configuration>
+		</plugin>
+		<!-- added to support docker image creation -->
+		<plugin>
+			<groupId>org.jolokia</groupId>
+			<artifactId>docker-maven-plugin</artifactId>
+			<version>0.13.9</version> <!-- last version in https://mvnrepository.com/artifact/org.jolokia/docker-maven-plugin -->
+			<configuration>
+				<images>
+					<image>
+						<alias>eu.operando.interfaces.aapi</alias>
+						<name>${docker.repository.name}:${project.version}</name>
+						<build>
+							<from>tomcat:7</from> <!-- in our case we start from tomcat image -->
+							<assembly>
+								<basedir>/</basedir>
+								<descriptor>docker-assembly.xml</descriptor>
+							</assembly>
+							<ports>
+								<port>8080</port>
+							</ports>
+						</build>
+						<run>
+							<namingStrategy>alias</namingStrategy>
+							<ports>
+								<port>${docker.logdb.port}:8080</port>
+							</ports>
+						</run>
+					</image>
+				</images>
+			</configuration>
+		</plugin>
+		<!-- end of addition -->
+	
+	</plugins>		
+
+	</build>
+</project>
