@@ -22,15 +22,18 @@ import org.mockito.runners.MockitoJUnitRunner;
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.api.impl.ReportsApiServiceImpl;
-import eu.operando.api.model.ReportOperando;
 import eu.operando.moduleclients.ClientAuthenticationApiOperandoService;
 import eu.operando.moduleclients.ClientReportGenerator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReportsApiServiceImplTests
 {
-	private static final String SERVICE_TICKET = "ticket-ST";
+	// Variables to test.
 	private static final String SERVICE_ID_GET_REPORT = "GET /regulator/reports/{report_id}";
+	
+	// Dummy variables.
+	private static final String REPORT_FROM_CLIENT = "reportFromClient";
+	private static final String SERVICE_TICKET = "ticket-ST";
 	private static final String REPORT_ID = "123";
 	private static final String FORMAT = "pdf";
 	private static final MultivaluedMap<String, String> PARAMETERS_OPTIONAL = new MultivaluedStringMap();
@@ -130,8 +133,7 @@ public class ReportsApiServiceImplTests
 	public void testReportsReportIdGet_OspAuthenticated_ClientReturnsReport_ResponseReturnedWithOkCode() throws OperandoCommunicationException
 	{
 		// Set up
-		ReportOperando report = new ReportOperando();
-		setUpResponseFromOtherModules(true, null, report);
+		setUpResponseFromOtherModules(true, null, REPORT_FROM_CLIENT);
 
 		Response responseToReturn = implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
@@ -144,8 +146,7 @@ public class ReportsApiServiceImplTests
 	public void testReportsReportIdGet_OspAuthenticated_ReportGeneratorReturnsReport_ResponseContainsReturnedReport() throws OperandoCommunicationException
 	{
 		// Set up
-		ReportOperando reportFromClient = new ReportOperando();
-		setUpResponseFromOtherModules(true, null, reportFromClient);
+		setUpResponseFromOtherModules(true, null, REPORT_FROM_CLIENT);
 
 		// Exercise
 		Response responseToReturn = implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
@@ -154,7 +155,7 @@ public class ReportsApiServiceImplTests
 		@SuppressWarnings("unchecked")
 		Entity<Object> entity = (Entity<Object>) responseToReturn.getEntity();
 		Object objectInBody = entity.getEntity();
-		assertEquals("In the event of successful report retrieval, the RAPI should return the report it gets from elsewhere in the platform.", reportFromClient,
+		assertEquals("In the event of successful report retrieval, the RAPI should return the report it gets from elsewhere in the platform.", REPORT_FROM_CLIENT,
 				objectInBody);
 	}
 
@@ -169,7 +170,7 @@ public class ReportsApiServiceImplTests
 	 */
 	@SuppressWarnings("unchecked")
 	private void setUpResponseFromOtherModules(boolean ospAuthenticated, CommunicationError errorOnOperandoCommunicationExceptionFromClient,
-			ReportOperando reportFromClient) throws OperandoCommunicationException
+			String reportFromClient) throws OperandoCommunicationException
 	{
 		when(clientAuthenticationService.isOspAuthenticatedForRequestedService(anyString(), anyString())).thenReturn(ospAuthenticated);
 		if (errorOnOperandoCommunicationExceptionFromClient != null)
