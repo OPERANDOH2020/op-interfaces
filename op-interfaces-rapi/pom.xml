@@ -103,10 +103,10 @@
 				</property>
 			</activation>
 			<properties>
-				<as.baseurl>http://10.0.0.5:8101/operando/core/as</as.baseurl>
-				<dan.baseurl>http://10.0.0.5:8111/operando/pdr/dan</dan.baseurl>
-				<ldb.baseurl>http://10.0.0.5:8090/operando/core/ldb</ldb.baseurl>
-	 	        <rm.baseurl>http://10.0.0.5:8102/operando/core/rm</rm.baseurl>
+				<as.baseurl>http://integration.operando.dmz.lab.esilab.org:8101/operando/core/as</as.baseurl>
+				<dan.baseurl>http://integration.operando.dmz.lab.esilab.org:8111/operando/pdr/dan</dan.baseurl>
+				<ldb.baseurl>http://integration.operando.dmz.lab.esilab.org:8090/operando/core/ldb</ldb.baseurl>
+	 	        <rm.baseurl>http://integration.operando.dmz.lab.esilab.org:8102/operando/core/rm</rm.baseurl>
 			</properties>
 		</profile>
 	</profiles>
