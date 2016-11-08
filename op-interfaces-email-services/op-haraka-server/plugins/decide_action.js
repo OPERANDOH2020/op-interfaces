@@ -82,19 +82,6 @@ exports.decideAction = function(next,connection){
     connection.relaying = false;
     sender = sender.substr(1, sender.length - 2);
 
-    plugin.loginfo("\n\n",connection.transaction,"\n\n");
-
-    if(sender==="operando@privatesky.xyz"){
-        connection.results.add(plugin,
-            {
-                "action": "noAction"
-            }
-        );
-        connection.relaying = true;
-        next(OK);
-        return;
-    }
-
     edb.getRealEmail(alias,function(err,realEmail){
         if(realEmail) {
             edb.registerConversation(sender, alias, function (err, conversationUUID) {
