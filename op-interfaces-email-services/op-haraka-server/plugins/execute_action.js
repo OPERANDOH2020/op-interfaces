@@ -51,6 +51,8 @@ exports.forward = function (next, connection) {
         plugin.loginfo("New to: "+newTo);
         connection.transaction.rcpt_to.pop();
         connection.transaction.rcpt_to.push(new address('<' + newTo + '>'));
+        connection.transaction.header.remove('to');
+        connection.transaction.header.add('to',newTo);
     }
 
     function changeFrom(newFrom) {
