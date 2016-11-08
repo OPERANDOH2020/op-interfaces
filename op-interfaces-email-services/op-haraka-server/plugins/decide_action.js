@@ -81,6 +81,9 @@ exports.decideAction = function(next,connection){
 
     connection.relaying = false;
     sender = sender.substr(1, sender.length - 2);
+
+    plugin.loginfo("\n\n",connection.transaction,"\n\n");
+
     if(sender==="operando@privatesky.xyz"){
         connection.results.add(plugin,
             {
