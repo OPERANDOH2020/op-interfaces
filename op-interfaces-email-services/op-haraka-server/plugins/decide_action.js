@@ -16,7 +16,7 @@ function SwarmConnector(){
     var adapterPort  = 3000;
     var adapterHost  = "localhost";
     var util         = require("swarmcore");
-    var client	  = util.createClient(adapterHost, adapterPort, "BroadcastUser", "ok","BroadcastTest", "testCtor");
+    var client	     = util.createClient(adapterHost, adapterPort, "BroadcastUser", "ok","BroadcastTest", "testCtor");
     var uuid         = require('node-uuid');
 
     this.registerConversation=function(sender,receiver,callback){
@@ -36,7 +36,10 @@ function SwarmConnector(){
             if(swarm.error){
                 callback(swarm.error);
             }else{
-                callback(undefined,swarm.conversation);
+                callback(undefined,{
+                    "receiver":swarm.receiverEmail,
+                    "sender"  :swarm.senderEmail
+                });
             }
         });
     };
@@ -54,13 +57,12 @@ function SwarmConnector(){
 
     this.getRealEmail=function(userAlias,callback){
         var swarmHandler = client.startSwarm("identity.js","getRealEmail",userAlias);
-	       
-	swarmHandler.onResponse(function(swarm){
-	    if(swarm.realEmail){
-                callback(undefined,swarm.realEmail);
-            }else{
-                callback(swarm.error);
-            }
+        swarmHandler.onResponse(function(swarm){
+            if(swarm.realEmail){
+                    callback(undefined,swarm.realEmail);
+                }else{
+                    callback(swarm.error);
+                }
         });
     };	
 }

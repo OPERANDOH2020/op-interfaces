@@ -76,7 +76,6 @@ exports.forward = function (next, connection) {
         connection.transaction.header.remove('DKIM-Signature');
         connection.transaction.header.remove('DomainKey-Signature');
     }
-
 }
 
 
