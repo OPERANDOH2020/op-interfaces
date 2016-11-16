@@ -37,8 +37,8 @@ function SwarmConnector(){
                 callback(swarm.error);
             }else{
                 callback(undefined,{
-                    "receiver":swarm.receiverEmail,
-                    "sender"  :swarm.senderEmail
+                    "receiver":swarm.conversation.receiver,
+                    "sender"  :swarm.conversation.sender
                 });
             }
         });
@@ -99,18 +99,18 @@ exports.decideAction = function(next,connection){
                     connection.relaying = true;
                     next(OK)
                 }else{
-		    plugin.loginfo("Could not register conversation between ",sender," and ",alias,"\nError:",err)
+		            plugin.loginfo("Could not register conversation between ",sender," and ",alias,"\nError:",err);
                     next(DENY)
                 }
             })
         }
         else{
-	    plugin.loginfo("Try to get conversation ", connection.transaction.rcpt_to[0].user);
+            plugin.loginfo("Try to get conversation ", connection.transaction.rcpt_to[0].user);
             edb.getConversation(connection.transaction.rcpt_to[0].user,function(err,conversation){
                 if(conversation) {
                     plugin.loginfo("Delivering to outside entity");
                     plugin.loginfo("Current conversation:"+connection.transaction.rcpt_to[0].user);
-                 
+
                     connection.results.add(plugin,
                         {
                             "action":"relayToOutsideEntity",
