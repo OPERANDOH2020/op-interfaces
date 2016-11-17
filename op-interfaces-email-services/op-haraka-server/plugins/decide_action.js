@@ -33,7 +33,6 @@ function SwarmConnector(){
     this.getConversation=function(conversationUUID,callback){
         var swarmHandler = client.startSwarm("emails.js","getConversation",conversationUUID);
         swarmHandler.onResponse(function(swarm){
-            plugin.loginfo("Got conversation\n\n\n",swarm,"\n\n\n");
             if(swarm.error){
                 callback(swarm.error);
             }else{
@@ -115,8 +114,8 @@ exports.decideAction = function(next,connection){
                     connection.results.add(plugin,
                         {
                             "action":"relayToOutsideEntity",
-                            "to":conversation['sender'],
-                            "from":conversation['receiver']
+                            "to":conversation['receiver'],
+                            "from":conversation['sender']
                         }
                     );
                     edb.removeConversation(connection.transaction.rcpt_to[0].user,function(err,result){
