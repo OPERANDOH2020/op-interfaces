@@ -33,6 +33,7 @@ function SwarmConnector(){
     this.getConversation=function(conversationUUID,callback){
         var swarmHandler = client.startSwarm("emails.js","getConversation",conversationUUID);
         swarmHandler.onResponse(function(swarm){
+            plugin.loginfo("Got conversation\n\n\n",swarm,"\n\n\n");
             if(swarm.error){
                 callback(swarm.error);
             }else{
