@@ -86,7 +86,7 @@ exports.decideAction = function(next,connection){
 
     edb.getRealEmail(alias,function(err,realEmail){
         if(realEmail) {
-            edb.registerConversation(sender, alias, function (err, conversationUUID) {
+            edb.registerConversation(alias,sender,function (err, conversationUUID) {
                 if(!err){
                     plugin.loginfo("Delivering to user");
                     connection.results.add(plugin,
