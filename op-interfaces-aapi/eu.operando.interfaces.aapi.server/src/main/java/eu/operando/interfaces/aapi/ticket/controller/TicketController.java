@@ -264,15 +264,16 @@ public class TicketController {
 			} else if (content.toString().contains("<cas:authenticationFailure code=\'INVALID_TICKET\'>")){
 				
 				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", content.toString(), LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
-				return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<String>(content.toString(), HttpStatus.BAD_REQUEST);
+                                
 			} else if (content.toString().contains("<cas:authenticationFailure code=\'INVALID_SERVICE\'>")){
 				
 				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", content.toString(), LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
-				return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<String>(content.toString(), HttpStatus.BAD_REQUEST);
 			}else {
 				
 				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", content.toString(), LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");			
-				return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);				
+				return new ResponseEntity<String>(content.toString(), HttpStatus.INTERNAL_SERVER_ERROR);				
 			}
 			
 		} catch (Exception ex){
