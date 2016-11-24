@@ -16,7 +16,10 @@ package eu.operando.interfaces.aapi.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -38,6 +41,24 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @SwaggerDefinition(basePath="/authenticationservice")
 class SwaggerConfiguration extends WebMvcConfigurerAdapter {
+
+	@Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		configurer.setUseRegisteredSuffixPatternMatch(true);
+	}
+
+	@Override
+	public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+		configurer
+		.favorPathExtension(false)
+		.favorParameter(false)		
+		.ignoreAcceptHeader(false)
+		.useJaf(false)
+		.defaultContentType(MediaType.APPLICATION_JSON)
+		.mediaType("json", MediaType.APPLICATION_JSON)
+		.mediaType("xml", MediaType.APPLICATION_XML)
+		.mediaType("html", MediaType.TEXT_HTML);
+	}
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {

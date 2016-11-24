@@ -100,7 +100,7 @@ public class UserController {
 
     }
 
-    @RequestMapping(value = "/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{username:.+}", method = RequestMethod.GET)
     @ApiOperation(value = "getUser", notes = "This operation returns the OPERANDO's registed user with given username")
     @ApiResponses(value = {
 	    @ApiResponse(code = 500, message = "Internal Server Error"),

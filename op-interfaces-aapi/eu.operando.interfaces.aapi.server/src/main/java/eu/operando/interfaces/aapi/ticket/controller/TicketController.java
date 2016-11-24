@@ -244,36 +244,34 @@ public class TicketController {
 			
 			response = httpClient.execute(httpGet);
 			
-			//Get the result
-			StringBuffer content=new StringBuffer();
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-			String line;
-
-			// read from the urlconnection via the bufferedreader
-			while ((line = bufferedReader.readLine()) != null)
-			{
-				content.append(line + "\n");
+			// Get CAS's server response HEADERS
+			HttpHeaders headers = new HttpHeaders();
+			for (Header header : response.getAllHeaders()) {
+				headers.add(header.getName(), header.getValue());
 			}
-			bufferedReader.close();
+			
+			// Get CAS's server response BODY
+			String body = null;
+			HttpEntity entity = response.getEntity();
+			body = EntityUtils.toString(entity);						
 
-			if (content.toString().contains("<cas:authenticationSuccess>")){
+			if (body.contains("<cas:authenticationSuccess>")){
 								
 				log.logMe(LogRequest.LogDataTypeEnum.INFO, "", String.format("st %s for serviceId %s is valid", serviceTicket, service), LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
-				return new ResponseEntity<String>(content.toString(), HttpStatus.OK);
-			} else if (content.toString().contains("<cas:authenticationFailure code=\'INVALID_TICKET\'>")){
+				return new ResponseEntity<String>(body, headers, HttpStatus.OK);
+			} else if (body.contains("<cas:authenticationFailure code=\'INVALID_TICKET\'>")){
 				
-				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", content.toString(), LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
-				return new ResponseEntity<String>(content.toString(), HttpStatus.BAD_REQUEST);
+				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
+				return new ResponseEntity<String>(body, headers, HttpStatus.BAD_REQUEST);
                                 
-			} else if (content.toString().contains("<cas:authenticationFailure code=\'INVALID_SERVICE\'>")){
+			} else if (body.contains("<cas:authenticationFailure code=\'INVALID_SERVICE\'>")){
 				
-				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", content.toString(), LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
-				return new ResponseEntity<String>(content.toString(), HttpStatus.BAD_REQUEST);
+				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
+				return new ResponseEntity<String>(body, headers, HttpStatus.BAD_REQUEST);
 			}else {
 				
-				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", content.toString(), LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");			
-				return new ResponseEntity<String>(content.toString(), HttpStatus.INTERNAL_SERVER_ERROR);				
+				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");			
+				return new ResponseEntity<String>(body, headers, HttpStatus.INTERNAL_SERVER_ERROR);				
 			}
 			
 		} catch (Exception ex){
