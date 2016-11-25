@@ -69,22 +69,22 @@ function SwarmConnector(){
 
 var edb = new SwarmConnector();
 
-exports.register = function(){
-    plugin = this;
-    this.register_hook("rcpt","decideAction");
-};
-var plugin;
+
 
 var cfg;
-exports.register = function () {
+var plugin;
+
+exports.register = function(){
     plugin = this;
-    cfg = plugin.config.get('operando.ini', function () {
-        plugin.register();
-    });
-    plugin.loginfo('Operando configuration:' + JSON.stringify(cfg));
+    readConfig();
+    this.register_hook("rcpt","decideAction");
+
 };
 
-
+function readConfig(){
+    cfg = plugin.config.get('operando.ini',readConfig);
+    plugin.loginfo("Operando configuration: ",cfg);
+}
 
 
 exports.decideAction = function(next,connection){
