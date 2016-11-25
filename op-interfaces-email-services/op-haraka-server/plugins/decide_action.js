@@ -75,6 +75,17 @@ exports.register = function(){
 };
 var plugin;
 
+var cfg;
+exports.register = function () {
+    plugin = this;
+    cfg = plugin.config.get('operando.ini', function () {
+        plugin.register();
+    });
+    plugin.loginfo('Operando configuration:' + JSON.stringify(cfg));
+};
+
+
+
 
 exports.decideAction = function(next,connection){
     var alias = connection.transaction.rcpt_to[0].user+"@"+connection.transaction.rcpt_to[0].host;
@@ -93,7 +104,7 @@ exports.decideAction = function(next,connection){
                         {
                             "action": "relayToUser",
                             "to": realEmail,
-                            "replyTo":conversationUUID+"@privatesky.xyz"
+                            "replyTo":conversationUUID+"@"+cfg.host
                         }
                     );
                     connection.relaying = true;
