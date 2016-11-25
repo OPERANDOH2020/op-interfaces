@@ -104,7 +104,7 @@ exports.decideAction = function(next,connection){
                         {
                             "action": "relayToUser",
                             "to": realEmail,
-                            "replyTo":conversationUUID+"@"+cfg.host
+                            "replyTo":conversationUUID+"@"+cfg.main.host
                         }
                     );
                     connection.relaying = true;
