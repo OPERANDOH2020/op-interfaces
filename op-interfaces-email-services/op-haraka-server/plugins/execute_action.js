@@ -13,12 +13,8 @@
  */
 
 var address = require("address-rfc2821").Address;
-var util = require('util');
-var outbound = require('./outbound');
-
 
 exports.register = function(){
-    this.register_hook("queue","forward");
     this.register_hook("queue_outbound","forward");
 };
 
@@ -32,6 +28,8 @@ exports.forward = function (next, connection) {
         {
             plugin.loginfo("Relay to user");
             changeTo(decision.to);
+            changeFrom(decision.from);
+            removeHeaders();
             addReplyTo(decision.replyTo);
             break;
         }
@@ -75,6 +73,7 @@ exports.forward = function (next, connection) {
         connection.transaction.header.remove('X-Sender');
         connection.transaction.header.remove('DKIM-Signature');
         connection.transaction.header.remove('DomainKey-Signature');
+        connection.transaction.header.remove('Message-ID');
     }
 }
 

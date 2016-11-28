@@ -59,10 +59,10 @@ function SwarmConnector(){
         var swarmHandler = client.startSwarm("identity.js","getRealEmail",userAlias);
         swarmHandler.onResponse(function(swarm){
             if(swarm.realEmail){
-                    callback(undefined,swarm.realEmail);
-                }else{
-                    callback(swarm.error);
-                }
+                callback(undefined,swarm.realEmail);
+            }else{
+                callback(swarm.error);
+            }
         });
     };	
 }
@@ -104,6 +104,7 @@ exports.decideAction = function(next,connection){
                         {
                             "action": "relayToUser",
                             "to": realEmail,
+                            "from": sender.replace("@","_")+"@"+cfg.main.host,
                             "replyTo":conversationUUID+"@"+cfg.main.host
                         }
                     );
