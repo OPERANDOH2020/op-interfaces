@@ -101,6 +101,7 @@ function readConfig(){
     plugin.loginfo("Operando configuration: ",cfg);
 }
 
+var os = require('os');
 var path = require('path');
 var uniq = 0;
 var MAX_UNIQ = 100000;
