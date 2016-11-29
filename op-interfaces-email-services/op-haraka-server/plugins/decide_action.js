@@ -106,7 +106,6 @@ var path = require('path');
 var uniq = 0;
 var MAX_UNIQ = 100000;
 var my_hostname = require('os').hostname().replace(/\\/, '\\057').replace(/:/, '\\072');
-var platformDOT = ((['win32','win64'].indexOf( os.platform() ) !== -1) ? '' : '__tmp__') + '.';
 
 function generateQueueLocation(){
     /*
@@ -115,7 +114,7 @@ function generateQueueLocation(){
     var queue_path =process.env.HARAKA+"/queue/";
     var fname = new Date().getTime()+'_0_' + process.pid + "_" + _next_uniq() + '.' + my_hostname;
 
-    return path.join(queue_path,platformDOT+fname);
+    return path.join(queue_path,fname);
 
     function _next_uniq(){
         if (uniq >= MAX_UNIQ) {
