@@ -20,6 +20,7 @@ function SwarmConnector(){
     var uuid           = require('node-uuid');
     var self           = this;
     var gotConnection  = false;
+    var outbound       = require("./outbound");
 
     this.registerConversation=function(sender,receiver,callback){
         var swarmHandler = client.startSwarm("emails.js","registerConversation",sender,receiver);
@@ -76,13 +77,8 @@ function SwarmConnector(){
     client.addListener('open',function(){
         self.gotConnection = true;
         plugin.loginfo("Swarm connection was opened");
-        deliverQueuedEmails();
+        outbound.load_queue();
     });
-
-
-    function deliverQueuedEmails(){
-
-    }
 
     this.connected = function(){
         return gotConnection;
@@ -106,6 +102,21 @@ function readConfig(){
 }
 
 
+var uniq = 0;
+var MAX_UNIQ = 100000;
+var my_hostname = require('os').hostname().replace(/\\/, '\\057').replace(/:/, '\\072');
+function generateQueueLocation(){
+    /*
+        The filename of the stored email must match the pattern in "./outbound.js" to be able to be queued
+     */
+    return process.env.HARAKA+"/queue/__tmp__"+new Date().getTime()+'_0_' + process.pid + "_" + _next_uniq() + '.' + my_hostname;
+    function _next_uniq(){
+        if (uniq >= MAX_UNIQ) {
+            uniq = 0;
+        }
+        return ++uniq;
+    }
+}
 
 
 exports.decideAction = function(next,connection){
@@ -116,13 +127,11 @@ exports.decideAction = function(next,connection){
     connection.relaying = false;
     sender = sender.substr(1, sender.length - 2);
 
-
-
     if(!edb.connected()){
         connection.results.add(plugin,
             {
                 "action": "storeEmail",
-                "location":cfg.storageFolder+"/"+connection.transaction.uuid
+                "location":generateQueueLocation()
             }
         );
         connection.relaying = false;

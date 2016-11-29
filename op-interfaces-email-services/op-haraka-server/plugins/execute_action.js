@@ -47,7 +47,7 @@ exports.forward = function (next, connection) {
         case "storeEmail":
         {
             plugin.loginfo("Storing email");
-            storeEmail(connection.transaction,decision.location,function(err,res){
+            storeEmail(decision.location,function(err,res){
                 if(err){
                     plugin.loginfo("An error occured while storring an email\n",err)
                 }
@@ -87,10 +87,10 @@ exports.forward = function (next, connection) {
         connection.transaction.header.remove('Message-ID');
     }
 
-    function storeEmail(email,path,callback){
+    function storeEmail(path,callback){
         var ws = fs.createWriteStream(path);
         ws.once('close',callback);
-        email.message_strean.pipe(ws);
+        connection.transaction.message_stream.pipe(ws,{ line_endings: '\r\n', dot_stuffing: true, ending_dot: false });
     }
 };
 
