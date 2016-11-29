@@ -16,8 +16,32 @@ var address = require("address-rfc2821").Address;
 var fs = require('fs');
 exports.register = function(){
     this.register_hook("queue_outbound","forward");
+    this.register_hook("queue","store");
 };
 
+exports.store = function(next,connection){
+    var plugin = this;
+    var decision = connection.results.get('decide_action');
+
+    switch (decision.action) {
+        case "storeEmail":
+        {
+            plugin.loginfo("Storing email");
+            storeEmail(decision.location,function(err,res){
+                if(err){
+                    plugin.loginfo("An error occured while storring an email\n",err)
+                }
+                next(OK);
+            })
+        }
+    }
+
+    function storeEmail(path,callback){
+        var ws = fs.createWriteStream(path);
+        ws.once('close',callback);
+        connection.transaction.message_stream.pipe(ws,{ line_endings: '\r\n', dot_stuffing: true, ending_dot: false });
+    }
+}
 
 exports.forward = function (next, connection) {
     var plugin = this;
@@ -31,7 +55,6 @@ exports.forward = function (next, connection) {
             changeFrom(decision.from);
             removeHeaders();
             addReplyTo(decision.replyTo);
-            next();
             break;
         }
         case "relayToOutsideEntity" :
@@ -41,20 +64,10 @@ exports.forward = function (next, connection) {
             addReplyTo(decision.from);
             changeTo(decision.to);
             removeHeaders();
-            next();
             break;
         }
-        case "storeEmail":
-        {
-            plugin.loginfo("Storing email");
-            storeEmail(decision.location,function(err,res){
-                if(err){
-                    plugin.loginfo("An error occured while storring an email\n",err)
-                }
-                next(OK);
-            })
-        }
     }
+    next();
 
     function changeTo(newTo) {
         plugin.loginfo("New to: "+newTo);
@@ -85,12 +98,6 @@ exports.forward = function (next, connection) {
         connection.transaction.header.remove('DKIM-Signature');
         connection.transaction.header.remove('DomainKey-Signature');
         connection.transaction.header.remove('Message-ID');
-    }
-
-    function storeEmail(path,callback){
-        var ws = fs.createWriteStream(path);
-        ws.once('close',callback);
-        connection.transaction.message_stream.pipe(ws,{ line_endings: '\r\n', dot_stuffing: true, ending_dot: false });
     }
 };
 
