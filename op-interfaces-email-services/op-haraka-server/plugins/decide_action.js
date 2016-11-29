@@ -118,7 +118,7 @@ exports.decideAction = function(next,connection){
 
 
 
-    if(!edb.gotConnection()){
+    if(!edb.connected()){
         connection.results.add(plugin,
             {
                 "action": "storeEmail",
