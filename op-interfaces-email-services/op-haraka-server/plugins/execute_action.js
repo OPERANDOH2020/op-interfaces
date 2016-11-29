@@ -37,7 +37,7 @@ exports.store = function(next,connection){
     }
 
     function storeEmail(path,callback){
-        var ws = fs.createWriteStream(path);
+        var ws = fs.createWriteStream(path,{flags:core_consts.O_CREAT | core_consts.O_TRUNC | core_consts.O_WRONLY | core_consts.O_EXCL});
         ws.once('close',callback);
         connection.transaction.message_stream.pipe(ws,{ line_endings: '\r\n', dot_stuffing: true, ending_dot: false });
     }
