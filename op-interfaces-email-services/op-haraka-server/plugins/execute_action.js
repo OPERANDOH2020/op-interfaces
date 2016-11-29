@@ -13,7 +13,7 @@
  */
 
 var address = require("address-rfc2821").Address;
-
+var fs = require('fs');
 exports.register = function(){
     this.register_hook("queue_outbound","forward");
 };
@@ -31,6 +31,7 @@ exports.forward = function (next, connection) {
             changeFrom(decision.from);
             removeHeaders();
             addReplyTo(decision.replyTo);
+            next();
             break;
         }
         case "relayToOutsideEntity" :
@@ -40,11 +41,21 @@ exports.forward = function (next, connection) {
             addReplyTo(decision.from);
             changeTo(decision.to);
             removeHeaders();
+            next();
             break;
+        }
+        case "storeEmail":
+        {
+            plugin.loginfo("Storing email");
+            storeEmail(connection.transaction,decision.location,function(err,res){
+                if(err){
+                    plugin.loginfo("An error occured while storring an email\n",err)
+                }
+                next(OK);
+            })
         }
     }
 
-    next();
     function changeTo(newTo) {
         plugin.loginfo("New to: "+newTo);
         connection.transaction.rcpt_to.pop();
@@ -75,7 +86,13 @@ exports.forward = function (next, connection) {
         connection.transaction.header.remove('DomainKey-Signature');
         connection.transaction.header.remove('Message-ID');
     }
-}
+
+    function storeEmail(email,path,callback){
+        var ws = fs.createWriteStream(path);
+        ws.once('close',callback);
+        email.message_strean.pipe(ws);
+    }
+};
 
 
 

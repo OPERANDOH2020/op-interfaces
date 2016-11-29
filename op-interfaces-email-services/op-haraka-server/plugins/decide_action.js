@@ -13,11 +13,13 @@
 
 
 function SwarmConnector(){
-    var adapterPort  = 3000;
-    var adapterHost  = "localhost";
-    var util         = require("swarmcore");
-    var client	     = util.createClient(adapterHost, adapterPort, "BroadcastUser", "ok","BroadcastTest", "testCtor");
-    var uuid         = require('node-uuid');
+    var adapterPort    = 3000;
+    var adapterHost    = "localhost";
+    var util           = require("swarmcore");
+    var client	       = util.createClient(adapterHost, adapterPort, "BroadcastUser", "ok","BroadcastTest", "testCtor");
+    var uuid           = require('node-uuid');
+    var self           = this;
+    var gotConnection  = false;
 
     this.registerConversation=function(sender,receiver,callback){
         var swarmHandler = client.startSwarm("emails.js","registerConversation",sender,receiver);
@@ -64,12 +66,30 @@ function SwarmConnector(){
                 callback(swarm.error);
             }
         });
-    };	
+    };
+
+    client.addListener("close",function(){
+        plugin.loginfo("Swarm connection was closed");
+        self.gotConnection = false;
+    });
+
+    client.addListener('open',function(){
+        self.gotConnection = true;
+        plugin.loginfo("Swarm connection was opened");
+        deliverQueuedEmails();
+    });
+
+
+    function deliverQueuedEmails(){
+
+    }
+
+    this.connected = function(){
+        return gotConnection;
+    }
 }
 
 var edb = new SwarmConnector();
-
-
 
 var cfg;
 var plugin;
@@ -78,13 +98,14 @@ exports.register = function(){
     plugin = this;
     readConfig();
     this.register_hook("rcpt","decideAction");
-
 };
 
 function readConfig(){
     cfg = plugin.config.get('operando.ini',readConfig);
     plugin.loginfo("Operando configuration: ",cfg);
 }
+
+
 
 
 exports.decideAction = function(next,connection){
@@ -95,53 +116,67 @@ exports.decideAction = function(next,connection){
     connection.relaying = false;
     sender = sender.substr(1, sender.length - 2);
 
-    edb.getRealEmail(alias,function(err,realEmail){
-        if(realEmail) {
-            edb.registerConversation(alias,sender,function (err, conversationUUID) {
-                if(!err){
-                    plugin.loginfo("Delivering to user");
-                    connection.results.add(plugin,
-                        {
-                            "action": "relayToUser",
-                            "to": realEmail,
-                            "from": sender.replace("@","_")+"@"+cfg.main.host,
-                            "replyTo":conversationUUID+"@"+cfg.main.host
-                        }
-                    );
-                    connection.relaying = true;
-                    next(OK)
-                }else{
-		            plugin.loginfo("Could not register conversation between ",sender," and ",alias,"\nError:",err);
-                    next(DENY)
-                }
-            })
-        }
-        else{
-            plugin.loginfo("Try to get conversation ", connection.transaction.rcpt_to[0].user);
-            edb.getConversation(connection.transaction.rcpt_to[0].user,function(err,conversation){
-                if(conversation) {
-                    plugin.loginfo("Delivering to outside entity");
-                    plugin.loginfo("Current conversation:"+connection.transaction.rcpt_to[0].user);
 
-                    connection.results.add(plugin,
-                        {
-                            "action":"relayToOutsideEntity",
-                            "to":conversation['receiver'],
-                            "from":conversation['sender']
-                        }
-                    );
-                    edb.removeConversation(connection.transaction.rcpt_to[0].user,function(err,result){
-                        if(err){
-                            self.loginfo("Failed to remove conversation:"+connection.transaction.rcpt_to[0].user+" from conversations database");
-                        }
-                    });
-                    connection.relaying = true;
-                    next(OK)
-                }else{
-                    plugin.loginfo("Dropping email");
-                    next(DENY);
-                }
-            });
-        }
-    });
+
+    if(!edb.gotConnection()){
+        connection.results.add(plugin,
+            {
+                "action": "storeEmail",
+                "location":cfg.storageFolder+"/"+connection.transaction.uuid
+            }
+        );
+        connection.relaying = false;
+        next(OK)
+    }
+    else {
+        edb.getRealEmail(alias, function (err, realEmail) {
+            if (realEmail) {
+                edb.registerConversation(alias, sender, function (err, conversationUUID) {
+                    if (!err) {
+                        plugin.loginfo("Delivering to user");
+                        connection.results.add(plugin,
+                            {
+                                "action": "relayToUser",
+                                "to": realEmail,
+                                "from": sender.replace("@", "_") + "@" + cfg.main.host,
+                                "replyTo": conversationUUID + "@" + cfg.main.host
+                            }
+                        );
+                        connection.relaying = true;
+                        next(OK)
+                    } else {
+                        plugin.loginfo("Could not register conversation between ", sender, " and ", alias, "\nError:", err);
+                        next(DENY)
+                    }
+                })
+            }
+            else {
+                plugin.loginfo("Try to get conversation ", connection.transaction.rcpt_to[0].user);
+                edb.getConversation(connection.transaction.rcpt_to[0].user, function (err, conversation) {
+                    if (conversation) {
+                        plugin.loginfo("Delivering to outside entity");
+                        plugin.loginfo("Current conversation:" + connection.transaction.rcpt_to[0].user);
+
+                        connection.results.add(plugin,
+                            {
+                                "action": "relayToOutsideEntity",
+                                "to": conversation['receiver'],
+                                "from": conversation['sender']
+                            }
+                        );
+                        edb.removeConversation(connection.transaction.rcpt_to[0].user, function (err, result) {
+                            if (err) {
+                                self.loginfo("Failed to remove conversation:" + connection.transaction.rcpt_to[0].user + " from conversations database");
+                            }
+                        });
+                        connection.relaying = true;
+                        next(OK)
+                    } else {
+                        plugin.loginfo("Dropping email");
+                        next(DENY);
+                    }
+                });
+            }
+        });
+    }
 };
