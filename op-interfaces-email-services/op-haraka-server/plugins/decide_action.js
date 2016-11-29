@@ -109,7 +109,7 @@ function generateQueueLocation(){
     /*
         The filename of the stored email must match the pattern in "./outbound.js" to be able to be queued
      */
-    return process.env.HARAKA+"/queue/__tmp__"+new Date().getTime()+'_0_' + process.pid + "_" + _next_uniq() + '.' + my_hostname;
+    return process.env.HARAKA+"/queue/__tmp__."+new Date().getTime()+'_0_' + process.pid + "_" + _next_uniq() + '.' + my_hostname;
     function _next_uniq(){
         if (uniq >= MAX_UNIQ) {
             uniq = 0;
