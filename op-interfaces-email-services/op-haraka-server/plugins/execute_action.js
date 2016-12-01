@@ -21,7 +21,7 @@ exports.register = function(){
 
 exports.deferr_message = function(next,hmailItem){
     var plugin = this;
-    plugin.loginfo("GET MX ARGUMENTS:\n\n",arguments);
+    plugin.loginfo("Send email hook arguments:\n\n",arguments);
     if(hmailItem.notes.deferr===true) {
         hmailItem.temp_fail(new Error("Operando backend if offline"));
     }else{
@@ -51,10 +51,6 @@ exports.forward = function (next, connection) {
             changeTo(decision.to);
             removeHeaders();
             break;
-        }
-        case "deferr":{
-            plugin.loginfo("Deferring email");
-
         }
     }
     next();

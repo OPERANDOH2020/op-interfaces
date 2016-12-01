@@ -143,7 +143,7 @@ exports.decideAction = function(next,connection){
         next(OK);
     }
     else {
-        connection.notes.deferr = false;
+        connection.transaction.notes.deferr = false;
         edb.getRealEmail(alias, function (err, realEmail) {
             if (realEmail) {
                 edb.registerConversation(alias, sender, function (err, conversationUUID) {
