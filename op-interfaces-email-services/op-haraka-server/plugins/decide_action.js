@@ -11,7 +11,6 @@
  www.operando.eu
  */
 
-
 function SwarmConnector(){
     var adapterPort    = 3000;
     var adapterHost    = "localhost";
@@ -20,7 +19,6 @@ function SwarmConnector(){
     var uuid           = require('node-uuid');
     var self           = this;
     var gotConnection  = false;
-    var outbound       = require("./outbound");
 
     this.registerConversation=function(sender,receiver,callback){
         var swarmHandler = client.startSwarm("emails.js","registerConversation",sender,receiver);
@@ -77,7 +75,6 @@ function SwarmConnector(){
     client.addListener('open',function(){
         self.gotConnection = true;
         plugin.loginfo("Swarm connection was opened");
-        outbound.load_queue();
     });
 
     this.connected = function(){
@@ -89,6 +86,7 @@ var edb = new SwarmConnector();
 
 var cfg;
 var plugin;
+var plugins = require('./plugins');
 
 exports.register = function(){
     plugin = this;
@@ -134,14 +132,9 @@ exports.decideAction = function(next,connection){
     sender = sender.substr(1, sender.length - 2);
 
     if(!edb.connected()){
-        connection.results.add(plugin,
-            {
-                "action": "storeEmail",
-                "location":generateQueueLocation()
-            }
-        );
-        connection.relaying = false;
-        next(OK)
+        connection.relaying = true;
+        next(OK);
+        //plugins.run_hooks('deferred',this,{delay:1000}); //postpone email delivery
     }
     else {
         edb.getRealEmail(alias, function (err, realEmail) {

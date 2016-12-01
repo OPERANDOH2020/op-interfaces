@@ -16,31 +16,12 @@ var address = require("address-rfc2821").Address;
 var fs = require('fs');
 exports.register = function(){
     this.register_hook("queue_outbound","forward");
-    this.register_hook("queue","store");
+    this.register_hook("get_mx","deferr_message");
 };
 
-exports.store = function(next,connection){
+exports.deferr_message = function(){
     var plugin = this;
-    var decision = connection.results.get('decide_action');
-
-    switch (decision.action) {
-        case "storeEmail":
-        {
-            plugin.loginfo("Storing email");
-            storeEmail(decision.location,function(err,res){
-                if(err){
-                    plugin.loginfo("An error occured while storring an email\n",err)
-                }
-                next(OK);
-            })
-        }
-    }
-
-    function storeEmail(path,callback){
-        var ws = fs.createWriteStream(path);
-        ws.once('close',callback);
-        connection.transaction.message_stream.pipe(ws,{ line_endings: '\r\n', dot_stuffing: true, ending_dot: false });
-    }
+    plugin.loginfo("GET MX ARGUMENTS:\n\n",arguments);
 }
 
 exports.forward = function (next, connection) {
@@ -65,6 +46,10 @@ exports.forward = function (next, connection) {
             changeTo(decision.to);
             removeHeaders();
             break;
+        }
+        case "deferr":{
+            plugin.loginfo("Deferring email");
+
         }
     }
     next();
