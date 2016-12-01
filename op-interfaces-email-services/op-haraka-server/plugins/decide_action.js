@@ -12,13 +12,13 @@
  */
 
 function SwarmConnector(){
+    var gotConnection  = false;
     var adapterPort    = 3000;
     var adapterHost    = "localhost";
     var util           = require("swarmcore");
     var client	       = util.createClient(adapterHost, adapterPort, "BroadcastUser", "ok","BroadcastTest", "testCtor");
     var uuid           = require('node-uuid');
     var self           = this;
-    var gotConnection  = false;
 
     this.registerConversation=function(sender,receiver,callback){
         var swarmHandler = client.startSwarm("emails.js","registerConversation",sender,receiver);
@@ -69,11 +69,11 @@ function SwarmConnector(){
 
     client.addListener("close",function(){
         plugin.loginfo("Swarm connection was closed");
-        self.gotConnection = false;
+        gotConnection = false;
     });
 
     client.addListener('open',function(){
-        self.gotConnection = true;
+        gotConnection = true;
         plugin.loginfo("Swarm connection was opened");
     });
 
@@ -86,7 +86,6 @@ var edb = new SwarmConnector();
 
 var cfg;
 var plugin;
-var plugins = require('./plugins');
 
 exports.register = function(){
     plugin = this;
@@ -99,28 +98,6 @@ function readConfig(){
     plugin.loginfo("Operando configuration: ",cfg);
 }
 
-var os = require('os');
-var path = require('path');
-var uniq = 0;
-var MAX_UNIQ = 100000;
-var my_hostname = require('os').hostname().replace(/\\/, '\\057').replace(/:/, '\\072');
-
-function generateQueueLocation(){
-    /*
-        The filename of the stored email must match the pattern in "./outbound.js" to be able to be queued
-     */
-    var queue_path =process.env.HARAKA+"/queue/";
-    var fname = new Date().getTime()+'_0_' + process.pid + "_" + _next_uniq() + '.' + my_hostname;
-
-    return path.join(queue_path,fname);
-
-    function _next_uniq(){
-        if (uniq >= MAX_UNIQ) {
-            uniq = 0;
-        }
-        return ++uniq;
-    }
-}
 
 
 exports.decideAction = function(next,connection){
@@ -131,7 +108,7 @@ exports.decideAction = function(next,connection){
     connection.relaying = false;
     sender = sender.substr(1, sender.length - 2);
 
-    if(!edb.connected()){
+    if(edb.connected() === false){
         next(DENYSOFT);
     }
     else {
