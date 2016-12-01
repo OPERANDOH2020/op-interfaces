@@ -16,17 +16,13 @@ var address = require("address-rfc2821").Address;
 var fs = require('fs');
 exports.register = function(){
     this.register_hook("queue_outbound","forward");
-    this.register_hook("get_mx","deferr_message");
+    this.register_hook("send_email","deferr_message");
 };
 
-exports.deferr_message = function(next,hmailItem,domain){
+exports.deferr_message = function(next,hmailItem){
     var plugin = this;
-    plugin.loginfo("GET MX ARGUMENTS:\n\n",arguments);
-    if(hmailItem.notes.deferred === true){
-        next();
-    }else{
-        next(OK);
-    }
+    //plugin.loginfo("GET MX ARGUMENTS:\n\n",arguments);
+    hmailItem.temp_fail(new Error("Operando backend if offline"));
 }
 
 exports.forward = function (next, connection) {
