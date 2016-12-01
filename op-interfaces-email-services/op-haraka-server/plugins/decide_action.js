@@ -133,10 +133,12 @@ exports.decideAction = function(next,connection){
 
     if(!edb.connected()){
         connection.relaying = true;
+        connection.notes.deferr = true;
         next(OK);
         //plugins.run_hooks('deferred',this,{delay:1000}); //postpone email delivery
     }
     else {
+        connection.notes.deferr = false;
         edb.getRealEmail(alias, function (err, realEmail) {
             if (realEmail) {
                 edb.registerConversation(alias, sender, function (err, conversationUUID) {
