@@ -21,8 +21,12 @@ exports.register = function(){
 
 exports.deferr_message = function(next,hmailItem){
     var plugin = this;
-    //plugin.loginfo("GET MX ARGUMENTS:\n\n",arguments);
-    hmailItem.temp_fail(new Error("Operando backend if offline"));
+    plugin.loginfo("GET MX ARGUMENTS:\n\n",arguments);
+    if(hmailItem.notes.deferr===true) {
+        hmailItem.temp_fail(new Error("Operando backend if offline"));
+    }else{
+        next(OK);
+    }
 }
 
 exports.forward = function (next, connection) {

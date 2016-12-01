@@ -133,9 +133,14 @@ exports.decideAction = function(next,connection){
 
     if(!edb.connected()){
         connection.relaying = true;
-        connection.notes.deferr = true;
+        connection.transaction.notes.deferr = true;
+        connection.results.add(plugin,
+            {
+                "action": "deferrEmail"
+            }
+        );
+
         next(OK);
-        //plugins.run_hooks('deferred',this,{delay:1000}); //postpone email delivery
     }
     else {
         connection.notes.deferr = false;
