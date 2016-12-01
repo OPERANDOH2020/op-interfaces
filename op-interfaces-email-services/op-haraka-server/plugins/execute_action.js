@@ -16,18 +16,8 @@ var address = require("address-rfc2821").Address;
 var fs = require('fs');
 exports.register = function(){
     this.register_hook("queue_outbound","forward");
-    this.register_hook("send_email","deferr_message");
 };
 
-exports.deferr_message = function(next,hmailItem){
-    var plugin = this;
-    plugin.loginfo("Send email hook arguments:\n\n",arguments);
-    if(hmailItem.notes.deferr===true) {
-        hmailItem.temp_fail(new Error("Operando backend if offline"));
-    }else{
-        next(OK);
-    }
-}
 
 exports.forward = function (next, connection) {
     var plugin = this;

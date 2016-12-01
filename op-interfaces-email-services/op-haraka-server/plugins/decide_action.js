@@ -132,18 +132,9 @@ exports.decideAction = function(next,connection){
     sender = sender.substr(1, sender.length - 2);
 
     if(!edb.connected()){
-        connection.relaying = true;
-        connection.transaction.notes.deferr = true;
-        connection.results.add(plugin,
-            {
-                "action": "deferrEmail"
-            }
-        );
-
-        next(OK);
+        next(DENYSOFT);
     }
     else {
-        connection.transaction.notes.deferr = false;
         edb.getRealEmail(alias, function (err, realEmail) {
             if (realEmail) {
                 edb.registerConversation(alias, sender, function (err, conversationUUID) {
