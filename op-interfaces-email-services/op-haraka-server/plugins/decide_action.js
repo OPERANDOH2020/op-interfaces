@@ -129,7 +129,7 @@ exports.decideAction = function(next,connection){
                         next(OK)
                     } else {
                         plugin.loginfo("Could not register conversation between ", sender, " and ", alias, "\nError:", err);
-                        next(DENY)
+                        next(DENYSOFT);
                     }
                 })
             }
@@ -147,11 +147,12 @@ exports.decideAction = function(next,connection){
                                 "from": conversation['sender']
                             }
                         );
+                        /*
                         edb.removeConversation(connection.transaction.rcpt_to[0].user, function (err, result) {
                             if (err) {
                                 self.loginfo("Failed to remove conversation:" + connection.transaction.rcpt_to[0].user + " from conversations database");
                             }
-                        });
+                        });*/
                         connection.relaying = true;
                         next(OK)
                     } else {
