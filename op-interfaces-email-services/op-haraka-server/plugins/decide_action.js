@@ -117,11 +117,17 @@ exports.decideAction = function(next,connection){
                 edb.registerConversation(alias, sender, function (err, conversationUUID) {
                     if (!err) {
                         plugin.loginfo("Delivering to user");
+
+                        var newSender = sender;
+                        if(newSender.split("@")[1].toLowerCase()!==cfg.main.host){
+                            newSender = newSender.replace("@", "_") + "@" + cfg.main.host;
+                        }
+
                         connection.results.add(plugin,
                             {
                                 "action": "relayToUser",
                                 "to": realEmail,
-                                "from": sender.replace("@", "_") + "@" + cfg.main.host,
+                                "from":newSender,
                                 "replyTo": conversationUUID + "@" + cfg.main.host
                             }
                         );
@@ -157,7 +163,7 @@ exports.decideAction = function(next,connection){
                         next(OK)
                     } else {
                         plugin.loginfo("Dropping email");
-                        next(DENY);
+                        next(DENYDISCONNECT);
                     }
                 });
             }
