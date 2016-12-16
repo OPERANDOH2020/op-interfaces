@@ -89,7 +89,7 @@ public class TicketController {
 				(userCredential.getUsername() == null || "".equals(userCredential.getUsername().trim())) ||
 				(userCredential.getPassword() == null || "".equals(userCredential.getPassword().trim()))) {
 
-			log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", "Missing credentials", LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
+			log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", "Missing credentials", LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
 			
 			throw new TicketingException(HttpStatus.BAD_REQUEST.toString(), " Missing credentials", null);
 		}
@@ -128,7 +128,7 @@ public class TicketController {
 			}
 		} catch (Exception ex) {
 			
-			log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", ex.getMessage(), LogRequest.LogPriorityEnum.CRITICAL.toString(), "op-interfaces-aapi");
+			log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", ex.getMessage(), LogRequest.LogPriorityEnum.CRITICAL.toString(), "op-interfaces-aapi");
 			
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
@@ -153,7 +153,7 @@ public class TicketController {
 		
 		if ((serviceId == null || "".equals(serviceId.trim())) || (tgt == null || "".equals(tgt.trim()))) {
 
-			log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", "Neither serviceId, nor tgt can be EMPTY || NULL", LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
+			log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", "Neither serviceId, nor tgt can be EMPTY || NULL", LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
 						
 			throw new TicketingException(HttpStatus.BAD_REQUEST.toString(), "Neither serviceId, nor tgt can be NULL", null);
 		} else{
@@ -192,16 +192,16 @@ public class TicketController {
 				return new ResponseEntity<String>(body, headers, HttpStatus.OK);
 			} else if (HttpStatus.BAD_REQUEST.value() == response.getStatusLine().getStatusCode()) {
 				
-				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
+				log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
 				return new ResponseEntity<String>(body, headers, HttpStatus.BAD_REQUEST);				
 			} else {
 				
-				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
+				log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
 				return new ResponseEntity<String>(body, headers, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} catch (Exception ex) {
 			
-			log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", ex.getMessage(), LogRequest.LogPriorityEnum.CRITICAL.toString(), "op-interfaces-aapi");			
+			log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", ex.getMessage(), LogRequest.LogPriorityEnum.CRITICAL.toString(), "op-interfaces-aapi");			
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
 			try {
@@ -227,7 +227,7 @@ public class TicketController {
 
 		if (serviceTicket == null || "".equals(serviceTicket.trim())) {
 			
-			log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", "serviceId can be EMPTY  || NULL", LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
+			log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", "serviceId can be EMPTY  || NULL", LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 		} else{
 			
@@ -261,22 +261,22 @@ public class TicketController {
 				return new ResponseEntity<String>(body, headers, HttpStatus.OK);
 			} else if (body.contains("<cas:authenticationFailure code=\'INVALID_TICKET\'>")){
 				
-				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
+				log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
 				return new ResponseEntity<String>(body, headers, HttpStatus.BAD_REQUEST);
                                 
 			} else if (body.contains("<cas:authenticationFailure code=\'INVALID_SERVICE\'>")){
 				
-				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
+				log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");
 				return new ResponseEntity<String>(body, headers, HttpStatus.BAD_REQUEST);
 			}else {
 				
-				log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");			
+				log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", body, LogRequest.LogPriorityEnum.HIGH.toString(), "op-interfaces-aapi");			
 				return new ResponseEntity<String>(body, headers, HttpStatus.INTERNAL_SERVER_ERROR);				
 			}
 			
 		} catch (Exception ex){
 			
-			log.logMe(LogRequest.LogDataTypeEnum.ERROS, "", ex.getMessage(), LogRequest.LogPriorityEnum.CRITICAL.toString(), "op-interfaces-aapi");			
+			log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", ex.getMessage(), LogRequest.LogPriorityEnum.CRITICAL.toString(), "op-interfaces-aapi");			
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}finally{
 			try {
