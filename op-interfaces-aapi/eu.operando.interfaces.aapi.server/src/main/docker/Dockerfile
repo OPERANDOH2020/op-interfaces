@@ -1,4 +1,4 @@
-FROM tomcat:8
+FROM tomcat:7-jre8
 
 ADD *.war /usr/local/tomcat/webapps/
 RUN wget https://raw.githubusercontent.com/osixia/docker-light-baseimage/stable/image/service-available/%3Assl-tools/assets/default-ca/default-ca.pem
