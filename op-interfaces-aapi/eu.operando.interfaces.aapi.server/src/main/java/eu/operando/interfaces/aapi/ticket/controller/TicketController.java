@@ -97,8 +97,9 @@ public class TicketController {
 		HttpPost httpPost = null;
 		CloseableHttpResponse response = null;
 		try {
+                        
 			httpPost = new HttpPost(casProtocol + "://" + casHost + ":" + casPort + "/" + casWebApp + "/v1/tickets");
-
+                        
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("username", userCredential.getUsername()));
 			nvps.add(new BasicNameValuePair("password", userCredential.getPassword()));
@@ -130,7 +131,7 @@ public class TicketController {
 			
 			log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", ex.getMessage(), LogRequest.LogPriorityEnum.CRITICAL.toString(), "op-interfaces-aapi");
 			System.out.println(ex.getMessage());
-			return new ResponseEntity<String>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<String>(ex.getMessage()+"URI:"+httpPost.getURI().getPath(), HttpStatus.INTERNAL_SERVER_ERROR);
                         
 		} finally {
 			try {
