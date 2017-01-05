@@ -131,7 +131,7 @@ public class TicketController {
 			
 			log.logMe(LogRequest.LogDataTypeEnum.ERROR, "", ex.getMessage(), LogRequest.LogPriorityEnum.CRITICAL.toString(), "op-interfaces-aapi");
 			System.out.println(ex.getMessage());
-			return new ResponseEntity<String>(ex.getMessage()+"URI:"+httpPost.getURI().getPath(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
                         
 		} finally {
 			try {
