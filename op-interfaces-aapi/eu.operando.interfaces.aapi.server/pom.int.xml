@@ -186,6 +186,8 @@
 									<!-- this time we will do it from a docker file element is needed 
 										to switch the usage of the extrenal file -->
 									<dockerFileDir>.</dockerFileDir>
+								    <basedir>/</basedir>
+									<descriptor>docker-assembly.xml</descriptor>
 									<!-- end -->
 								</assembly>
 							</build>
