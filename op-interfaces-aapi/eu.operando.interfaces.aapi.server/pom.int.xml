@@ -168,6 +168,7 @@
 				<configuration>
 					<!-- added to support right path -->
 					<warName>${user.warName}</warName>
+					<outputDirectory>src\main\docker\</outputDirectory>
 					<!-- end of addition -->
 				</configuration>
 			</plugin>
