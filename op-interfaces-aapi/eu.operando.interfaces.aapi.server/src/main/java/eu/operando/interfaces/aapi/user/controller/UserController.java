@@ -195,7 +195,7 @@ public class UserController {
     private String getOptionalAttributesAsString(User user) {
 	String optionalAttributesAsString = "";
 	Attribute[] myOptionalAttrs = user.getOptionalAttrs();
-	for (int i = 0; i < myOptionalAttrs.length; i++) {
+	for (int i = 0; myOptionalAttrs!=null && i < myOptionalAttrs.length; i++) {
 	    Attribute curAttr = myOptionalAttrs[i];
 	    optionalAttributesAsString += curAttr.getAttrName() + "::" + curAttr.getAttrValue() + ";;";
 
@@ -208,7 +208,7 @@ public class UserController {
     private String getPrivacySettingsAsString(User user) {
 	String privacySettingsAsString = "";
 	PrivacySetting[] myPrivacySettings = user.getPrivacySettings();
-	for (int i = 0; i < myPrivacySettings.length; i++) {
+	for (int i = 0; myPrivacySettings!=null && i < myPrivacySettings.length; i++) {
 	    PrivacySetting curPrivacySetting = myPrivacySettings[i];
 	    privacySettingsAsString += curPrivacySetting.getSettingName() + "::" + curPrivacySetting.getSettingValue()
 		    + ";;";
@@ -222,7 +222,7 @@ public class UserController {
     private String getRequiredAttributesAsString(User user) {
 	String requiredAttributesAsString = "";
 	Attribute[] myRequiredAttrs = user.getRequiredAttrs();
-	for (int i = 0; i < myRequiredAttrs.length; i++) {
+	for (int i = 0; myRequiredAttrs!=null && i < myRequiredAttrs.length; i++) {
 	    Attribute curAttr = myRequiredAttrs[i];
 	    requiredAttributesAsString += curAttr.getAttrName() + "::" + curAttr.getAttrValue() + ";;";
 
