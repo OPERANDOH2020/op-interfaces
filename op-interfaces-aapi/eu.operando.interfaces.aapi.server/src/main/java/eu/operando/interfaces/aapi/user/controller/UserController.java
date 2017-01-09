@@ -162,6 +162,7 @@ public class UserController {
 	    env.put(Context.SECURITY_AUTHENTICATION, "simple");
 	    env.put(Context.SECURITY_PRINCIPAL, ldapUsername); 
 	    env.put(Context.SECURITY_CREDENTIALS, ldapPassword);
+	    env.put("java.naming.ldap.factory.socket", "eu.operando.interfaces.aapi.socketfactory.LdapDefaultSSLSocketFactory");
 	    // init the connection
 
 	    DirContext ctx = new InitialDirContext(env);
