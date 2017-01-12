@@ -135,8 +135,7 @@ public class UserController {
 	@ApiImplicitParam(name = "user", value = "Users data", required = true, dataType = "User", paramType = "body")})
     public ResponseEntity<User> modifyUser(@PathVariable("username") String username, @RequestBody User user)
 	    throws UserException {
-
-	return new ResponseEntity<User>(new User(), HttpStatus.ACCEPTED);
+        return new ResponseEntity<User>(new User(), HttpStatus.ACCEPTED);
     }
 
     @RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
@@ -177,10 +176,16 @@ public class UserController {
 	    matchAttrs.put(new BasicAttribute("objectClass", "inetOrgPerson"));
 	    // When the final scheme is ready, the fields below will be changed.
 	    // At the moment they are placeholders
-	    matchAttrs.put(new BasicAttribute("departmentNumber", getOptionalAttributesAsString(user)));
-	    matchAttrs.put(new BasicAttribute("employeeNumber", getPrivacySettingsAsString(user)));
-	    matchAttrs.put(new BasicAttribute("employeeType", getRequiredAttributesAsString(user)));
-	    // Finally add the user
+            String currentOptionalAttributes = getOptionalAttributesAsString(user);
+            if(currentOptionalAttributes!=null && !currentOptionalAttributes.trim().equals(""))  matchAttrs.put(new BasicAttribute("departmentNumber", currentOptionalAttributes));
+	   
+            String currentPrivacySettings = getPrivacySettingsAsString(user);
+            if(currentPrivacySettings!=null && !currentPrivacySettings.trim().equals("")) matchAttrs.put(new BasicAttribute("employeeNumber", currentPrivacySettings));
+	    
+            String currentRequiredAttributes = getRequiredAttributesAsString(user);
+            if(currentRequiredAttributes!=null && !currentRequiredAttributes.trim().equals("")) matchAttrs.put(new BasicAttribute("employeeType", currentRequiredAttributes));
+	   
+            // Finally add the user
 	    ctx.createSubcontext("uid=" + user.getUsername() + ",ou=People,dc=nodomain", matchAttrs);
 
 	} catch (Exception e) {
@@ -197,7 +202,7 @@ public class UserController {
 	String optionalAttributesAsString = "";
 	Attribute[] myOptionalAttrs = user.getOptionalAttrs();
 	for (int i = 0; myOptionalAttrs!=null && i < myOptionalAttrs.length; i++) {
-	    Attribute curAttr = myOptionalAttrs[i];
+            Attribute curAttr = myOptionalAttrs[i];
 	    optionalAttributesAsString += curAttr.getAttrName() + "::" + curAttr.getAttrValue() + ";;";
 
 	}
@@ -254,45 +259,55 @@ public class UserController {
 		Attributes attrs = answer.next().getAttributes();
 
 		List<Attribute> myOptionalAttrsList = new ArrayList();
-		String optAsString = attrs.get("departmentNumber").toString();
-		String[] optionalRows = optAsString.split(";;");
-		for (int i = 0; i < optionalRows.length; i++) {
-		    String[] optAttrParts = optionalRows[i].split("::");
-		    Attribute optAttr = new Attribute();
-		    optAttr.setAttrName(optAttrParts[0].split(":")[1].trim());
-		    optAttr.setAttrValue(optAttrParts[1]);
-		    myOptionalAttrsList.add(optAttr);
-		}
+                if(attrs.get("departmentNumber")!=null)
+                {
+                    String optAsString = attrs.get("departmentNumber").toString();
+                    String[] optionalRows = optAsString.split(";;");
+                    for (int i = 0; i < optionalRows.length; i++) {
+                        String[] optAttrParts = optionalRows[i].split("::");
+                        Attribute optAttr = new Attribute();
+                        optAttr.setAttrName(optAttrParts[0].split(":")[1].trim());
+                        optAttr.setAttrValue(optAttrParts[1]);
+                        myOptionalAttrsList.add(optAttr);
+                    }
+                }
+		
 
 		Attribute[] myOptionalAttrsArr = new Attribute[myOptionalAttrsList.size()];
 		myOptionalAttrsArr = myOptionalAttrsList.toArray(myOptionalAttrsArr);
 		currentUser.setOptionalAttrs(myOptionalAttrsArr);
 
 		List<PrivacySetting> myPrivAttrsList = new ArrayList();
-		String privAsString = attrs.get("employeeNumber").toString();
-		String[] privRows = privAsString.split(";;");
-		for (int i = 0; i < privRows.length; i++) {
-		    String[] privAttrParts = privRows[i].split("::");
-		    PrivacySetting privAttr = new PrivacySetting();
-		    privAttr.setSettingName(privAttrParts[0].split(":")[1].trim());
-		    privAttr.setSettingValue(privAttrParts[1]);
-		    myPrivAttrsList.add(privAttr);
-		}
+                if(attrs.get("employeeNumber")!=null){
+                    String privAsString = attrs.get("employeeNumber").toString();
+                    String[] privRows = privAsString.split(";;");
+                    for (int i = 0; i < privRows.length; i++) {
+                        String[] privAttrParts = privRows[i].split("::");
+                        PrivacySetting privAttr = new PrivacySetting();
+                        privAttr.setSettingName(privAttrParts[0].split(":")[1].trim());
+                        privAttr.setSettingValue(privAttrParts[1]);
+                        myPrivAttrsList.add(privAttr);
+                    }
+                }
+		
 
 		PrivacySetting[] myPrivAttrsArr = new PrivacySetting[myPrivAttrsList.size()];
 		myPrivAttrsArr = myPrivAttrsList.toArray(myPrivAttrsArr);
 		currentUser.setPrivacySettings(myPrivAttrsArr);
 
 		List<Attribute> myReqAttrsList = new ArrayList();
-		String reqAsString = attrs.get("employeeType").toString();
-		String[] reqRows = reqAsString.split(";;");
-		for (int i = 0; i < reqRows.length; i++) {
-		    String[] reqAttrParts = reqRows[i].split("::");
-		    Attribute reqAttr = new Attribute();
-		    reqAttr.setAttrName(reqAttrParts[0].split(":")[1].trim());
-		    reqAttr.setAttrValue(reqAttrParts[1]);
-		    myReqAttrsList.add(reqAttr);
-		}
+                if(attrs.get("employeeType")!=null){
+                   String reqAsString = attrs.get("employeeType").toString();
+                    String[] reqRows = reqAsString.split(";;");
+                    for (int i = 0; i < reqRows.length; i++) {
+                        String[] reqAttrParts = reqRows[i].split("::");
+                        Attribute reqAttr = new Attribute();
+                        reqAttr.setAttrName(reqAttrParts[0].split(":")[1].trim());
+                        reqAttr.setAttrValue(reqAttrParts[1]);
+                        myReqAttrsList.add(reqAttr);
+                    }
+                }
+		
 
 		Attribute[] myReqAttrsArr = new Attribute[myReqAttrsList.size()];
 		myReqAttrsArr = myReqAttrsList.toArray(myReqAttrsArr);
