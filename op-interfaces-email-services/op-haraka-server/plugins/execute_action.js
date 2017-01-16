@@ -65,7 +65,7 @@ exports.forward = function (next, connection) {
             plugin.loginfo("New from: "+newFrom);
             connection.transaction.add_header('From', newFrom);
         }else{
-            var fromMessage = "'"+original+"' <"+newFrom+">";
+            var fromMessage = "'IdentityManager@plusprivacy.com on behalf of "+original+"' <"+newFrom+">";
             plugin.loginfo(fromMessage);
             connection.transaction.add_header('From',fromMessage );
         }
