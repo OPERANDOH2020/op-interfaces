@@ -55,15 +55,12 @@ exports.forward = function (next, connection) {
 
     function changeFrom(newFrom,displayOriginal) {
         plugin.loginfo("New from: "+newFrom);
-        connection.transaction.mail_from.original = '<' + newFrom + '>';
-        connection.transaction.mail_from.user = newFrom.split('@')[0];
-        connection.transaction.mail_from.host = newFrom.split('@')[1];
-        var original = connection.transaction.header.get('from');
         connection.transaction.header.remove('from');
-        if(!displayOriginal) {
-            connection.transaction.header.add('from', newFrom);
-        }else{
-            connection.transaction.header.add('from', "IdentityManager@plusprivacy,com on behalf of "+original);
+        connection.transaction.header.add('from', newFrom);
+        if(!displayOriginal){
+            connection.transaction.mail_from.original = '<' + newFrom + '>';
+            connection.transaction.mail_from.user = newFrom.split('@')[0];
+            connection.transaction.mail_from.host = newFrom.split('@')[1];
         }
     }
 
