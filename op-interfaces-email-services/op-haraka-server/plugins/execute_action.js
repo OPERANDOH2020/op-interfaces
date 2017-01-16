@@ -28,7 +28,7 @@ exports.forward = function (next, connection) {
         {
             plugin.loginfo("Relay to user");
             changeTo(decision.to);
-            changeFrom(decision.from);
+            changeFrom(decision.from,true);
             removeHeaders();
             addReplyTo(decision.replyTo);
             break;
@@ -53,13 +53,15 @@ exports.forward = function (next, connection) {
         connection.transaction.header.add('to',newTo);
     }
 
-    function changeFrom(newFrom) {
+    function changeFrom(newFrom,displayOriginal) {
         plugin.loginfo("New from: "+newFrom);
         connection.transaction.mail_from.original = '<' + newFrom + '>';
         connection.transaction.mail_from.user = newFrom.split('@')[0];
         connection.transaction.mail_from.host = newFrom.split('@')[1];
-        var original = connection.transaction.header.remove('from');
-        connection.transaction.header.add('from',"IdentityManager@plusprivacy.com on behalf of "+original);
+        if(!displayOriginal) {
+            connection.transaction.header.remove('from');
+            connection.transaction.header.add('from', newFrom);
+        }
     }
 
     function addReplyTo(replyTo) {
