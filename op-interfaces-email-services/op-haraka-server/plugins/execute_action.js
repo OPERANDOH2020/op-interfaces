@@ -55,7 +55,7 @@ exports.forward = function (next, connection) {
 
     function changeFrom(newFrom,displayOriginal) {
         plugin.loginfo("New from: "+newFrom);
-        var original = connection.transaction.mail_from.original;
+        var original = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host;
 
         connection.transaction.mail_from.original = '<' + newFrom + '>';
         connection.transaction.mail_from.user = newFrom.split('@')[0];
