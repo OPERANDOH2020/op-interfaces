@@ -54,7 +54,6 @@ exports.forward = function (next, connection) {
     }
 
     function changeFrom(newFrom,displayOriginal) {
-        plugin.loginfo("New from: "+newFrom);
         var original = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host;
 
         connection.transaction.mail_from.original = '<' + newFrom + '>';
@@ -63,10 +62,12 @@ exports.forward = function (next, connection) {
 
         connection.transaction.remove_header('From');
         if(!displayOriginal) {
+            plugin.loginfo("New from: "+newFrom);
             connection.transaction.add_header('From', newFrom);
         }else{
-            original = original.split("@");
-            connection.transaction.add_header('From', "Identity manager on behalf of '"+original+"' <"+newFrom+">");
+            var fromMessage = "Identity manager on behalf of '"+original+"' <"+newFrom+">";
+            plugin.loginfo(fromMessage);
+            connection.transaction.add_header('From',fromMessage );
         }
     }
 
