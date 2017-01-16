@@ -15,7 +15,7 @@
 var address = require("address-rfc2821").Address;
 var fs = require('fs');
 exports.register = function(){
-    this.register_hook("queue_outbound","forward");
+    this.register_hook("data_post","forward");
 };
 
 
@@ -55,12 +55,18 @@ exports.forward = function (next, connection) {
 
     function changeFrom(newFrom,displayOriginal) {
         plugin.loginfo("New from: "+newFrom);
-        connection.transaction.header.remove('from');
-        connection.transaction.header.add('from', newFrom);
-        if(!displayOriginal){
-            connection.transaction.mail_from.original = '<' + newFrom + '>';
-            connection.transaction.mail_from.user = newFrom.split('@')[0];
-            connection.transaction.mail_from.host = newFrom.split('@')[1];
+        var original = connection.transaction.mail_from.original;
+
+        connection.transaction.mail_from.original = '<' + newFrom + '>';
+        connection.transaction.mail_from.user = newFrom.split('@')[0];
+        connection.transaction.mail_from.host = newFrom.split('@')[1];
+
+        connection.transaction.remove_header('From');
+        if(!displayOriginal) {
+            connection.transaction.add_header('From', newFrom);
+        }else{
+            original = original.split("@");
+            connection.transaction.add_header('From', "Identity manager on behalf of '"+original+"' <"+newFrom+">");
         }
     }
 
