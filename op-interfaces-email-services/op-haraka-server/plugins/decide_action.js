@@ -112,7 +112,7 @@ exports.decideAction = function(next,connection){
         next(DENYSOFT);
     }
     else {
-        edb.getRealEmail(alias, function (err, realEmail) {
+        edb.getRealEmail(alias.toLowerCase(), function (err, realEmail) {
             if (realEmail) {
                 edb.registerConversation(alias, sender, function (err, conversationUUID) {
                     if (!err) {
@@ -141,7 +141,7 @@ exports.decideAction = function(next,connection){
             }
             else {
                 plugin.loginfo("Try to get conversation ", connection.transaction.rcpt_to[0].user);
-                edb.getConversation(connection.transaction.rcpt_to[0].user, function (err, conversation) {
+                edb.getConversation(connection.transaction.rcpt_to[0].user.toLowerCase(), function (err, conversation) {
                     if (conversation) {
                         plugin.loginfo("Delivering to outside entity");
                         plugin.loginfo("Current conversation:" + connection.transaction.rcpt_to[0].user);
