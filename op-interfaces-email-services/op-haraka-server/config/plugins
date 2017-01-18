@@ -60,9 +60,10 @@
 #clamd
 #spamassassin
 
+#dkim_verify
 decide_action
 execute_action
-#dkim_sign
+dkim_sign
 #queue/deliver
 #store_test_emails
 

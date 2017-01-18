@@ -112,9 +112,10 @@ exports.decideAction = function(next,connection){
         next(DENYSOFT);
     }
     else {
+        plugin.loginfo("Check if "+alias.toLowerCase()+" is an alias");
         edb.getRealEmail(alias.toLowerCase(), function (err, realEmail) {
             if (realEmail) {
-                edb.registerConversation(alias, sender, function (err, conversationUUID) {
+                edb.registerConversation(alias.toLowerCase(), sender.toLowerCase(), function (err, conversationUUID) {
                     if (!err) {
                         plugin.loginfo("Delivering to user");
 
@@ -153,12 +154,6 @@ exports.decideAction = function(next,connection){
                                 "from": conversation['sender']
                             }
                         );
-                        /*
-                        edb.removeConversation(connection.transaction.rcpt_to[0].user, function (err, result) {
-                            if (err) {
-                                self.loginfo("Failed to remove conversation:" + connection.transaction.rcpt_to[0].user + " from conversations database");
-                            }
-                        });*/
                         connection.relaying = true;
                         next(OK)
                     } else {
