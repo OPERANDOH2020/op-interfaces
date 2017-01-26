@@ -115,7 +115,7 @@ exports.decideAction = function(next,connection){
         plugin.loginfo("Check if "+alias.toLowerCase()+" is an alias");
         edb.getRealEmail(alias.toLowerCase(), function (err, realEmail) {
             if (realEmail) {
-                edb.registerConversation(alias.toLowerCase(), sender.toLowerCase(), function (err, conversationUUID) {
+                edb.registerConversation(alias, sender, function (err, conversationUUID) {
                     if (!err) {
                         plugin.loginfo("Delivering to user");
 
