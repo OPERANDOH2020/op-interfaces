@@ -8,6 +8,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import eu.operando.api.AuthenticationService;
+import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.api.model.ComplianceReport;
 import eu.operando.interfaces.rapi.factories.ComplianceReportApiServiceFactory;
 import io.swagger.annotations.ApiParam;
@@ -16,7 +18,8 @@ import io.swagger.annotations.ApiParam;
 @Produces({ MediaType.APPLICATION_JSON })
 @io.swagger.annotations.Api(description = "the compliance report API")
 public class ComplianceReportApi {
-	private final ComplianceReportApiService delegate = ComplianceReportApiServiceFactory.getComplienceReportApiService();
+	private final AuthenticationService authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService();
+	private final ComplianceReportApiService reportDelegate = ComplianceReportApiServiceFactory.getComplienceReportApiService();
 	
 	@GET
 	@Path("{osp-id}/compliance-report")
@@ -52,7 +55,8 @@ public class ComplianceReportApi {
 		@ApiParam(value = "The unique identifier of an online service provider.", required = true) @PathParam("osp-id") 
 			String ospId
 	){
-		return delegate.ComplianceReportGet(serviceTicket, ospId);
+		ComplianceReport report = reportDelegate.getComplianceReport(ospId);
+		return null;
 	}
 	
 }

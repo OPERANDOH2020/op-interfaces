@@ -14,6 +14,8 @@ import eu.operando.moduleclients.ClientReportGeneratorTests;
 ({
 	RegulationsApiServiceImplTests.class,
 	ReportsApiServiceImplTests.class,
+	ComplianceReportApiTests.class,
+	ComplianceReportApiServiceImplTests.class,
 	ClientAuthenticationApiOperandoServiceTests.class,
 	ClientPolicyDbTests.class,
 	ClientPolicyComputationTests.class,

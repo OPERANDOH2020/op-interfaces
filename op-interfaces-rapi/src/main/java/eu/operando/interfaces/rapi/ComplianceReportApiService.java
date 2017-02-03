@@ -1,7 +1,7 @@
 package eu.operando.interfaces.rapi;
 
-import javax.ws.rs.core.Response;
+import eu.operando.api.model.ComplianceReport;
 
 public interface ComplianceReportApiService {
-	public Response ComplianceReportGet(String serviceTicket, String ospId);
+	public ComplianceReport getComplianceReport(String ospId);
 }
