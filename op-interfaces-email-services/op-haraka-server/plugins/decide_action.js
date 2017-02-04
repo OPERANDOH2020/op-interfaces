@@ -120,6 +120,9 @@ exports.decideAction = function(next,connection){
                         plugin.loginfo("Delivering to user");
 
                         var newSender = sender;
+
+                        plugin.loginfo("New sender:"+newSender);
+
                         if(newSender.split("@")[1].toLowerCase()!==cfg.main.host){
                             newSender = newSender.replace("@", "_") + "@" + cfg.main.host;
                         }
