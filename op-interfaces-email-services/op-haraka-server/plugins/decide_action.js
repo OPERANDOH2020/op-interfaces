@@ -104,7 +104,8 @@ exports.decideAction = function(next,connection){
     var alias = connection.transaction.rcpt_to[0].user+"@"+connection.transaction.rcpt_to[0].host;
     plugin = this;
     var sender = connection.transaction.mail_from.original;
-    plugin.loginfo("MAIL FROM ORIGINAL:\n\n\n\n",connection.transaction.mail_from,"\n\n\n");
+    plugin.loginfo("MAIL FROM ORIGINAL:\n\n\n\n",connection.transaction,"\n\n\n");
+    plugin.loginfo(connection.transaction.header.get('From'));
     connection.relaying = false;
     sender = sender.substr(1, sender.length - 2);
 
