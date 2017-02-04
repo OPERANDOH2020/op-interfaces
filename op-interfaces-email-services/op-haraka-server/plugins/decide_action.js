@@ -104,7 +104,7 @@ exports.decideAction = function(next,connection){
     var alias = connection.transaction.rcpt_to[0].user+"@"+connection.transaction.rcpt_to[0].host;
     plugin = this;
     var sender = connection.transaction.mail_from.original;
-
+    plugin.loginfo("MAIL FROM ORIGINAL:\n\n\n\n",connection.transaction.mail_from,"\n\n\n");
     connection.relaying = false;
     sender = sender.substr(1, sender.length - 2);
 
@@ -120,8 +120,6 @@ exports.decideAction = function(next,connection){
                         plugin.loginfo("Delivering to user");
 
                         var newSender = sender;
-
-                        plugin.loginfo("New sender:"+newSender);
 
                         if(newSender.split("@")[1].toLowerCase()!==cfg.main.host){
                             newSender = newSender.replace("@", "_") + "@" + cfg.main.host;
