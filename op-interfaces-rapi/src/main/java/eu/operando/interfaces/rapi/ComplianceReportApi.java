@@ -76,7 +76,7 @@ public class ComplianceReportApi {
 		try{
 			if(authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID)){
 				try{
-				ComplianceReport report = reportDelegate.getComplianceReport(ospId);
+				ComplianceReport report = reportDelegate.getComplianceReportForOsp(ospId);
 				response = Response.ok(report).build();
 				} catch (OperandoCommunicationException ex){
 					CommunicationError error = ex.getCommunitcationError();

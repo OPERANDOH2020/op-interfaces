@@ -52,7 +52,7 @@ public class ComplianceReportApiTests {
 		
 		api.complianceReportGet("bad", "B987");
 		
-		verify(reportDelegate, never()).getComplianceReport(anyString());
+		verify(reportDelegate, never()).getComplianceReportForOsp(anyString());
 	}
 	
 	@Test
@@ -88,7 +88,7 @@ public class ComplianceReportApiTests {
 		
 		api.complianceReportGet("A123", ospId);
 		
-		verify(reportDelegate).getComplianceReport(ospId);
+		verify(reportDelegate).getComplianceReportForOsp(ospId);
 	}
 	
 	@Test
@@ -106,7 +106,7 @@ public class ComplianceReportApiTests {
 	
 	@Test
 	public void testGetComplianceReport_Report_ReturnsReportIfFound() throws OperandoCommunicationException{
-		ComplianceReport report = new ComplianceReport();
+		ComplianceReport report = new ComplianceReport(null);
 		setUpServices(true, report);
 		
 		Response response = api.complianceReportGet("A123", "B987");
@@ -155,12 +155,12 @@ public class ComplianceReportApiTests {
 	
 	private void setUpServices(boolean shouldAuthenticate, ComplianceReport toReturn) throws OperandoCommunicationException{
 		when(authenticationDelegate.isAuthenticatedForService(anyString(), anyString())).thenReturn(shouldAuthenticate);
-		when(reportDelegate.getComplianceReport(anyString())).thenReturn(toReturn);
+		when(reportDelegate.getComplianceReportForOsp(anyString())).thenReturn(toReturn);
 	}
 	
 	private void setUpServices(boolean shouldAuthenticate, OperandoCommunicationException ex) throws OperandoCommunicationException{
 		when(authenticationDelegate.isAuthenticatedForService(anyString(), anyString())).thenReturn(shouldAuthenticate);
-		when(reportDelegate.getComplianceReport(anyString())).thenThrow(ex);
+		when(reportDelegate.getComplianceReportForOsp(anyString())).thenThrow(ex);
 	}
 	
 }

@@ -4,5 +4,5 @@ import eu.operando.OperandoCommunicationException;
 import eu.operando.api.model.ComplianceReport;
 
 public interface ComplianceReportApiService {
-	public ComplianceReport getComplianceReport(String ospId) throws OperandoCommunicationException;
+	public ComplianceReport getComplianceReportForOsp(String ospId) throws OperandoCommunicationException;
 }
