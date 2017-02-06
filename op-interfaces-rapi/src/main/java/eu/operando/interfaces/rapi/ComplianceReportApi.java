@@ -7,7 +7,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import eu.operando.OperandoCommunicationException;
+import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.api.model.ComplianceReport;
@@ -18,8 +21,16 @@ import io.swagger.annotations.ApiParam;
 @Produces({ MediaType.APPLICATION_JSON })
 @io.swagger.annotations.Api(description = "the compliance report API")
 public class ComplianceReportApi {
-	private final AuthenticationService authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService();
-	private final ComplianceReportApiService reportDelegate = ComplianceReportApiServiceFactory.getComplienceReportApiService();
+	
+	private static final String SERVICE_ID = "GET/osps/{osp-id}/compliance-report";
+	
+	private AuthenticationService authenticationDelegate;
+	private ComplianceReportApiService reportDelegate;
+	
+	public ComplianceReportApi(){
+		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService();
+		reportDelegate = ComplianceReportApiServiceFactory.getComplienceReportApiService();
+	}
 	
 	@GET
 	@Path("{osp-id}/compliance-report")
@@ -39,12 +50,17 @@ public class ComplianceReportApi {
 			),
 			@io.swagger.annotations.ApiResponse(
 				code = 401,
-				message = "The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
+				message = "Error - The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
 				response = ComplianceReport.class
 			),
 			@io.swagger.annotations.ApiResponse(
 				code = 404,
 				message = "Error - The OSP could not be found.",
+				response = ComplianceReport.class
+			),
+			@io.swagger.annotations.ApiResponse(
+				code = 500,
+				message = "Error - An internal error has occured.",
 				response = ComplianceReport.class
 			) 
 		}
@@ -55,8 +71,25 @@ public class ComplianceReportApi {
 		@ApiParam(value = "The unique identifier of an online service provider.", required = true) @PathParam("osp-id") 
 			String ospId
 	){
-		ComplianceReport report = reportDelegate.getComplianceReport(ospId);
-		return null;
+		Response response;
+		try{
+			if(authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID)){
+				ComplianceReport report = reportDelegate.getComplianceReport(ospId);
+				response = Response.ok(report).build();
+			} else {
+				response = Response.status(Status.UNAUTHORIZED).build();
+			}
+		}
+		catch(OperandoCommunicationException ex){
+			CommunicationError error = ex.getCommunitcationError();
+			if(error == CommunicationError.REQUESTED_RESOURCE_NOT_FOUND){
+				response = Response.status(Status.NOT_FOUND).build();
+			} 
+			else {
+				response = Response.serverError().build();
+			}
+		}
+		return response;
 	}
 	
 }
