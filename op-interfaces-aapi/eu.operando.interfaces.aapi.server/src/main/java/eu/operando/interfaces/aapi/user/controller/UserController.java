@@ -135,7 +135,34 @@ public class UserController {
 	@ApiImplicitParam(name = "user", value = "Users data", required = true, dataType = "User", paramType = "body")})
     public ResponseEntity<User> modifyUser(@PathVariable("username") String username, @RequestBody User user)
 	    throws UserException {
-        return new ResponseEntity<User>(new User(), HttpStatus.ACCEPTED);
+        User currentUser = new User();
+	try {
+            // Make the connection with LDAP
+	    Hashtable env = new Hashtable();
+	    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+	    env.put(Context.PROVIDER_URL, (ldapProtocol + "://" + ldapHost + ":" + ldapPort));
+	    env.put(Context.SECURITY_AUTHENTICATION, "simple");
+	    env.put(Context.SECURITY_PRINCIPAL, ldapUsername); 
+	    env.put(Context.SECURITY_CREDENTIALS, ldapPassword);
+	    env.put("java.naming.ldap.factory.socket", "eu.operando.interfaces.aapi.socketfactory.LdapDefaultSSLSocketFactory");
+	    // init the connection
+            
+	    DirContext ctx = new InitialDirContext(env);
+            //STEP 1:delete user
+            ctx.unbind("cn="+username+"ou=People,dc=nodomain"); //delete user from ldap
+             
+            //STEP 2: recreate user
+            if (storeUserToLdap(user)) {
+		return new ResponseEntity<User>(user, HttpStatus.CREATED);
+	    } else {
+		return new ResponseEntity<User>(user, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+            
+        } catch (Exception ex) {
+	    ex.printStackTrace();
+	}
+        
+	return new ResponseEntity<User>(user, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
@@ -266,7 +293,11 @@ public class UserController {
                     for (int i = 0; i < optionalRows.length; i++) {
                         String[] optAttrParts = optionalRows[i].split("::");
                         Attribute optAttr = new Attribute();
-                        optAttr.setAttrName(optAttrParts[0].split(":")[1].trim());
+                        if(optAttrParts[0]!=null && optAttrParts[0].contains(":")){
+                            optAttr.setAttrName(optAttrParts[0].split(":")[1].trim());
+                        }else{
+                            optAttr.setAttrName(optAttrParts[0].trim());
+                        }
                         optAttr.setAttrValue(optAttrParts[1]);
                         myOptionalAttrsList.add(optAttr);
                     }
@@ -284,7 +315,12 @@ public class UserController {
                     for (int i = 0; i < privRows.length; i++) {
                         String[] privAttrParts = privRows[i].split("::");
                         PrivacySetting privAttr = new PrivacySetting();
-                        privAttr.setSettingName(privAttrParts[0].split(":")[1].trim());
+                       if(privAttrParts[0]!=null && privAttrParts[0].contains(":")){
+                           privAttr.setSettingName(privAttrParts[0].split(":")[1].trim());
+                       }else{
+                           privAttr.setSettingName(privAttrParts[0].trim());
+                       }
+                        
                         privAttr.setSettingValue(privAttrParts[1]);
                         myPrivAttrsList.add(privAttr);
                     }
@@ -302,7 +338,11 @@ public class UserController {
                     for (int i = 0; i < reqRows.length; i++) {
                         String[] reqAttrParts = reqRows[i].split("::");
                         Attribute reqAttr = new Attribute();
-                        reqAttr.setAttrName(reqAttrParts[0].split(":")[1].trim());
+                        if(reqAttrParts[0]!=null && reqAttrParts[0].contains(":")){
+                            reqAttr.setAttrName(reqAttrParts[0].split(":")[1].trim());
+                        }else{
+                            reqAttr.setAttrName(reqAttrParts[0].trim());
+                        }
                         reqAttr.setAttrValue(reqAttrParts[1]);
                         myReqAttrsList.add(reqAttr);
                     }
