@@ -22,13 +22,14 @@ import io.swagger.annotations.ApiParam;
 @io.swagger.annotations.Api(description = "the compliance report API")
 public class ComplianceReportApi {
 	
+	private static final String PROPERTIES_FILE_RAPI = "config.properties";
 	private static final String SERVICE_ID = "GET/osps/{osp-id}/compliance-report";
 	
 	private AuthenticationService authenticationDelegate;
 	private ComplianceReportApiService reportDelegate;
 	
 	public ComplianceReportApi(){
-		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService();
+		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(PROPERTIES_FILE_RAPI);
 		reportDelegate = ComplianceReportApiServiceFactory.getComplienceReportApiService();
 	}
 	
@@ -74,20 +75,24 @@ public class ComplianceReportApi {
 		Response response;
 		try{
 			if(authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID)){
+				try{
 				ComplianceReport report = reportDelegate.getComplianceReport(ospId);
 				response = Response.ok(report).build();
+				} catch (OperandoCommunicationException ex){
+					CommunicationError error = ex.getCommunitcationError();
+					if(error == CommunicationError.REQUESTED_RESOURCE_NOT_FOUND){
+						response = Response.status(Status.NOT_FOUND).build();
+					} 
+					else {
+						throw ex;
+					}
+				}
 			} else {
 				response = Response.status(Status.UNAUTHORIZED).build();
 			}
 		}
 		catch(OperandoCommunicationException ex){
-			CommunicationError error = ex.getCommunitcationError();
-			if(error == CommunicationError.REQUESTED_RESOURCE_NOT_FOUND){
-				response = Response.status(Status.NOT_FOUND).build();
-			} 
-			else {
-				response = Response.serverError().build();
-			}
+			response = Response.serverError().build();
 		}
 		return response;
 	}

@@ -70,7 +70,7 @@ public class ComplianceReportApiTests {
 	
 	@Test
 	public void testGetComplianceReport_Authentication_ReturnInternalErrorCodeIfCantAuthenticate() throws OperandoCommunicationException{
-		setUpServices(new OperandoCommunicationException(null));
+		setUpServices(new OperandoCommunicationException(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND));
 		
 		Response response = api.complianceReportGet("A123", "B987");
 		
