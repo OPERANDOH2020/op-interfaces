@@ -14,7 +14,6 @@ import eu.operando.moduleclients.ClientReportGeneratorTests;
 @Suite.SuiteClasses
 ({
 	RegulationsApiServiceImplTests.class,
-	ReportsApiServiceImplTests.class,
 	ComplianceReportApiTests.class,
 	ComplianceReportApiServiceImplTests.class,
 	AuthenticationServiceImplTests.class,
