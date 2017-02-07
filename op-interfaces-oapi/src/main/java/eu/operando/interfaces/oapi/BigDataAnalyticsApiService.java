@@ -1,10 +1,9 @@
 package eu.operando.interfaces.oapi;
 
-import javax.ws.rs.core.Response;
-
-import eu.operando.interfaces.oapi.model.WrapperBdaRequestBody;
+import eu.operando.OperandoCommunicationException;
+import eu.operando.api.model.AnalyticsReport;
 
 public abstract class BigDataAnalyticsApiService
 {
-	public abstract Response getBdaReport(String serviceTicket, WrapperBdaRequestBody wrapper, String jobId);
+	public abstract AnalyticsReport getBdaReport(String jobId) throws OperandoCommunicationException;
 }

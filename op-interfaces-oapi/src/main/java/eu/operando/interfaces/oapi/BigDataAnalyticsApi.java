@@ -7,9 +7,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import eu.operando.OperandoCommunicationException;
+import eu.operando.OperandoCommunicationException.CommunicationError;
+import eu.operando.api.AuthenticationService;
+import eu.operando.api.factories.AuthenticationServiceFactory;
+import eu.operando.api.model.AnalyticsReport;
 import eu.operando.interfaces.oapi.factories.BigDataAnalyticsApiServiceFactory;
-import eu.operando.interfaces.oapi.model.WrapperBdaRequestBody;
 import io.swagger.annotations.ApiParam;
 
 @Path("/bda")
@@ -19,29 +24,80 @@ import io.swagger.annotations.ApiParam;
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-08-31T09:45:10.086Z")
 public class BigDataAnalyticsApi
 {
+	private static final String SERVICE_ID = "GET/bda/jobs/{job-id}/reports/latest";
+	
+	// Location of properties file.
+	private static final String PROPERTIES_FILE_OAPI = "config.properties";
+	
+	private AuthenticationService authenticationDelegate;
+	private BigDataAnalyticsApiService bigDataDelegate;
 
-	private final BigDataAnalyticsApiService delegate = BigDataAnalyticsApiServiceFactory.getBdaApi();
-
+	public BigDataAnalyticsApi(){
+		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(PROPERTIES_FILE_OAPI);
+		bigDataDelegate = BigDataAnalyticsApiServiceFactory.getBdaApi();
+	}
+	
 	@GET
-	@Path("/jobs/{job-id}/reports")
+	@Path("/jobs/{job-id}/reports/latest")
 	@Produces({ MediaType.APPLICATION_JSON })
-	@io.swagger.annotations.ApiOperation(value = "", notes = "provides a link to download a report", response = void.class, tags = {})
+	@io.swagger.annotations.ApiOperation(
+		value = "", 
+		notes = "", 
+		response = AnalyticsReport.class, 
+		tags = { "big data analytics" }
+	)
 	@io.swagger.annotations.ApiResponses(value = {
-			@io.swagger.annotations.ApiResponse(code = 200, message = "Successful response", response = void.class),
-
-			@io.swagger.annotations.ApiResponse(
-					code = 401,
-					message = "The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
-					response = void.class),
-
-			@io.swagger.annotations.ApiResponse(
-					code = 403,
-					message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
-					response = void.class) })
-	public Response getBdaReport(@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam("service-ticket") String serviceTicket,
-			@ApiParam(value = "Identification of the job to get the status about", required = true) @PathParam("job-id") String jobId,
-			@ApiParam(value = "Identification of the requesting end user", required = true) WrapperBdaRequestBody wrapper)
-	{
-		return delegate.getBdaReport(serviceTicket, wrapper, jobId);
+		@io.swagger.annotations.ApiResponse(
+			code = 200, 
+			message = "Successful response", 
+			response = AnalyticsReport.class
+		),
+		@io.swagger.annotations.ApiResponse(
+			code = 401,
+			message = "Error - The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
+			response = AnalyticsReport.class
+		),
+		@io.swagger.annotations.ApiResponse(
+			code = 404,
+			message = "Error - The specified job could not be found.",
+			response = AnalyticsReport.class
+		),
+		@io.swagger.annotations.ApiResponse(
+			code = 500,
+			message = "Error - An internal error has occured.",
+			response = AnalyticsReport.class
+		) 
+	})
+	public Response getBdaReport(
+		@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam("service-ticket") 
+			String serviceTicket,
+		@ApiParam(value = "Identification of the job to get the status about", required = true) @PathParam("job-id") 
+			String jobId
+	){
+		Response response;
+		try{
+			boolean isAuthenticated = authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID);
+			if(isAuthenticated){
+				try{
+					AnalyticsReport report = bigDataDelegate.getBdaReport(jobId);
+					response = Response.ok(report).build();
+				}
+				catch(OperandoCommunicationException ex){
+					if(ex.getCommunitcationError() == CommunicationError.REQUESTED_RESOURCE_NOT_FOUND){
+						response = Response.status(Status.NOT_FOUND).build();
+					} 
+					else {
+						response = Response.serverError().build();
+					}
+				}
+			}
+			else {
+				response = Response.status(Status.UNAUTHORIZED).build();
+			}
+		} 
+		catch(OperandoCommunicationException ex){
+			response = Response.serverError().build();
+		}
+		return response;
 	}
 }
