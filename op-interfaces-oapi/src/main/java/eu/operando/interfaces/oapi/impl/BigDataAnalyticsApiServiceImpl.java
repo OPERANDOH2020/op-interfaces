@@ -17,7 +17,6 @@ public class BigDataAnalyticsApiServiceImpl extends BigDataAnalyticsApiService
 
 	@Override
 	public AnalyticsReport getBdaReport(String jobId, String userId) throws OperandoCommunicationException {
-		// TODO Auto-generated method stub
-		return null;
+		return clientBigDataAnalytics.getBdaReport(jobId, userId);
 	}
 }

@@ -1,7 +1,10 @@
 package eu.operando.interfaces.oapi.impl;
 
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,28 +31,28 @@ public class BigDataAnalyticsApiServiceImplTests
 	{
 		String jobId = "C456";
 		String userId = "D000";
-		setUpServices(null);
+		setUpServices((AnalyticsReport) null);
 		
 		implementation.getBdaReport(jobId, userId);
 		
-		fail("class not ready for testing yet");
+		verify(clientBigDataAnalytics).getBdaReport(jobId, userId);
 	}
 	
 	@Test
 	public void testGetBdaReport_ReturnCorrectReportIfFound() throws OperandoCommunicationException
 	{
-		Object toReturn = null;
+		AnalyticsReport toReturn = new AnalyticsReport();
 		setUpServices(toReturn);
 		
 		AnalyticsReport report = implementation.getBdaReport("C456", "D000");
 		
-		fail("class not ready for testing yet");
+		assertEquals(toReturn, report);
 	}
 	
 	@Test
-	public void testGetBdaReport_ReturnNotFoundExceptionIfReportNotFound()
+	public void testGetBdaReport_ReturnNotFoundExceptionIfReportNotFound() throws OperandoCommunicationException
 	{
-		setUpServices(new OperandoCommunicationException(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND));
+		setUpServices(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
 		
 		try{
 			implementation.getBdaReport("C456", "D000");
@@ -61,9 +64,9 @@ public class BigDataAnalyticsApiServiceImplTests
 	}
 	
 	@Test
-	public void testGetBdaReport_ReturnInternalErrorExceptionIfCantGetReport()
+	public void testGetBdaReport_ReturnInternalErrorExceptionIfCantGetReport() throws OperandoCommunicationException
 	{
-		setUpServices(new OperandoCommunicationException(CommunicationError.ERROR_FROM_OTHER_MODULE));
+		setUpServices(CommunicationError.ERROR_FROM_OTHER_MODULE);
 		
 		try{
 			implementation.getBdaReport("C456", "D000");
@@ -74,11 +77,11 @@ public class BigDataAnalyticsApiServiceImplTests
 		}
 	}
 	
-	private void setUpServices(Object toReturn){
-		
+	private void setUpServices(AnalyticsReport toReturn) throws OperandoCommunicationException{
+		when(clientBigDataAnalytics.getBdaReport(anyString(), anyString())).thenReturn(toReturn);
 	}
 	
-	private void setUpServices(OperandoCommunicationException ex){
-
+	private void setUpServices(CommunicationError err) throws OperandoCommunicationException{
+		when(clientBigDataAnalytics.getBdaReport(anyString(), anyString())).thenThrow(new OperandoCommunicationException(err));
 	}
 }
