@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import eu.operando.AuthenticationWrapper;
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.api.AuthenticationService;
@@ -76,10 +77,10 @@ public class BigDataAnalyticsApi
 	){
 		Response response;
 		try{
-			boolean isAuthenticated = authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID);
-			if(isAuthenticated){
+			AuthenticationWrapper wrapper = authenticationDelegate.requestAuthenticationDetails(serviceTicket, SERVICE_ID);
+			if(wrapper.isTicketValid()){
 				try{
-					AnalyticsReport report = bigDataDelegate.getBdaReport(jobId);
+					AnalyticsReport report = bigDataDelegate.getBdaReport(jobId, wrapper.getIdOspUser());
 					response = Response.ok(report).build();
 				}
 				catch(OperandoCommunicationException ex){

@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import eu.operando.AuthenticationWrapper;
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.api.AuthenticationService;
@@ -39,25 +40,25 @@ public class BigDataAnalyticsApiTests {
 	@Test
 	public void testGetReport_Authentication_CorrectParameters() throws OperandoCommunicationException{
 		String serviceTicket = "A123";
-		setUpServices(true);
+		setUpAuth(true);
 		
 		api.getBdaReport(serviceTicket, "C456");
 		
-		verify(authenticationDelegate).isAuthenticatedForService(serviceTicket, SERVICE_ID);
+		verify(authenticationDelegate).requestAuthenticationDetails(serviceTicket, SERVICE_ID);
 	}
 	
 	@Test
 	public void testGetReport_Authentication_OtherModulesNotCalledIfNotAuthenticated() throws OperandoCommunicationException{
-		setUpServices(false);
+		setUpAuth(false);
 		
 		api.getBdaReport("A123", "C456");
 		
-		verify(bigDataDelegate, never()).getBdaReport(anyString());
+		verify(bigDataDelegate, never()).getBdaReport(anyString(), anyString());
 	}
 	
 	@Test
 	public void testGetReport_Authentication_UnauthorisedCodeReturnedIfNotAuthenticated() throws OperandoCommunicationException{
-		setUpServices(false);
+		setUpAuth(false);
 		
 		Response response = api.getBdaReport("A123", "C456");
 		
@@ -70,7 +71,7 @@ public class BigDataAnalyticsApiTests {
 	
 	@Test
 	public void testGetReport_Authentication_InternalErrorCodeReturnedIfNotAuthenticated() throws OperandoCommunicationException{
-		setUpServices(new OperandoCommunicationException(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND));
+		setUpAuth(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
 		
 		Response response = api.getBdaReport("A123", "C456");
 		
@@ -83,18 +84,18 @@ public class BigDataAnalyticsApiTests {
 	
 	@Test
 	public void testGetReport_Report_CorrectParameters() throws OperandoCommunicationException{
-		String serviceTicket = "A123";
 		String jobId = "C456";
-		setUpServices(true);
+		String userId = "D000";
+		setUpAuth(true, userId);
 		
-		api.getBdaReport(serviceTicket, jobId);
+		api.getBdaReport("A123", jobId);
 		
-		verify(bigDataDelegate).getBdaReport(jobId);
+		verify(bigDataDelegate).getBdaReport(jobId, userId);
 	}
 	
 	@Test
 	public void testGetReport_Report_OkCodeReturnedIfFound() throws OperandoCommunicationException{
-		setUpServices(true);
+		setUpAuth(true);
 		
 		Response response = api.getBdaReport("A123", "C456");
 		
@@ -108,7 +109,7 @@ public class BigDataAnalyticsApiTests {
 	@Test
 	public void testGetReport_Report_ReportReturnedIfFound() throws OperandoCommunicationException{
 		AnalyticsReport report = new AnalyticsReport();
-		setUpServices(true, report);
+		setUpServices(report);
 		
 		Response response = api.getBdaReport("A123", "C456");
 		
@@ -121,7 +122,7 @@ public class BigDataAnalyticsApiTests {
 	
 	@Test
 	public void testGetReport_Report_NotFoundCodeReturnedIfCantFindReport() throws OperandoCommunicationException{
-		setUpServices(true, new OperandoCommunicationException(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND));
+		setUpServices(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
 		
 		Response response = api.getBdaReport("A123", "C456");
 		
@@ -134,7 +135,7 @@ public class BigDataAnalyticsApiTests {
 	
 	@Test
 	public void testGetReport_Report_InternalErrorCodeReturnedIfCantGetReport() throws OperandoCommunicationException{
-		setUpServices(true, new OperandoCommunicationException(CommunicationError.ERROR_FROM_OTHER_MODULE));
+		setUpServices(CommunicationError.ERROR_FROM_OTHER_MODULE);
 		
 		Response response = api.getBdaReport("A123", "C456");
 		
@@ -145,21 +146,30 @@ public class BigDataAnalyticsApiTests {
 		);
 	}
 	
-	private void setUpServices(boolean shouldAuthenticate) throws OperandoCommunicationException{
-		setUpServices(shouldAuthenticate, (AnalyticsReport) null);
+	private void setUpAuth(boolean shouldAuthenticate) throws OperandoCommunicationException{
+		setUpAuth(shouldAuthenticate, null);
 	}
 	
-	private void setUpServices(OperandoCommunicationException ex) throws OperandoCommunicationException{
-		when(authenticationDelegate.isAuthenticatedForService(anyString(), anyString())).thenThrow(ex);
+	private void setUpAuth(boolean shouldAuthenticate, String userName) throws OperandoCommunicationException{
+		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
+			.thenReturn(new AuthenticationWrapper(shouldAuthenticate, userName));
+		when(bigDataDelegate.getBdaReport(anyString(), anyString())).thenReturn(null);
 	}
 	
-	private void setUpServices(boolean shouldAuthenticate, AnalyticsReport toReturn) throws OperandoCommunicationException{
-		when(authenticationDelegate.isAuthenticatedForService(anyString(), anyString())).thenReturn(shouldAuthenticate);
-		when(bigDataDelegate.getBdaReport(anyString())).thenReturn(toReturn);
+	private void setUpAuth(CommunicationError err) throws OperandoCommunicationException{
+		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
+			.thenThrow(new OperandoCommunicationException(err));
 	}
 	
-	private void setUpServices(boolean shouldAuthenticate, OperandoCommunicationException ex) throws OperandoCommunicationException{
-		when(authenticationDelegate.isAuthenticatedForService(anyString(), anyString())).thenReturn(shouldAuthenticate);
-		when(bigDataDelegate.getBdaReport(anyString())).thenThrow(ex);
+	private void setUpServices(AnalyticsReport toReturn) throws OperandoCommunicationException{
+		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
+		.thenReturn(new AuthenticationWrapper(true, ""));
+		when(bigDataDelegate.getBdaReport(anyString(), anyString())).thenReturn(toReturn);
+	}
+	
+	private void setUpServices(CommunicationError err) throws OperandoCommunicationException{
+		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
+			.thenReturn(new AuthenticationWrapper(true, ""));
+		when(bigDataDelegate.getBdaReport(anyString(), anyString())).thenThrow(new OperandoCommunicationException(err));
 	}
 }

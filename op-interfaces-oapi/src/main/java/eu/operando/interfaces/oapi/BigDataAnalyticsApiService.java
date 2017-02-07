@@ -5,5 +5,5 @@ import eu.operando.api.model.AnalyticsReport;
 
 public abstract class BigDataAnalyticsApiService
 {
-	public abstract AnalyticsReport getBdaReport(String jobId) throws OperandoCommunicationException;
+	public abstract AnalyticsReport getBdaReport(String jobId, String userId) throws OperandoCommunicationException;
 }
