@@ -41,7 +41,7 @@ public class BigDataAnalyticsApiServiceImplTests
 	@Test
 	public void testGetBdaReport_ReturnCorrectReportIfFound() throws OperandoCommunicationException
 	{
-		AnalyticsReport toReturn = new AnalyticsReport();
+		AnalyticsReport toReturn = new AnalyticsReport("2", "Report", "a report", "CgoKCgoKCgoKCgo8IURPQ1RZUEUg");
 		setUpServices(toReturn);
 		
 		AnalyticsReport report = implementation.getBdaReport("C456", "D000");

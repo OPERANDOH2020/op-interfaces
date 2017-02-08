@@ -3,7 +3,6 @@ package eu.operando.interfaces.oapi.factories;
 import eu.operando.Utils;
 import eu.operando.interfaces.oapi.BigDataAnalyticsApiService;
 import eu.operando.interfaces.oapi.impl.BigDataAnalyticsApiServiceImpl;
-import eu.operando.moduleclients.ClientAuthenticationApiOperandoService;
 import eu.operando.moduleclients.ClientBigDataAnalytics;
 
 public class BigDataAnalyticsApiServiceFactory

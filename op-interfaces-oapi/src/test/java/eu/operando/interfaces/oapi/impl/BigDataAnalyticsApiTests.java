@@ -108,7 +108,7 @@ public class BigDataAnalyticsApiTests {
 	
 	@Test
 	public void testGetReport_Report_ReportReturnedIfFound() throws OperandoCommunicationException{
-		AnalyticsReport report = new AnalyticsReport();
+		AnalyticsReport report = new AnalyticsReport("2", "Report", "a report", "CgoKCgoKCgoKCgo8IURPQ1RZUEUg");
 		setUpServices(report);
 		
 		Response response = api.getBdaReport("A123", "C456");
