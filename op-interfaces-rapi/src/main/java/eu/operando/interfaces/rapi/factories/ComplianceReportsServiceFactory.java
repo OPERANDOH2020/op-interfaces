@@ -1,11 +1,11 @@
 package eu.operando.interfaces.rapi.factories;
 
 import eu.operando.Utils;
-import eu.operando.interfaces.rapi.ComplianceReportApiService;
-import eu.operando.interfaces.rapi.impl.ComplianceReportApiServiceImpl;
+import eu.operando.interfaces.rapi.ComplianceReportsService;
+import eu.operando.interfaces.rapi.impl.ComplianceReportsServiceImpl;
 import eu.operando.moduleclients.ClientPolicyDb;
 
-public class ComplianceReportApiServiceFactory {
+public class ComplianceReportsServiceFactory {
 
 	// Location of properties file.
 	private static final String PROPERTIES_FILE_RAPI = "config.properties";
@@ -13,9 +13,9 @@ public class ComplianceReportApiServiceFactory {
 	// Property file property names.
 	private static final String PROPERTY_NAME_ORIGIN_POLICY_DB = "originPolicyDb";
 	
-	private static ComplianceReportApiService service;
+	private static ComplianceReportsService service;
 	
-	public static ComplianceReportApiService getComplienceReportApiService(){
+	public static ComplianceReportsService getComplienceReportApiService(){
 		if (service == null)
 		{
 			service = configureService();
@@ -23,7 +23,7 @@ public class ComplianceReportApiServiceFactory {
 		return service;
 	}
 	
-	private static ComplianceReportApiService configureService(){
+	private static ComplianceReportsService configureService(){
 		// Property file property values.
 		String originPolicyDb = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_POLICY_DB);
 		
@@ -31,6 +31,6 @@ public class ComplianceReportApiServiceFactory {
 		ClientPolicyDb clientPolicyDb = new ClientPolicyDb(originPolicyDb);
 		
 		// Configure the service.
-		return new ComplianceReportApiServiceImpl(clientPolicyDb);
+		return new ComplianceReportsServiceImpl(clientPolicyDb);
 	}
 }
