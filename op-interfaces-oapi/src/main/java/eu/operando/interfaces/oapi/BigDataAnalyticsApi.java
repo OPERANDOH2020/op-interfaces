@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response.Status;
 import eu.operando.AuthenticationWrapper;
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
+import eu.operando.UnableToGetDataException;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.api.model.AnalyticsReport;
@@ -96,7 +97,7 @@ public class BigDataAnalyticsApi
 				response = Response.status(Status.UNAUTHORIZED).build();
 			}
 		} 
-		catch(OperandoCommunicationException ex){
+		catch(UnableToGetDataException ex){
 			response = Response.serverError().build();
 		}
 		return response;

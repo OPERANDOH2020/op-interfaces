@@ -18,6 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import eu.operando.AuthenticationWrapper;
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
+import eu.operando.UnableToGetDataException;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.model.AnalyticsReport;
 import eu.operando.interfaces.oapi.BigDataAnalyticsApi;
@@ -38,7 +39,7 @@ public class BigDataAnalyticsApiTests {
 	private BigDataAnalyticsApi api = new BigDataAnalyticsApi();
 	
 	@Test
-	public void testGetReport_Authentication_CorrectParameters() throws OperandoCommunicationException{
+	public void testGetReport_Authentication_CorrectParameters() throws OperandoCommunicationException, UnableToGetDataException{
 		String serviceTicket = "A123";
 		setUpAuth(true);
 		
@@ -48,7 +49,7 @@ public class BigDataAnalyticsApiTests {
 	}
 	
 	@Test
-	public void testGetReport_Authentication_OtherModulesNotCalledIfNotAuthenticated() throws OperandoCommunicationException{
+	public void testGetReport_Authentication_OtherModulesNotCalledIfNotAuthenticated() throws OperandoCommunicationException, UnableToGetDataException{
 		setUpAuth(false);
 		
 		api.getBdaReport("A123", "C456");
@@ -57,7 +58,7 @@ public class BigDataAnalyticsApiTests {
 	}
 	
 	@Test
-	public void testGetReport_Authentication_UnauthorisedCodeReturnedIfNotAuthenticated() throws OperandoCommunicationException{
+	public void testGetReport_Authentication_UnauthorisedCodeReturnedIfNotAuthenticated() throws OperandoCommunicationException, UnableToGetDataException{
 		setUpAuth(false);
 		
 		Response response = api.getBdaReport("A123", "C456");
@@ -70,7 +71,7 @@ public class BigDataAnalyticsApiTests {
 	}
 	
 	@Test
-	public void testGetReport_Authentication_InternalErrorCodeReturnedIfNotAuthenticated() throws OperandoCommunicationException{
+	public void testGetReport_Authentication_InternalErrorCodeReturnedIfNotAuthenticated() throws OperandoCommunicationException, UnableToGetDataException{
 		setUpAuth(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
 		
 		Response response = api.getBdaReport("A123", "C456");
@@ -83,7 +84,7 @@ public class BigDataAnalyticsApiTests {
 	}
 	
 	@Test
-	public void testGetReport_Report_CorrectParameters() throws OperandoCommunicationException{
+	public void testGetReport_Report_CorrectParameters() throws OperandoCommunicationException, UnableToGetDataException{
 		String jobId = "C456";
 		String userId = "D000";
 		setUpAuth(true, userId);
@@ -94,7 +95,7 @@ public class BigDataAnalyticsApiTests {
 	}
 	
 	@Test
-	public void testGetReport_Report_OkCodeReturnedIfFound() throws OperandoCommunicationException{
+	public void testGetReport_Report_OkCodeReturnedIfFound() throws OperandoCommunicationException, UnableToGetDataException{
 		setUpAuth(true);
 		
 		Response response = api.getBdaReport("A123", "C456");
@@ -107,7 +108,7 @@ public class BigDataAnalyticsApiTests {
 	}
 	
 	@Test
-	public void testGetReport_Report_ReportReturnedIfFound() throws OperandoCommunicationException{
+	public void testGetReport_Report_ReportReturnedIfFound() throws OperandoCommunicationException, UnableToGetDataException{
 		AnalyticsReport report = new AnalyticsReport("2", "Report", "a report", "CgoKCgoKCgoKCgo8IURPQ1RZUEUg");
 		setUpServices(report);
 		
@@ -121,7 +122,7 @@ public class BigDataAnalyticsApiTests {
 	}
 	
 	@Test
-	public void testGetReport_Report_NotFoundCodeReturnedIfCantFindReport() throws OperandoCommunicationException{
+	public void testGetReport_Report_NotFoundCodeReturnedIfCantFindReport() throws OperandoCommunicationException, UnableToGetDataException{
 		setUpServices(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
 		
 		Response response = api.getBdaReport("A123", "C456");
@@ -134,7 +135,7 @@ public class BigDataAnalyticsApiTests {
 	}
 	
 	@Test
-	public void testGetReport_Report_InternalErrorCodeReturnedIfCantGetReport() throws OperandoCommunicationException{
+	public void testGetReport_Report_InternalErrorCodeReturnedIfCantGetReport() throws OperandoCommunicationException, UnableToGetDataException{
 		setUpServices(CommunicationError.ERROR_FROM_OTHER_MODULE);
 		
 		Response response = api.getBdaReport("A123", "C456");
@@ -146,28 +147,28 @@ public class BigDataAnalyticsApiTests {
 		);
 	}
 	
-	private void setUpAuth(boolean shouldAuthenticate) throws OperandoCommunicationException{
+	private void setUpAuth(boolean shouldAuthenticate) throws OperandoCommunicationException, UnableToGetDataException{
 		setUpAuth(shouldAuthenticate, null);
 	}
 	
-	private void setUpAuth(boolean shouldAuthenticate, String userName) throws OperandoCommunicationException{
+	private void setUpAuth(boolean shouldAuthenticate, String userName) throws OperandoCommunicationException, UnableToGetDataException{
 		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
 			.thenReturn(new AuthenticationWrapper(shouldAuthenticate, userName));
 		when(bigDataDelegate.getBdaReport(anyString(), anyString())).thenReturn(null);
 	}
 	
-	private void setUpAuth(CommunicationError err) throws OperandoCommunicationException{
+	private void setUpAuth(CommunicationError err) throws UnableToGetDataException{
 		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
 			.thenThrow(new OperandoCommunicationException(err));
 	}
 	
-	private void setUpServices(AnalyticsReport toReturn) throws OperandoCommunicationException{
+	private void setUpServices(AnalyticsReport toReturn) throws OperandoCommunicationException, UnableToGetDataException{
 		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
 		.thenReturn(new AuthenticationWrapper(true, ""));
 		when(bigDataDelegate.getBdaReport(anyString(), anyString())).thenReturn(toReturn);
 	}
 	
-	private void setUpServices(CommunicationError err) throws OperandoCommunicationException{
+	private void setUpServices(CommunicationError err) throws OperandoCommunicationException, UnableToGetDataException{
 		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
 			.thenReturn(new AuthenticationWrapper(true, ""));
 		when(bigDataDelegate.getBdaReport(anyString(), anyString())).thenThrow(new OperandoCommunicationException(err));
