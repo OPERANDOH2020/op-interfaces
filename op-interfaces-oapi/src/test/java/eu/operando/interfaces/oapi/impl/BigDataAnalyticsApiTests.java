@@ -71,7 +71,7 @@ public class BigDataAnalyticsApiTests {
 	}
 	
 	@Test
-	public void testGetReport_Authentication_InternalErrorCodeReturnedIfNotAuthenticated() throws OperandoCommunicationException, UnableToGetDataException{
+	public void testGetReport_Authentication_InternalErrorCodeReturnedIfCannotNotAuthenticate() throws OperandoCommunicationException, UnableToGetDataException{
 		setUpAuth(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
 		
 		Response response = api.getBdaReport("A123", "C456");
@@ -96,7 +96,8 @@ public class BigDataAnalyticsApiTests {
 	
 	@Test
 	public void testGetReport_Report_OkCodeReturnedIfFound() throws OperandoCommunicationException, UnableToGetDataException{
-		setUpAuth(true);
+		AnalyticsReport report = new AnalyticsReport("2", "Report", "a report", "CgoKCgoKCgoKCgo8IURPQ1RZUEUg");
+		setUpServices(report);
 		
 		Response response = api.getBdaReport("A123", "C456");
 		
@@ -123,7 +124,7 @@ public class BigDataAnalyticsApiTests {
 	
 	@Test
 	public void testGetReport_Report_NotFoundCodeReturnedIfCantFindReport() throws OperandoCommunicationException, UnableToGetDataException{
-		setUpServices(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
+		setUpServices((AnalyticsReport) null);
 		
 		Response response = api.getBdaReport("A123", "C456");
 		
@@ -159,7 +160,7 @@ public class BigDataAnalyticsApiTests {
 	
 	private void setUpAuth(CommunicationError err) throws UnableToGetDataException{
 		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
-			.thenThrow(new OperandoCommunicationException(err));
+			.thenThrow(new UnableToGetDataException(new OperandoCommunicationException(err)));
 	}
 	
 	private void setUpServices(AnalyticsReport toReturn) throws OperandoCommunicationException, UnableToGetDataException{
@@ -171,6 +172,6 @@ public class BigDataAnalyticsApiTests {
 	private void setUpServices(CommunicationError err) throws OperandoCommunicationException, UnableToGetDataException{
 		when(authenticationDelegate.requestAuthenticationDetails(anyString(), anyString()))
 			.thenReturn(new AuthenticationWrapper(true, ""));
-		when(bigDataDelegate.getBdaReport(anyString(), anyString())).thenThrow(new OperandoCommunicationException(err));
+		when(bigDataDelegate.getBdaReport(anyString(), anyString())).thenThrow(new UnableToGetDataException(new OperandoCommunicationException(err)));
 	}
 }

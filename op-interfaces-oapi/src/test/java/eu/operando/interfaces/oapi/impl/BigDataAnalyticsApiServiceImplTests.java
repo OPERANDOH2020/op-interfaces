@@ -14,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
+import eu.operando.UnableToGetDataException;
 import eu.operando.api.model.AnalyticsReport;
 import eu.operando.moduleclients.ClientBigDataAnalytics;
 
@@ -27,7 +28,7 @@ public class BigDataAnalyticsApiServiceImplTests
 	private BigDataAnalyticsApiServiceImpl implementation;
 	
 	@Test
-	public void testGetBdaReport_CorrectParameters() throws OperandoCommunicationException
+	public void testGetBdaReport_CorrectParameters() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		String jobId = "C456";
 		String userId = "D000";
@@ -39,7 +40,7 @@ public class BigDataAnalyticsApiServiceImplTests
 	}
 	
 	@Test
-	public void testGetBdaReport_ReturnCorrectReportIfFound() throws OperandoCommunicationException
+	public void testGetBdaReport_ReturnCorrectReportIfFound() throws UnableToGetDataException, OperandoCommunicationException
 	{
 		AnalyticsReport toReturn = new AnalyticsReport("2", "Report", "a report", "CgoKCgoKCgoKCgo8IURPQ1RZUEUg");
 		setUpServices(toReturn);
@@ -50,31 +51,25 @@ public class BigDataAnalyticsApiServiceImplTests
 	}
 	
 	@Test
-	public void testGetBdaReport_ReturnNotFoundExceptionIfReportNotFound() throws OperandoCommunicationException
+	public void testGetBdaReport_ReturnNullIfReportNotFound() throws UnableToGetDataException, OperandoCommunicationException
 	{
 		setUpServices(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
 		
-		try{
-			implementation.getBdaReport("C456", "D000");
-			fail("If the report cannot be found an exception should be returned");
-		}
-		catch(OperandoCommunicationException ex){
-			assertEquals(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND, ex.getCommunitcationError());
-		}
+		AnalyticsReport report = implementation.getBdaReport("C456", "D000");
+		
+		assertEquals(null, report);
+
 	}
 	
-	@Test
-	public void testGetBdaReport_ReturnInternalErrorExceptionIfCantGetReport() throws OperandoCommunicationException
+	@Test(expected = UnableToGetDataException.class)
+	public void testGetBdaReport_ReturnInternalErrorExceptionIfCantGetReport() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		setUpServices(CommunicationError.ERROR_FROM_OTHER_MODULE);
 		
-		try{
-			implementation.getBdaReport("C456", "D000");
-			fail("If the report cannot be retrieved an exception should be returned");
-		}
-		catch(OperandoCommunicationException ex){
-			assertEquals(CommunicationError.ERROR_FROM_OTHER_MODULE, ex.getCommunitcationError());
-		}
+		implementation.getBdaReport("C456", "D000");
+		fail("If the report cannot be retrieved an exception should be returned");
+
+
 	}
 	
 	private void setUpServices(AnalyticsReport toReturn) throws OperandoCommunicationException{

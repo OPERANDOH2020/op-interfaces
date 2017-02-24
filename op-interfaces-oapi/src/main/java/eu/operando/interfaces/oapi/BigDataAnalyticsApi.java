@@ -10,8 +10,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import eu.operando.AuthenticationWrapper;
-import eu.operando.OperandoCommunicationException;
-import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.UnableToGetDataException;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.factories.AuthenticationServiceFactory;
@@ -80,23 +78,18 @@ public class BigDataAnalyticsApi
 		try{
 			AuthenticationWrapper wrapper = authenticationDelegate.requestAuthenticationDetails(serviceTicket, SERVICE_ID);
 			if(wrapper.isTicketValid()){
-				try{
-					AnalyticsReport report = bigDataDelegate.getBdaReport(jobId, wrapper.getIdOspUser());
+				AnalyticsReport report = bigDataDelegate.getBdaReport(jobId, wrapper.getIdOspUser());
+				if(report == null){
+					response = Response.status(Status.NOT_FOUND).build();
+				} 
+				else {
 					response = Response.ok(report).build();
-				}
-				catch(OperandoCommunicationException ex){
-					if(ex.getCommunitcationError() == CommunicationError.REQUESTED_RESOURCE_NOT_FOUND){
-						response = Response.status(Status.NOT_FOUND).build();
-					} 
-					else {
-						response = Response.serverError().build();
-					}
 				}
 			}
 			else {
 				response = Response.status(Status.UNAUTHORIZED).build();
 			}
-		} 
+		}
 		catch(UnableToGetDataException ex){
 			response = Response.serverError().build();
 		}
