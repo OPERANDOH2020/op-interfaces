@@ -16,7 +16,7 @@ function SwarmConnector(){
     var adapterPort    = 3000;
     var adapterHost    = "localhost";
     var util           = require("swarmcore");
-    var client	       = util.createClient(adapterHost, adapterPort, "iAmAnEmailServer@plusprivacy.com", "haraka","BroadcastTest", "userLogin");
+    var client	       = util.createClient(adapterHost, adapterPort, "emailServer", "haraka","BroadcastTest", "emailLoginCtor");
     var uuid           = require('node-uuid');
     var self           = this;
 
