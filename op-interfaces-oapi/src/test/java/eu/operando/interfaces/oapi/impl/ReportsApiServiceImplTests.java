@@ -28,7 +28,7 @@ import eu.operando.moduleclients.ClientReportGenerator;
 public class ReportsApiServiceImplTests
 {
 	// Variables to test.
-	private static final String SERVICE_ID_GET_REPORT = "GET /regulator/reports/{report_id}";
+	private static final String SERVICE_ID_GET_REPORT = "/operando/webui/reports/";
 	
 	// Dummy variables.
 	private static final String REPORT_FROM_CLIENT = "reportFromClient";
@@ -148,12 +148,10 @@ public class ReportsApiServiceImplTests
 		setUpResponseFromOtherModules(true, null, REPORT_FROM_CLIENT);
 
 		// Exercise
-		Response responseToReturn = implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseFromReportGenerator = implementation.reportsGetReport(SERVICE_TICKET, REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
-		@SuppressWarnings("unchecked")
-		Entity<Object> entity = (Entity<Object>) responseToReturn.getEntity();
-		Object objectInBody = entity.getEntity();
+		Object objectInBody = responseFromReportGenerator.getEntity();
 		assertEquals("In the event of successful report retrieval, the RAPI should return the report it gets from elsewhere in the platform.", REPORT_FROM_CLIENT,
 				objectInBody);
 	}
