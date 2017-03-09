@@ -1,6 +1,7 @@
 package eu.operando.interfaces.oapi.impl;
 
 
+import eu.operando.OperandoAuthenticationException;
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.UnableToGetDataException;
@@ -30,6 +31,9 @@ public class BigDataAnalyticsApiServiceImpl extends BigDataAnalyticsApiService
 			else {
 				throw new UnableToGetDataException(ex);
 			}
+		}
+		catch(OperandoAuthenticationException ex){
+			throw new UnableToGetDataException(ex);
 		}
 	}
 }
