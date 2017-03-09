@@ -137,26 +137,18 @@ public class UserController {
 	    throws UserException {
         User currentUser = new User();
 	try {
-            // Make the connection with LDAP
-	    Hashtable env = new Hashtable();
-	    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-	    env.put(Context.PROVIDER_URL, (ldapProtocol + "://" + ldapHost + ":" + ldapPort));
-	    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-	    env.put(Context.SECURITY_PRINCIPAL, ldapUsername); 
-	    env.put(Context.SECURITY_CREDENTIALS, ldapPassword);
-	    env.put("java.naming.ldap.factory.socket", "eu.operando.interfaces.aapi.socketfactory.LdapDefaultSSLSocketFactory");
-	    // init the connection
             
-	    DirContext ctx = new InitialDirContext(env);
             //STEP 1:delete user
-            ctx.unbind("cn="+username+"ou=People,dc=nodomain"); //delete user from ldap
+            deleteUserFromLdap(username);
+            
              
-            //STEP 2: recreate user
+//            //STEP 2: recreate user
             if (storeUserToLdap(user)) {
 		return new ResponseEntity<User>(user, HttpStatus.CREATED);
 	    } else {
 		return new ResponseEntity<User>(user, HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
+//            return new ResponseEntity<User>(user, HttpStatus.CREATED);
             
         } catch (Exception ex) {
 	    ex.printStackTrace();
@@ -165,6 +157,30 @@ public class UserController {
 	return new ResponseEntity<User>(user, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    private void deleteUserFromLdap(String username){
+        try {
+            Hashtable env = new Hashtable();
+            env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+            env.put(Context.PROVIDER_URL, (ldapProtocol + "://" + ldapHost + ":" + ldapPort));
+            env.put(Context.SECURITY_AUTHENTICATION, "simple");
+            env.put(Context.SECURITY_PRINCIPAL, ldapUsername); 
+            env.put(Context.SECURITY_CREDENTIALS, ldapPassword);
+            env.put("java.naming.ldap.factory.socket", "eu.operando.interfaces.aapi.socketfactory.LdapDefaultSSLSocketFactory");
+            // init the connection
+
+            DirContext ctx = new InitialDirContext(env);
+//            ctx.destroySubcontext("cn="+username+",ou=People,dc=nodomain");
+            ctx.unbind("uid=" + username + ",ou=People,dc=nodomain");
+            ctx.destroySubcontext("uid=" + username + ",ou=People,dc=nodomain");
+            ctx.close();
+            
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Make the connection with LDAP
+        
+    }
     @RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
     @ApiOperation(value = "deleteUser", notes = "This operation deletes the OPERANDO's registed user with given username")
     @ApiResponses(value = { 
