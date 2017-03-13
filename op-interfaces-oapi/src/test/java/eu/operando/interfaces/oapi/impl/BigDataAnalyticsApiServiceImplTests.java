@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import eu.operando.OperandoAuthenticationException;
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.UnableToGetDataException;
@@ -28,7 +29,7 @@ public class BigDataAnalyticsApiServiceImplTests
 	private BigDataAnalyticsApiServiceImpl implementation;
 	
 	@Test
-	public void testGetBdaReport_CorrectParameters() throws OperandoCommunicationException, UnableToGetDataException
+	public void testGetBdaReport_CorrectParameters() throws OperandoCommunicationException, UnableToGetDataException, OperandoAuthenticationException
 	{
 		String jobId = "C456";
 		String userId = "D000";
@@ -40,7 +41,7 @@ public class BigDataAnalyticsApiServiceImplTests
 	}
 	
 	@Test
-	public void testGetBdaReport_ReturnCorrectReportIfFound() throws UnableToGetDataException, OperandoCommunicationException
+	public void testGetBdaReport_ReturnCorrectReportIfFound() throws UnableToGetDataException, OperandoCommunicationException, OperandoAuthenticationException
 	{
 		AnalyticsReport toReturn = new AnalyticsReport("2", "Report", "a report", "CgoKCgoKCgoKCgo8IURPQ1RZUEUg");
 		setUpServices(toReturn);
@@ -51,7 +52,7 @@ public class BigDataAnalyticsApiServiceImplTests
 	}
 	
 	@Test
-	public void testGetBdaReport_ReturnNullIfReportNotFound() throws UnableToGetDataException, OperandoCommunicationException
+	public void testGetBdaReport_ReturnNullIfReportNotFound() throws UnableToGetDataException, OperandoCommunicationException, OperandoAuthenticationException
 	{
 		setUpServices(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
 		
@@ -62,7 +63,7 @@ public class BigDataAnalyticsApiServiceImplTests
 	}
 	
 	@Test(expected = UnableToGetDataException.class)
-	public void testGetBdaReport_ReturnInternalErrorExceptionIfCantGetReport() throws OperandoCommunicationException, UnableToGetDataException
+	public void testGetBdaReport_ReturnInternalErrorExceptionIfCantGetReport() throws OperandoCommunicationException, UnableToGetDataException, OperandoAuthenticationException
 	{
 		setUpServices(CommunicationError.ERROR_FROM_OTHER_MODULE);
 		
@@ -72,11 +73,11 @@ public class BigDataAnalyticsApiServiceImplTests
 
 	}
 	
-	private void setUpServices(AnalyticsReport toReturn) throws OperandoCommunicationException{
+	private void setUpServices(AnalyticsReport toReturn) throws OperandoCommunicationException, OperandoAuthenticationException{
 		when(clientBigDataAnalytics.getBdaReport(anyString(), anyString())).thenReturn(toReturn);
 	}
 	
-	private void setUpServices(CommunicationError err) throws OperandoCommunicationException{
+	private void setUpServices(CommunicationError err) throws OperandoCommunicationException, OperandoAuthenticationException{
 		when(clientBigDataAnalytics.getBdaReport(anyString(), anyString())).thenThrow(new OperandoCommunicationException(err));
 	}
 }
