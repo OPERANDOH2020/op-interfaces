@@ -327,6 +327,11 @@ public class UserController {
 	    NamingEnumeration<SearchResult> answer = ctx.search("dc=nodomain", "cn=" + username, searchControls);
 	    if (answer.hasMore()) {
 		Attributes attrs = answer.next().getAttributes();
+                
+                if(attrs.get("o")!=null && attrs.get("o").toString().equals("o: deleted"))
+                {
+                    return null; 
+                }
 
 		List<Attribute> myOptionalAttrsList = new ArrayList();
                 if(attrs.get("departmentNumber")!=null)
@@ -415,7 +420,7 @@ public class UserController {
     private SearchControls getSearchControls() {
 	SearchControls cons = new SearchControls();
 	cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
-	String[] attrIDs = { "departmentNumber", "employeeNumber", "employeeType" };
+	String[] attrIDs = { "departmentNumber", "employeeNumber", "employeeType", "o" };
 	cons.setReturningAttributes(attrIDs);
 	return cons;
     }
