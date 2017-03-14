@@ -9,6 +9,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import eu.operando.UnableToGetDataException;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.factories.AuthenticationServiceFactory;
@@ -22,6 +25,8 @@ import io.swagger.annotations.ApiParam;
 public class ComplianceReportApi
 {
 
+	final Logger LOGGER;
+	
 	private static final String PROPERTIES_FILE_RAPI = "config.properties";
 	private static final String SERVICE_ID = "GET/osps/{osp-id}/compliance-report";
 
@@ -32,6 +37,7 @@ public class ComplianceReportApi
 	{
 		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(PROPERTIES_FILE_RAPI);
 		reportDelegate = ComplianceReportsServiceFactory.getComplienceReportApiService();
+		LOGGER = LogManager.getLogger(ComplianceReportApi.class);
 	}
 
 	@GET
@@ -68,8 +74,7 @@ public class ComplianceReportApi
 		}
 		catch (UnableToGetDataException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Error authenticating Service Ticket for Compliance Report Api: " + e.toString());
 			response = Response.serverError()
 					.build();
 		}
@@ -95,7 +100,7 @@ public class ComplianceReportApi
 		}
 		catch (UnableToGetDataException ex)
 		{
-			ex.printStackTrace();
+			LOGGER.error("Error getting Compliance Report for Compliance Report Api: " + ex.toString());
 			response = Response.serverError()
 				.build();
 		}
