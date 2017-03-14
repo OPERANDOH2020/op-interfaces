@@ -1,21 +1,28 @@
 package eu.operando.interfaces.rapi.impl;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import eu.operando.OperandoCommunicationException;
 import eu.operando.UnableToGetDataException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.api.model.ComplianceReport;
 import eu.operando.api.model.PrivacyPolicy;
+import eu.operando.interfaces.rapi.ComplianceReportApi;
 import eu.operando.interfaces.rapi.ComplianceReportsService;
 import eu.operando.moduleclients.ClientPolicyDb;
 
 public class ComplianceReportsServiceImpl implements ComplianceReportsService
 {
 
+	final Logger LOGGER;
+	
 	private ClientPolicyDb clientPolicyDb = null;
 
 	public ComplianceReportsServiceImpl(ClientPolicyDb clientPolicyDb)
 	{
 		this.clientPolicyDb = clientPolicyDb;
+		LOGGER = LogManager.getLogger(ComplianceReportsServiceImpl.class);
 	}
 
 	/**
@@ -49,9 +56,9 @@ public class ComplianceReportsServiceImpl implements ComplianceReportsService
 		}
 		catch (OperandoCommunicationException ex)
 		{
-			ex.printStackTrace();
-			CommunicationError communitcationError = ex.getCommunitcationError();
-			if (!communitcationError.equals(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND))
+			LOGGER.warn("Could not get requested Compliance Report for Compliance Reports Service Impl: " + ex.toString());
+			CommunicationError communicationError = ex.getCommunitcationError();
+			if (!communicationError.equals(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND))
 			{
 				throw new UnableToGetDataException(ex);
 			}

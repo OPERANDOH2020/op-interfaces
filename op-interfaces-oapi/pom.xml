@@ -88,9 +88,12 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<as.baseurl>http://localhost:8080</as.baseurl>
+		<bda.baseurl>http://localhost:8080</bda.baseurl>
 		<ldb.baseurl>http://localhost:8080</ldb.baseurl>
 		<rm.baseurl>http://localhost:8080</rm.baseurl>
 		<dan.baseurl>http://localhost:8080</dan.baseurl>
+		<aapi.oapiusername>operando</aapi.oapiusername>
+		<aapi.oapipassword>1234</aapi.oapipassword>
 		<!-- added to support docker image creation -->
 		<docker.registry.name>localhost:5000/</docker.registry.name><!-- leave 
 			empty for docker hub; use e.g. "localhost:5000/" for a local docker registry -->
@@ -110,9 +113,12 @@
 			</activation>
 			<properties>
 				<as.baseurl>http://integration.operando.dmz.lab.esilab.org:8101/operando/core/as</as.baseurl>
+				<bda.baseurl>http://integration.operando.dmz.lab.esilab.org:8098/operando/core/bigdata/</bda.baseurl>
 				<dan.baseurl>http://integration.operando.dmz.lab.esilab.org:8111/operando/pdr/dan</dan.baseurl>
 				<ldb.baseurl>http://integration.operando.dmz.lab.esilab.org:8090/operando/core/ldb</ldb.baseurl>
 	 	        <rm.baseurl>http://integration.operando.dmz.lab.esilab.org:8102/operando/core/rm</rm.baseurl>
+        		<aapi.oapiusername>operando</aapi.oapiusername>
+				<aapi.oapipassword>1234</aapi.oapipassword>
 			</properties>
 		</profile>
 	</profiles>

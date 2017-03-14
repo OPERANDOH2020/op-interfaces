@@ -9,6 +9,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import eu.operando.AuthenticationWrapper;
 import eu.operando.UnableToGetDataException;
 import eu.operando.api.AuthenticationService;
@@ -24,6 +27,8 @@ import io.swagger.annotations.ApiParam;
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-08-31T09:45:10.086Z")
 public class BigDataAnalyticsApi
 {
+	final Logger LOGGER;
+	
 	private static final String SERVICE_ID = "GET/bda/jobs/{job-id}/reports/latest";
 	
 	// Location of properties file.
@@ -35,6 +40,7 @@ public class BigDataAnalyticsApi
 	public BigDataAnalyticsApi(){
 		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(PROPERTIES_FILE_OAPI);
 		bigDataDelegate = BigDataAnalyticsApiServiceFactory.getBdaApi();
+		LOGGER = LogManager.getLogger(BigDataAnalyticsApi.class);
 	}
 	
 	@GET
@@ -91,6 +97,7 @@ public class BigDataAnalyticsApi
 			}
 		}
 		catch(UnableToGetDataException ex){
+			LOGGER.error("Error for Big Data Analytics Api: " + ex.toString());
 			response = Response.serverError().build();
 		}
 		return response;
