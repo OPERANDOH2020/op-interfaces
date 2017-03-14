@@ -49,6 +49,7 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
@@ -190,8 +191,34 @@ public class UserController {
     @ApiImplicitParams({
 	@ApiImplicitParam(name = "username", value = "User's username", required = true, dataType = "string", paramType = "path")})
     public ResponseEntity<User> deleteUser(@PathVariable("username") String username) throws UserException {
+        
+        markUserAsDeleted(username);
 
 	return new ResponseEntity<User>(new User(), HttpStatus.ACCEPTED);
+    }
+    
+    private void markUserAsDeleted(String username){
+        Hashtable env = new Hashtable();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, (ldapProtocol + "://" + ldapHost + ":" + ldapPort));
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.SECURITY_PRINCIPAL, ldapUsername); 
+        env.put(Context.SECURITY_CREDENTIALS, ldapPassword);
+        env.put("java.naming.ldap.factory.socket", "eu.operando.interfaces.aapi.socketfactory.LdapDefaultSSLSocketFactory");
+        // init the connection
+        try {
+             DirContext ctx = new InitialDirContext(env);
+             ModificationItem[] mods = new ModificationItem[1];
+             javax.naming.directory.Attribute mod0 = new BasicAttribute("o", "deleted");
+             
+             mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, mod0);
+             
+             ctx.modifyAttributes("uid=" + username + ",ou=People,dc=nodomain", mods);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+       
+        
     }
 
     private boolean storeUserToLdap(User user) throws IOException {
@@ -300,6 +327,11 @@ public class UserController {
 	    NamingEnumeration<SearchResult> answer = ctx.search("dc=nodomain", "cn=" + username, searchControls);
 	    if (answer.hasMore()) {
 		Attributes attrs = answer.next().getAttributes();
+                
+                if(attrs.get("o")!=null && attrs.get("o").toString().equals("o: deleted"))
+                {
+                    return null; 
+                }
 
 		List<Attribute> myOptionalAttrsList = new ArrayList();
                 if(attrs.get("departmentNumber")!=null)
@@ -388,7 +420,7 @@ public class UserController {
     private SearchControls getSearchControls() {
 	SearchControls cons = new SearchControls();
 	cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
-	String[] attrIDs = { "departmentNumber", "employeeNumber", "employeeType" };
+	String[] attrIDs = { "departmentNumber", "employeeNumber", "employeeType", "o" };
 	cons.setReturningAttributes(attrIDs);
 	return cons;
     }
