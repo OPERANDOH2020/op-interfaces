@@ -64,7 +64,7 @@
 		</plugins>
 		<resources>
 			<resource>
-				<directory>src/main/resources/config</directory>
+				<directory>src/main/resources/config.properties</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
