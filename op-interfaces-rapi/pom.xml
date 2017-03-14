@@ -89,6 +89,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<as.baseurl>http://localhost:8080</as.baseurl>
+		<pdb.baseurl>http://localhost:8080</pdb.baseurl>
 		<ldb.baseurl>http://localhost:8080</ldb.baseurl>
 		<rm.baseurl>http://localhost:8080</rm.baseurl>
 		<dan.baseurl>http://localhost:8080</dan.baseurl>
@@ -113,6 +114,7 @@
 				<as.baseurl>http://integration.operando.lan.esilab.org:8135/operando/interfaces/aapi/</as.baseurl>
 				<dan.baseurl>http://integration.operando.dmz.lab.esilab.org:8111/operando/pdr/dan</dan.baseurl>
 				<ldb.baseurl>http://integration.operando.dmz.lab.esilab.org:8090/operando/core/ldb</ldb.baseurl>
+				<pdb.baseurl>http://integration.operando.dmz.lab.esilab.org:8096/operando/core/pdb</pdb.baseurl>
 	 	        <rm.baseurl>http://integration.operando.dmz.lab.esilab.org:8102/operando/core/rm</rm.baseurl>
 			</properties>
 		</profile>
