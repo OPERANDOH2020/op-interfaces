@@ -39,7 +39,7 @@ public class RemoteLog implements Runnable{
         logapi.setApiClient(logClient);  
         try {
             logapi.lodDB(new LogRequest().logPriority(LogRequest.LogPriorityEnum.LOW).description(this.logDescription).requesterId(this.requesterId)
-             .title(this.logTitle).requesterType(LogRequest.RequesterTypeEnum.MODULE).logDataType(logLevel));
+             .title(this.logTitle).requesterType(LogRequest.RequesterTypeEnum.MODULE).logLevel(logLevel));
         } catch (Exception e) {
             System.out.println("error while writing at logdb");
         }
