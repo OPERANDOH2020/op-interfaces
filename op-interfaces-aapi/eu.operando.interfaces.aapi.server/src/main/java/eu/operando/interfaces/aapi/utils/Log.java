@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Log {
     
-    public void logMe(LogRequest.LogDataTypeEnum logLevel, String logTitle, String logDescription, String logPriority, String requesterId){
+    public void logMe(LogRequest.LogLevelEnum logLevel, String logTitle, String logDescription, String logPriority, String requesterId){
         
         ExecutorService executor = Executors.newFixedThreadPool(1);
 	   

@@ -21,9 +21,9 @@ public class RemoteLog implements Runnable{
     String logDescription;
     String logPriority;
     String requesterId;
-    LogRequest.LogDataTypeEnum logLevel;
+    LogRequest.LogLevelEnum logLevel;
     
-    RemoteLog(LogRequest.LogDataTypeEnum logLevel, String logTitle, String logDescription, String logPriority, String requesterId){
+    RemoteLog(LogRequest.LogLevelEnum logLevel, String logTitle, String logDescription, String logPriority, String requesterId){
         this.logLevel = logLevel;
         this.logTitle = logTitle;
         this.logDescription = logDescription;

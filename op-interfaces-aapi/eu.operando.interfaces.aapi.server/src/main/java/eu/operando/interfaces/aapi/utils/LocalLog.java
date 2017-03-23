@@ -22,9 +22,9 @@ public class LocalLog implements Runnable{
     String logDescription;
     String logPriority;
     String requesterId;
-    LogRequest.LogDataTypeEnum logLevel;
+    LogRequest.LogLevelEnum logLevel;
     
-    LocalLog(LogRequest.LogDataTypeEnum logLevel, String logTitle, String logDescription, String logPriority, String requesterId){
+    LocalLog(LogRequest.LogLevelEnum logLevel, String logTitle, String logDescription, String logPriority, String requesterId){
         this.logLevel = logLevel;
         this.logTitle = logTitle;
         this.logDescription = logDescription;
