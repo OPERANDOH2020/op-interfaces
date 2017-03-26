@@ -1,4 +1,4 @@
-package eu.operando.interfaces.rapi;
+package eu.operando.interfaces.oapi;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
