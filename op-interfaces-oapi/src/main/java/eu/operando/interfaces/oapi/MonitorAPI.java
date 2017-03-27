@@ -23,9 +23,8 @@ public class MonitorAPI
 	public Response processGetRequest(@Context HttpHeaders headers)
 	{
 		System.out.print("monitor"); //GBE
-		Response response = null;
 		
-        return Response.ok().build();
+        return Response.ok().entity("server ok").build();
 	}
 	
 }
