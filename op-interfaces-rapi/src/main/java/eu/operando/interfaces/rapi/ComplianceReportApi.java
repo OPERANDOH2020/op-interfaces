@@ -44,17 +44,17 @@ public class ComplianceReportApi
 	@Produces({ MediaType.APPLICATION_JSON })
 	@io.swagger.annotations.ApiOperation(value = "Get the compliance report for an OSP.", response = ComplianceReport.class)
 	@io.swagger.annotations.ApiResponses(
-			value = {
-					@io.swagger.annotations.ApiResponse(
-							code = 200,
-							message = "The compliance report for the OSP is returned as a JSON object.",
-							response = ComplianceReport.class),
-					@io.swagger.annotations.ApiResponse(
-							code = 401,
-							message = "Error - The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
-							response = ComplianceReport.class),
-					@io.swagger.annotations.ApiResponse(code = 404, message = "Error - The OSP could not be found.", response = ComplianceReport.class),
-					@io.swagger.annotations.ApiResponse(code = 500, message = "Error - An internal error has occured.", response = ComplianceReport.class) })
+		value = {
+			@io.swagger.annotations.ApiResponse(
+				code = 200,
+				message = "The compliance report for the OSP is returned as a JSON object.",
+				response = ComplianceReport.class),
+			@io.swagger.annotations.ApiResponse(
+				code = 401,
+				message = "Error - The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
+				response = ComplianceReport.class),
+			@io.swagger.annotations.ApiResponse(code = 404, message = "Error - The OSP could not be found.", response = ComplianceReport.class),
+			@io.swagger.annotations.ApiResponse(code = 500, message = "Error - An internal error has occured.", response = ComplianceReport.class) })
 	public Response complianceReportGet(
 			@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam("service-ticket") String serviceTicket,
 			@ApiParam(value = "The unique identifier of an online service provider.", required = true) @PathParam("osp-id") String ospId)

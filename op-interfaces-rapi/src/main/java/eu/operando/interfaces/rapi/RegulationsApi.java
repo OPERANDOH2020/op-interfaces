@@ -27,24 +27,24 @@ public class RegulationsApi
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	@io.swagger.annotations.ApiOperation(
-			value = "Add a new regulation to the system.",
-			notes = "Called by a regulator to ensure that the platform becomes compliant with the new regulation. The regulation that was saved is returned, along with an identifer which should be used to refer to it in later communication. ",
-			response = PrivacyRegulation.class,
-			tags = { "regulations", })
+		value = "Add a new regulation to the system.",
+		notes = "Called by a regulator to ensure that the platform becomes compliant with the new regulation. The regulation that was saved is returned, along with an identifer which should be used to refer to it in later communication. ",
+		response = PrivacyRegulation.class,
+		tags = { "regulations", })
 	@io.swagger.annotations.ApiResponses(
-			value = {
-					@io.swagger.annotations.ApiResponse(
-							code = 201,
-							message = "The regulation was successfully created, and the platform has been made compliant with it.",
-							response = PrivacyRegulation.class),
-					@io.swagger.annotations.ApiResponse(
-							code = 401,
-							message = "The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
-							response = PrivacyRegulation.class),
-					@io.swagger.annotations.ApiResponse(
-							code = 403,
-							message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
-							response = PrivacyRegulation.class) })
+		value = {
+			@io.swagger.annotations.ApiResponse(
+				code = 201,
+				message = "The regulation was successfully created, and the platform has been made compliant with it.",
+				response = PrivacyRegulation.class),
+			@io.swagger.annotations.ApiResponse(
+				code = 401,
+				message = "The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
+				response = PrivacyRegulation.class),
+			@io.swagger.annotations.ApiResponse(
+				code = 403,
+				message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
+				response = PrivacyRegulation.class) })
 	public Response regulationsPost(@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam("service-ticket") String serviceTicket,
 			@ApiParam(value = "", required = true) PrivacyRegulationInput regulation)
 	{
@@ -55,24 +55,24 @@ public class RegulationsApi
 	@Path("/{reg-id}")
 	@Produces({ MediaType.APPLICATION_JSON })
 	@io.swagger.annotations.ApiOperation(
-			value = "Update an exisiting regulation.",
-			notes = "Called by a regulator to ensure that the platform becomes compliant with the new terms of the regulation. The regulation that was saved is returned, along with an identifer which should be used to refer to it in later communication. ",
-			response = DtoPrivacyRegulation.class,
-			tags = { "regulations" })
+		value = "Update an exisiting regulation.",
+		notes = "Called by a regulator to ensure that the platform becomes compliant with the new terms of the regulation. The regulation that was saved is returned, along with an identifer which should be used to refer to it in later communication. ",
+		response = DtoPrivacyRegulation.class,
+		tags = { "regulations" })
 	@io.swagger.annotations.ApiResponses(
-			value = {
-					@io.swagger.annotations.ApiResponse(
-							code = 204,
-							message = "The regulation was successfully updated, and the platform has been made compliant with it.",
-							response = DtoPrivacyRegulation.class),
-					@io.swagger.annotations.ApiResponse(
-							code = 401,
-							message = "The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
-							response = DtoPrivacyRegulation.class),
-					@io.swagger.annotations.ApiResponse(
-							code = 403,
-							message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
-							response = DtoPrivacyRegulation.class) })
+		value = {
+			@io.swagger.annotations.ApiResponse(
+				code = 204,
+				message = "The regulation was successfully updated, and the platform has been made compliant with it.",
+				response = DtoPrivacyRegulation.class),
+			@io.swagger.annotations.ApiResponse(
+				code = 401,
+				message = "The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
+				response = DtoPrivacyRegulation.class),
+			@io.swagger.annotations.ApiResponse(
+				code = 403,
+				message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
+				response = DtoPrivacyRegulation.class) })
 	public Response regulationsRegIdPut(@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam("service-ticket") String serviceTicket,
 			@ApiParam(value = "", required = true) PrivacyRegulationInput regulation,
 			@ApiParam(value = "the unique identifier of a regulation.", required = true) @PathParam("reg-id") String regId)
