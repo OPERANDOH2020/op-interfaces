@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -47,6 +48,21 @@ public class RegulationsApiServiceImplTests
 	@InjectMocks
 	private RegulationsApiServiceImpl implementation;
 
+	@Test
+	public void testProcessNewRegulation_CommunicationException_InternalServerErrorCodeReturned() throws OperandoCommunicationException
+	{
+		// Set up
+		when(clientAuthenticationService.isOspAuthenticatedForRequestedService(anyString(), anyString())).thenThrow(new OperandoCommunicationException(CommunicationError.ERROR_FROM_OTHER_MODULE));
+		
+		// Exercise
+		String serviceTicket = "ST-1234";
+		Response responseToRegulator = implementation.processNewRegulation(serviceTicket, new PrivacyRegulationInput());
+		
+		// Verify
+		assertEquals(Response.Status.INTERNAL_SERVER_ERROR, responseToRegulator.getStatusInfo());
+		
+	}
+	
 	@Test
 	public void testProcessNewRegulation_CorrectArgumentsToVerifyAuthentication() throws OperandoCommunicationException
 	{
@@ -262,6 +278,20 @@ public class RegulationsApiServiceImplTests
 		when(clientOspEnforcement.sendNewRegulationToOspEnforcement(any(PrivacyRegulation.class))).thenReturn(successFromOse);
 	}
 
+	@Test
+	public void testProcessExistingRegulation_CommunicationException_InternalServerErrorCodeReturned() throws OperandoCommunicationException
+	{
+		// Set up
+		when(clientAuthenticationService.isOspAuthenticatedForRequestedService(anyString(), anyString())).thenThrow(new OperandoCommunicationException(CommunicationError.ERROR_FROM_OTHER_MODULE));
+		
+		// Exercise
+		String serviceTicket = "ST-1234";
+		Response responseToRegulator = implementation.processNewRegulation(serviceTicket, new PrivacyRegulationInput());
+		
+		// Verify
+		assertEquals(Response.Status.INTERNAL_SERVER_ERROR, responseToRegulator.getStatusInfo());
+	}
+	
 	@Test
 	public void testProcessExistingRegulation_CorrectArgumentsToClientForAuthenticationVerification() throws OperandoCommunicationException
 	{
