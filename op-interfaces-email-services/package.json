@@ -1,0 +1,9 @@
+{
+  "name": "email-services",
+  "description": "An Email Service based on haraka",
+  "version": "0.1.0",
+  "dependencies": {
+    "swarmcore":"git+https://mastaleru@github.com/PrivateSky/swarmcore.git#master",
+    "uuid":">=2.0.0"
+  }
+}
