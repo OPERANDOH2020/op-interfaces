@@ -243,7 +243,7 @@ public class UserController {
                 
                 if(attrs.get("cn")!=null)
                 {
-                    names += "\""+attrs.get("cn").toString().replace("cn: ", "")+"\""+",";
+                    names += "\""+attrs.get("cn").toString().replace("cn: ", "")+"\""+","; 
                     
                 }
 		
