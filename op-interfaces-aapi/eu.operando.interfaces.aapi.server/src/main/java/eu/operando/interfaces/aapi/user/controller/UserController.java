@@ -197,6 +197,67 @@ public class UserController {
 	return new ResponseEntity<User>(new User(), HttpStatus.ACCEPTED);
     }
     
+    @RequestMapping(value = "/getOspList", method = RequestMethod.GET)
+    @ApiOperation(value = "getOspList", notes = "This operation gets all available OSPs.")
+    @ApiResponses(value = { 
+	    @ApiResponse(code = 500, message = "Internal Server Error"),
+	    @ApiResponse(code = 201, message = "List created") })
+    public ResponseEntity getOspList(){
+	try {
+            String ospList = "{ \"osps\":\n" +
+                             "    [";
+                String namesList = getOSPList();
+                if (namesList.endsWith(",")) namesList = namesList.substring(0,namesList.length()-1);
+                ospList += namesList;
+                
+                ospList += "]\n" +
+                            "}";
+	   	return new ResponseEntity(ospList, HttpStatus.CREATED);
+	    
+	} catch (Exception e) {
+	   return new ResponseEntity("", HttpStatus.CREATED);
+	}
+
+    }
+    private String getOSPList(){
+       String names = "";
+       try {
+            
+	    // Make the connection with LDAP
+	    Hashtable env = new Hashtable();
+	    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+	    env.put(Context.PROVIDER_URL, (ldapProtocol + "://" + ldapHost + ":" + ldapPort));
+	    env.put(Context.SECURITY_AUTHENTICATION, "simple");
+	    env.put(Context.SECURITY_PRINCIPAL, ldapUsername);
+	    env.put(Context.SECURITY_CREDENTIALS, ldapPassword);
+	    // init the connection
+
+	    env.put(Context.REFERRAL, "follow");
+
+	    LdapContext ctx = new InitialLdapContext(env, null);
+
+	    NamingEnumeration<SearchResult> answer = ctx.search("dc=nodomain", "employeeType=*role::OSP*" , getOSPSearchControls());
+	    while (answer.hasMore()) {
+                
+		Attributes attrs = answer.next().getAttributes();
+                
+                if(attrs.get("cn")!=null)
+                {
+                    names += attrs.get("cn").toString().replace("cn: ", "")+",";
+                    
+                }
+		
+
+	    } 
+
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    return null;
+
+	} 
+
+	return names;
+    }
     private void markUserAsDeleted(String username){
         Hashtable env = new Hashtable();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -421,6 +482,14 @@ public class UserController {
 	SearchControls cons = new SearchControls();
 	cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
 	String[] attrIDs = { "departmentNumber", "employeeNumber", "employeeType", "o" };
+	cons.setReturningAttributes(attrIDs);
+	return cons;
+    }
+    
+    private SearchControls getOSPSearchControls() {
+	SearchControls cons = new SearchControls();
+	cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
+	String[] attrIDs = { "cn" };
 	cons.setReturningAttributes(attrIDs);
 	return cons;
     }
