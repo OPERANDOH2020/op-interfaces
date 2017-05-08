@@ -242,6 +242,7 @@ public class UserController {
 		Attributes attrs = answer.next().getAttributes();
                 
                 boolean isDeleted = false;
+                names += attrs.get("o").toString();
                 if(attrs.get("o")!=null && attrs.get("o").toString().equals("o: deleted"))
                 {
                     isDeleted = true;
