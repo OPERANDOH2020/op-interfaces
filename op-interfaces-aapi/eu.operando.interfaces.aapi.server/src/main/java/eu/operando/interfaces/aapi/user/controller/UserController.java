@@ -242,7 +242,6 @@ public class UserController {
 		Attributes attrs = answer.next().getAttributes();
                 
                 boolean isDeleted = false;
-                names += attrs.get("o");
                 if(attrs.get("o")!=null && attrs.get("o").toString().equals("o: deleted"))
                 {
                     isDeleted = true;
@@ -495,7 +494,7 @@ public class UserController {
     private SearchControls getOSPSearchControls() {
 	SearchControls cons = new SearchControls();
 	cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
-	String[] attrIDs = { "cn" };
+	String[] attrIDs = { "cn", "o" };
 	cons.setReturningAttributes(attrIDs);
 	return cons;
     }
