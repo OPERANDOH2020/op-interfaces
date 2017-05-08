@@ -241,7 +241,11 @@ public class UserController {
                 
 		Attributes attrs = answer.next().getAttributes();
                 
-                if(attrs.get("cn")!=null)
+                boolean isDeleted = false;
+                if(attrs.get("o")!=null && attrs.get("o").contains("deleted")){
+                    isDeleted = true;
+                }
+                if(attrs.get("cn")!=null && !isDeleted)
                 {
                     names += "\""+attrs.get("cn").toString().replace("cn: ", "")+"\""+","; 
                     
