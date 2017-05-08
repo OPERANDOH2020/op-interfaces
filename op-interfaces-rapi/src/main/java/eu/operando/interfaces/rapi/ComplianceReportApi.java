@@ -107,7 +107,7 @@ public class ComplianceReportApi
 				.build();
 		}
 		catch (ProcessingException ex){
-			String uri = Utils.loadPropertyString("config.properties", "originPolicyDb");
+			String uri = Utils.loadPropertyString("config.properties", "originAuthenticationApi");
 			throw new ProcessingException(uri, ex);
 		}
 		return response;
