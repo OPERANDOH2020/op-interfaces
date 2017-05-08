@@ -198,7 +198,7 @@ public class UserController {
     }
     
     @RequestMapping(value = "/getOspList", method = RequestMethod.GET)
-    @ApiOperation(value = "getOspList", notes = "This operation gets all available OSPs.")
+    @ApiOperation(value = "getOspList", notes = "This operation gets all available OSPs (deleted OSPs are excluded!)")
     @ApiResponses(value = { 
 	    @ApiResponse(code = 500, message = "Internal Server Error"),
 	    @ApiResponse(code = 201, message = "List created") })
@@ -241,7 +241,12 @@ public class UserController {
                 
 		Attributes attrs = answer.next().getAttributes();
                 
-                if(attrs.get("cn")!=null)
+                boolean isDeleted = false;
+                if(attrs.get("o")!=null && attrs.get("o").toString().equals("o: deleted"))
+                {
+                    isDeleted = true;
+                }
+                if(attrs.get("cn")!=null && !isDeleted)
                 {
                     names += "\""+attrs.get("cn").toString().replace("cn: ", "")+"\""+","; 
                     
@@ -489,7 +494,7 @@ public class UserController {
     private SearchControls getOSPSearchControls() {
 	SearchControls cons = new SearchControls();
 	cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
-	String[] attrIDs = { "cn" };
+	String[] attrIDs = { "cn", "o" };
 	cons.setReturningAttributes(attrIDs);
 	return cons;
     }
