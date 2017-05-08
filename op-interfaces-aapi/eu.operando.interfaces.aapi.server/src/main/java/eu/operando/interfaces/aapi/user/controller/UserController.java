@@ -198,7 +198,7 @@ public class UserController {
     }
     
     @RequestMapping(value = "/getOspList", method = RequestMethod.GET)
-    @ApiOperation(value = "getOspList", notes = "This operation gets all available OSPs.")
+    @ApiOperation(value = "getOspList", notes = "This operation gets all available OSPs (deleted OSPs are excluded)")
     @ApiResponses(value = { 
 	    @ApiResponse(code = 500, message = "Internal Server Error"),
 	    @ApiResponse(code = 201, message = "List created") })
