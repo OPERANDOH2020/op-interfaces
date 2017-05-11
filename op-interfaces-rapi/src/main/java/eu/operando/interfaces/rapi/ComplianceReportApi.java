@@ -4,6 +4,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import eu.operando.UnableToGetDataException;
+import eu.operando.Utils;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.api.model.ComplianceReport;
@@ -103,6 +105,16 @@ public class ComplianceReportApi
 			LOGGER.error("Error getting Compliance Report for Compliance Report Api: " + ex.toString());
 			response = Response.serverError()
 				.build();
+		}
+		catch (ProcessingException ex){
+			String aapi = Utils.loadPropertyString("config.properties", "originAuthenticationApi");
+			String pdb = Utils.loadPropertyString("config.properties", "originPolicyDb");
+			String ldb = Utils.loadPropertyString("config.properties", "originLogDb");
+			String rm = Utils.loadPropertyString("config.properties", "originRightsManagement");
+			String dan = Utils.loadPropertyString("config.properties", "originDataAccessNode");
+			String sigr = Utils.loadPropertyString("config.properties", "serviceIdGetReport");
+			String msg = aapi + ", " + pdb + ", " + ldb + ", " + rm + ", " + dan + ", " + sigr;
+			throw new ProcessingException(msg, ex);
 		}
 		return response;
 	}
