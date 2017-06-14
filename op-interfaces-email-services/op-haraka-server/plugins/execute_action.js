@@ -48,9 +48,16 @@ exports.forward = function (next, connection) {
     function changeTo(newTo) {
         plugin.loginfo("New to: "+newTo);
         connection.transaction.rcpt_to.pop();
-        connection.transaction.rcpt_to.push(new address('<' + newTo + '>'));
         connection.transaction.header.remove('to');
-        connection.transaction.header.add('to',newTo);
+        if (Array.isArray(newTo)){
+            newTo.forEach(function(t){
+                connection.transaction.header.add('to', t);
+                connection.transaction.rcpt_to.push(new address('<' + t + '>'));
+            })
+        }else{
+            connection.transaction.header.add('to', newTo);
+            connection.transaction.rcpt_to.push(new address('<' + newTo + '>'));
+        }
     }
 
     function changeFrom(newFrom,displayOriginal) {
