@@ -21,13 +21,26 @@ exports.register = function(){
 
 
 exports.clean_body = function (next, connection) {
+    /*
+	Replace anything that refferences the real user.
+    */
     var plugin = this;
     var decision = connection.results.get('decide_action');
-
     if (decision.action === 'relayToOutsideEntity') {
         plugin.loginfo("Filtering the body");
         connection.transaction.add_body_filter('text/html',function(content_type,encoding,body_buffer){
-            plugin.loginfo("BODY FILTER:\n\n",arguments);
+	    var body = body_buffer.toString()
+	    var originalFrom = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host	
+            var filteredBody = body.split(originalFrom).join(decision.from);
+	    var ret = Buffer.from(filteredBody,encoding);
+            return ret
+        })
+	connection.transaction.add_body_filter('text/plain',function(content_type,encoding,body_buffer){
+            var body = body_buffer.toString()
+            var originalFrom = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host
+            var filteredBody = body.replace(originalFrom,decision.from)
+            var ret = Buffer.from(filteredBody,encoding);
+            return ret
         })
     }
     next();
