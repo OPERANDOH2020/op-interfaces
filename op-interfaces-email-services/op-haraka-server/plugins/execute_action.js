@@ -15,9 +15,23 @@
 var address = require("address-rfc2821").Address;
 var fs = require('fs');
 exports.register = function(){
+    this.register_hook("data","clean_body");
     this.register_hook("data_post","forward");
 };
 
+
+exports.clean_body = function (next, connection) {
+    var plugin = this;
+    var decision = connection.results.get('decide_action');
+
+    if (decision.action === 'relayToOutsideEntity') {
+        plugin.loginfo("Filtering the body");
+        connection.transaction.add_body_filter('text/html',function(content_type,encoding,body_buffer){
+            plugin.loginfo("BODY FILTER:\n\n",arguments);
+        })
+    }
+    next();
+};
 
 exports.forward = function (next, connection) {
     var plugin = this;
