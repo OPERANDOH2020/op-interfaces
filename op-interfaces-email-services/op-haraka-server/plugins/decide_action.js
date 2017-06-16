@@ -79,7 +79,7 @@ exports.decideAction = function(next,connection){
         next(DENYSOFT);
     }
     else {
-        if(conection.transaction.rcpt_to[0].user === "replies"){
+        if(connection.transaction.rcpt_to[0].user === "replies"){
             jwt.verify(connection.transaction.header.get("X-REPLY-ID"),publicKey,['RS256'],function(err,conversation){
                 if(err){
                     next(DENYDISCONNECT)
