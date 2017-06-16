@@ -54,8 +54,7 @@ exports.forward = function (next, connection) {
             changeTo(decision.to);
             changeFrom(decision.from,true);
             removeHeaders();
-            addReplyTo("replies@plusprivacy.com");
-            connection.transaction.header.add("X-REPLY-ID",decision.replyId);
+            addReplyTo(decision.replyTo);
             break;
         }
         case "relayToOutsideEntity" :
@@ -106,7 +105,7 @@ exports.forward = function (next, connection) {
     function addReplyTo(replyTo) {
         plugin.loginfo("New Reply-To :"+replyTo);
         connection.transaction.header.remove("Reply-To");
-        connection.transaction.header.add("Reply-To", replyTo); //the user will send the reply to this address
+        connection.transaction.header.add("Reply-To", "Reply to sender <"+replyTo+">"); //the user will send the reply to this address
     }
 
     function removeHeaders(){
@@ -115,7 +114,6 @@ exports.forward = function (next, connection) {
         connection.transaction.header.remove('DKIM-Signature');
         connection.transaction.header.remove('DomainKey-Signature');
         connection.transaction.header.remove('Message-ID');
-        connection.transaction.header.remove("X-REPLY-ID");
     }
 };
 

@@ -56,8 +56,7 @@ var plugin;
 exports.register = function(){
     plugin = this;
     readConfig();
-    this.register_hook("rcpt","forwardToUser");
-    this.register_hook("data","deliverReply");
+    this.register_hook("rcpt","decideAction");
 };
 
 function readConfig(){
@@ -67,8 +66,9 @@ function readConfig(){
     plugin.loginfo("Operando configuration: ",cfg);
 }
 
-exports.forwardToUser = function(next,connection){
+exports.decideAction = function(next,connection){
     var alias = connection.transaction.rcpt_to[0].user+"@"+connection.transaction.rcpt_to[0].host;
+    var sender = connection.transaction.mail_from.original.slice(1,connection.transaction.mail_from.original.length-2)
     plugin = this
     connection.relaying = false;
 
@@ -77,57 +77,40 @@ exports.forwardToUser = function(next,connection){
     }else {
         plugin.loginfo("Check whether "+alias.toLowerCase()+" is an alias");
         edb.getRealEmail(alias.toLowerCase(), function (err, realEmail) {
-            if(err){
-                next(DENYSOFT)
-            }
-            else {
-                if (realEmail) {
-                    plugin.loginfo("Delivering to user");
-                    var conversation = Buffer.from(JSON.stringify({
-                        "alias": alias,
-                        "sender": sender
-                    })).toString('base64');
-                    var token = jwt.sign(conversation, privateKey, {algorithm: "RS256"});
-                    var newSender = sender.split("@").join("_at_") + "_via_plusprivacy@plusprivacy.com";
-                    connection.results.add(plugin, {
-                        "action": "relayToUser",
-                        "to": realEmail,
-                        "from": newSender,
-                        "replyId": token
-                    });
-                    connection.relaying = true;
-                    next(OK)
-                }
-                else{
-                    if(connection.transaction.rcpt_to[0].user === "replies"){
-                        next(OK)
-                    }else{
-                        next(DENYDISCONNECT)
-                    }
-                }
-            }
-        });
-    }
-};
-
-exports.deliverReply = function(next,connection){
-    if(connection.transaction.rcpt_to[0].user === "replies") {
-        jwt.verify(connection.transaction.header.get("X-REPLY-ID"), publicKey, ['RS256'], function (err, conversation) {
-            if (err) {
-                next(DENYDISCONNECT)
-            } else {
-                plugin.loginfo("Delivering to outside entity");
-                conversation = JSON.parse(new Buffer(conversation, 'base64').toString())
+            if (realEmail) {
+                plugin.loginfo("Delivering to user");
+                var conversation = Buffer.from(JSON.stringify({
+                    "alias": alias,
+                    "sender": sender
+                })).toString('base64');
+                var token = jwt.sign(conversation, privateKey, {algorithm: "RS256"});
+                var newSender = sender.split("@").join("_at_") + "_via_plusprivacy@plusprivacy.com";
                 connection.results.add(plugin, {
-                    "action": "relayToOutsideEntity",
-                    "to": conversation['sender'],
-                    "from": conversation['alias']
+                    "action": "relayToUser",
+                    "to": realEmail,
+                    "from": newSender,
+                    "replyTo": token+"@plusprivacy.com>"
                 });
                 connection.relaying = true;
                 next(OK)
             }
-        })
-    }else{
-        next(OK)
+            else{
+                jwt.verify(connection.transaction.rcpt_to[0].user, publicKey, ['RS256'], function (err, conversation) {
+                    if (err) {
+                        next(DENYDISCONNECT)
+                    } else {
+                        plugin.loginfo("Delivering to outside entity");
+                        conversation = JSON.parse(new Buffer(conversation, 'base64').toString())
+                        connection.results.add(plugin, {
+                            "action": "relayToOutsideEntity",
+                            "to": conversation['sender'],
+                            "from": conversation['alias']
+                        });
+                        connection.relaying = true;
+                        next(OK)
+                    }
+                })
+            }
+        });
     }
 };
