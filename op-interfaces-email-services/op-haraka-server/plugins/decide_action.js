@@ -83,8 +83,11 @@ function SwarmConnector(){
 }
 
 var edb = new SwarmConnector();
-
+var jwt = require('jsonwebtoken')
+var fs = require('fs')
 var cfg;
+var publicKey;
+var privateKey;
 var plugin;
 
 exports.register = function(){
@@ -95,6 +98,8 @@ exports.register = function(){
 
 function readConfig(){
     cfg = plugin.config.get('operando.ini',readConfig);
+    publicKey = fs.readFileSync(cfg.publicKey);
+    privateKey= fs.readFileSync(cfg.privateKey);
     plugin.loginfo("Operando configuration: ",cfg);
 }
 
@@ -111,56 +116,41 @@ exports.decideAction = function(next,connection){
         next(DENYSOFT);
     }
     else {
-        plugin.loginfo("Check if "+alias.toLowerCase()+" is an alias");
+        plugin.loginfo("Check whether "+alias.toLowerCase()+" is an alias");
         edb.getRealEmail(alias.toLowerCase(), function (err, realEmail) {
             if (realEmail) {
-                edb.registerConversation(alias, sender, function (err, conversationUUID) {
-                    if (!err) {
-                        plugin.loginfo("Delivering to user");
-
-                        var newSender = sender;
-
-                        if(newSender.split("@")[1].toLowerCase()!==cfg.main.host){
-                            newSender = newSender.replace("@", "_") + "@" + cfg.main.host;
-                        }
-
-                        connection.results.add(plugin,
-                            {
-                                "action": "relayToUser",
-                                "to": realEmail,
-                                "from":newSender,
-                                "replyTo": conversationUUID + "@" + cfg.main.host
-                            }
-                        );
-                        connection.relaying = true;
-                        next(OK)
-                    } else {
-                        plugin.loginfo("Could not register conversation between ", sender, " and ", alias, "\nError:", err);
-                        next(DENYSOFT);
-                    }
-                })
+                plugin.loginfo("Delivering to user");
+                var conversation = Buffer.from(JSON.stringify({
+                    "alias":alias,
+                    "sender":sender
+                })).toString('base64');
+                var token = jwt.sign(conversation,privateKey,{algorithm:"RS256"});
+                var newSender = sender.split("@").join("_at_")+"_via_plusprivacy@plusprivacy.com";
+                connection.results.add(plugin, {
+                        "action": "relayToUser",
+                        "to": realEmail,
+                        "from":newSender,
+                        "replyId": token
+                    });
+                connection.relaying = true;
+                next(OK)
             }
             else {
-                plugin.loginfo("Try to get conversation ", connection.transaction.rcpt_to[0].user);
-                edb.getConversation(connection.transaction.rcpt_to[0].user.toLowerCase(), function (err, conversation) {
-                    if (conversation) {
+                jwt.verify(connection.transaction.header.get("X-REPLY-ID"),publicKey,['RS256'],function(err,conversation){
+                    if(err){
+                        next(DENYDISCONNECT)
+                    }else{
                         plugin.loginfo("Delivering to outside entity");
-                        plugin.loginfo("Current conversation:" + connection.transaction.rcpt_to[0].user);
-
-                        connection.results.add(plugin,
-                            {
-                                "action": "relayToOutsideEntity",
-                                "to": conversation['receiver'],
-                                "from": conversation['sender']
-                            }
-                        );
+                        conversation = JSON.parse(new Buffer(conversation,'base64').toString())
+                        connection.results.add(plugin, {
+                            "action": "relayToOutsideEntity",
+                            "to": conversation['alias'],
+                            "from": conversation['sender']
+                        });
                         connection.relaying = true;
                         next(OK)
-                    } else {
-                        plugin.loginfo("Dropping email");
-                        next(DENYDISCONNECT);
                     }
-                });
+                })
             }
         });
     }

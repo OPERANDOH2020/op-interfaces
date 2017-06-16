@@ -47,7 +47,6 @@ exports.clean_body = function (next, connection) {
 exports.forward = function (next, connection) {
     var plugin = this;
     var decision = connection.results.get('decide_action');
-
     switch (decision.action) {
         case "relayToUser" :
         {
@@ -55,7 +54,8 @@ exports.forward = function (next, connection) {
             changeTo(decision.to);
             changeFrom(decision.from,true);
             removeHeaders();
-            addReplyTo(decision.replyTo);
+            addReplyTo("replies@plusprivacy.com");
+            connection.transaction.header.add("X-REPLY-ID",decision.replyId);
             break;
         }
         case "relayToOutsideEntity" :
@@ -97,7 +97,7 @@ exports.forward = function (next, connection) {
             plugin.loginfo("New from: "+newFrom);
             connection.transaction.add_header('From', newFrom);
         }else{
-            var fromMessage = "'IdentityManager@plusprivacy.com on behalf of "+original+"' <"+newFrom+">";
+            var fromMessage = original+" via plusprivacy.com"+"' <"+newFrom+">";
             plugin.loginfo(fromMessage);
             connection.transaction.add_header('From',fromMessage );
         }
@@ -115,6 +115,7 @@ exports.forward = function (next, connection) {
         connection.transaction.header.remove('DKIM-Signature');
         connection.transaction.header.remove('DomainKey-Signature');
         connection.transaction.header.remove('Message-ID');
+        connection.transaction.header.remove("X-REPLY-ID");
     }
 };
 
