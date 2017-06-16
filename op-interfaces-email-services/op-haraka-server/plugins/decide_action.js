@@ -18,43 +18,6 @@ function SwarmConnector(){
     var util           = require("swarmcore");
     var client	       = util.createClient(adapterHost, adapterPort, "emailServer", "haraka","BroadcastTest", "emailLoginCtor");
     var uuid           = require('node-uuid');
-    var self           = this;
-
-    this.registerConversation=function(sender,receiver,callback){
-        var swarmHandler = client.startSwarm("emails.js","registerConversation",sender,receiver);
-        swarmHandler.onResponse(function(swarm){
-            if(swarm.error){
-                callback(swarm.error);
-            }else{
-                callback(undefined,swarm.conversationUUID);
-            }
-        });
-    };
-
-    this.getConversation=function(conversationUUID,callback){
-        var swarmHandler = client.startSwarm("emails.js","getConversation",conversationUUID);
-        swarmHandler.onResponse(function(swarm){
-            if(swarm.error){
-                callback(swarm.error);
-            }else{
-                callback(undefined,{
-                    "receiver":swarm.conversation.receiver,
-                    "sender"  :swarm.conversation.sender
-                });
-            }
-        });
-    };
-
-    this.removeConversation=function(conversationUUID,callback){
-        var swarmHandler = client.startSwarm("emails.js","removeConversation",conversationUUID);
-        swarmHandler.onResponse(function(swarm){
-            if(swarm.error){
-                callback(swarm.error);
-            }else{
-                callback(undefined,swarm.result);
-            }
-        });
-    };
 
     this.getRealEmail=function(userAlias,callback){
         var swarmHandler = client.startSwarm("identity.js","getRealEmail",userAlias);
