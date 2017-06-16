@@ -98,8 +98,8 @@ exports.register = function(){
 
 function readConfig(){
     cfg = plugin.config.get('operando.ini',readConfig);
-    publicKey = fs.readFileSync(cfg.publicKey);
-    privateKey= fs.readFileSync(cfg.privateKey);
+    publicKey = fs.readFileSync(cfg.main.publicKey);
+    privateKey= fs.readFileSync(cfg.main.privateKey);
     plugin.loginfo("Operando configuration: ",cfg);
 }
 
@@ -107,8 +107,8 @@ function readConfig(){
 
 exports.decideAction = function(next,connection){
     var alias = connection.transaction.rcpt_to[0].user+"@"+connection.transaction.rcpt_to[0].host;
-    plugin = this;
     var sender = connection.transaction.mail_from.original;
+    plugin = this;
     connection.relaying = false;
     sender = sender.substr(1, sender.length - 2);
 
@@ -116,42 +116,46 @@ exports.decideAction = function(next,connection){
         next(DENYSOFT);
     }
     else {
-        plugin.loginfo("Check whether "+alias.toLowerCase()+" is an alias");
-        edb.getRealEmail(alias.toLowerCase(), function (err, realEmail) {
-            if (realEmail) {
-                plugin.loginfo("Delivering to user");
-                var conversation = Buffer.from(JSON.stringify({
-                    "alias":alias,
-                    "sender":sender
-                })).toString('base64');
-                var token = jwt.sign(conversation,privateKey,{algorithm:"RS256"});
-                var newSender = sender.split("@").join("_at_")+"_via_plusprivacy@plusprivacy.com";
-                connection.results.add(plugin, {
+        if(conection.transaction.rcpt_to[0].user === "replies"){
+            jwt.verify(connection.transaction.header.get("X-REPLY-ID"),publicKey,['RS256'],function(err,conversation){
+                if(err){
+                    next(DENYDISCONNECT)
+                }else{
+                    plugin.loginfo("Delivering to outside entity");
+                    conversation = JSON.parse(new Buffer(conversation,'base64').toString())
+                    connection.results.add(plugin, {
+                        "action": "relayToOutsideEntity",
+                        "to": conversation['alias'],
+                        "from": conversation['sender']
+                    });
+                    connection.relaying = true;
+                    next(OK)
+                }
+            })
+        }else{
+            plugin.loginfo("Check whether "+alias.toLowerCase()+" is an alias");
+            edb.getRealEmail(alias.toLowerCase(), function (err, realEmail) {
+                if (realEmail) {
+                    plugin.loginfo("Delivering to user");
+                    var conversation = Buffer.from(JSON.stringify({
+                        "alias":alias,
+                        "sender":sender
+                    })).toString('base64');
+                    var token = jwt.sign(conversation,privateKey,{algorithm:"RS256"});
+                    var newSender = sender.split("@").join("_at_")+"_via_plusprivacy@plusprivacy.com";
+                    connection.results.add(plugin, {
                         "action": "relayToUser",
                         "to": realEmail,
                         "from":newSender,
                         "replyId": token
                     });
-                connection.relaying = true;
-                next(OK)
-            }
-            else {
-                jwt.verify(connection.transaction.header.get("X-REPLY-ID"),publicKey,['RS256'],function(err,conversation){
-                    if(err){
-                        next(DENYDISCONNECT)
-                    }else{
-                        plugin.loginfo("Delivering to outside entity");
-                        conversation = JSON.parse(new Buffer(conversation,'base64').toString())
-                        connection.results.add(plugin, {
-                            "action": "relayToOutsideEntity",
-                            "to": conversation['alias'],
-                            "from": conversation['sender']
-                        });
-                        connection.relaying = true;
-                        next(OK)
-                    }
-                })
-            }
-        });
+                    connection.relaying = true;
+                    next(OK)
+                }
+                else {
+                    next(DENYDISCONNECT)
+                }
+            });
+        }
     }
 };
