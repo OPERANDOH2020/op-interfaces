@@ -60,9 +60,8 @@ tls
 #clamd
 #spamassassin
 
-#dkim_verify
-decide_action
-execute_action
+dkim_verify
+forward_emails
 dkim_sign
 #queue/deliver
 #store_test_emails
