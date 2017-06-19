@@ -96,15 +96,15 @@ exports.forward_to_user = function(next,connection){
                 });
                 connection.relaying = true;
             }
-            next(OK)
+            next()
         })
     }
 }
 
 exports.forward_to_outside_entity = function(next,connection){
-    var forward_to_user = connection.results.get('forward_emails')!==undefined;
-    if(!forward_to_user) {
-        jwt.verify(connection.transaction.rcpt_to[0].user, publicKey, ['RS256'], function (err, conversation) {
+    var forward_to_user_details = connection.results.get('forward_emails');
+    if(forward_to_user_details===undefined) {
+        jwt.verify(connection.transaction.header.get('X-REPLY-ID'), publicKey, ['RS256'], function (err, conversation) {
             if (err) {
                 next(DENIDISCONNECT)
             } else {
@@ -121,13 +121,13 @@ exports.forward_to_outside_entity = function(next,connection){
             }
         })
     }else{
-        next(OK)
+        next()
     }
 };
 
 exports.clean_body = function (next, connection) {
     var plugin = this;
-    var forward_to_user_details = connection.results.get('decide_action');
+    var forward_to_user_details = connection.results.get('forward_emails');
     if (forward_to_user_details!==undefined) {
         plugin.loginfo("Filtering the body");
         connection.transaction.add_body_filter('text/html',function(content_type,encoding,body_buffer){
@@ -148,12 +148,12 @@ exports.clean_body = function (next, connection) {
 
 exports.finish_forward_to_user = function (next, connection) {
     var plugin = this;
-    var forward_to_user_details = connection.results.get('decide_action');
+    var forward_to_user_details = connection.results.get('forward_emails');
     if(forward_to_user_details!==undefined) {
         plugin.loginfo("Relay to user");
-        changeTo(forward_to_user_details.to);
-        changeFrom(forward_to_user_details.from, true);
-        removeHeaders();
+        changeTo(connection,forward_to_user_details.to);
+        changeFrom(connection,forward_to_user_details.from, true);
+        removeHeaders(connection);
         addReplyTo(connection,"replies@plusprivacy.com",forward_to_user_details['X-REPLY-ID']);
     }
     next();
