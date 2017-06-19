@@ -127,19 +127,19 @@ exports.forward_to_outside_entity = function(next,connection){
 
 exports.clean_body = function (next, connection) {
     var plugin = this;
-    var forward_to_user = connection.results.get('decide_action')!==undefined;
-    if (!forward_to_user) {
+    var forward_to_user_details = connection.results.get('decide_action');
+    if (forward_to_user_details!==undefined) {
         plugin.loginfo("Filtering the body");
         connection.transaction.add_body_filter('text/html',function(content_type,encoding,body_buffer){
 	    var body = body_buffer.toString()
 	    var originalFrom = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host
-            var filteredBody = body.split(originalFrom).join(decision.from);
+            var filteredBody = body.split(originalFrom).join(forward_to_user_details.from);
             return Buffer.from(filteredBody,encoding);
         })
 	    connection.transaction.add_body_filter('text/plain',function(content_type,encoding,body_buffer){
             var body = body_buffer.toString()
             var originalFrom = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host
-            var filteredBody = body.split(originalFrom).join(decision.from);
+            var filteredBody = body.split(originalFrom).join(forward_to_user_details.from);
             return Buffer.from(filteredBody,encoding);
         })
     }
