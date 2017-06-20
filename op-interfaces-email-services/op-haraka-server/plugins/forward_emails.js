@@ -64,10 +64,9 @@ function readConfig(){
 }
 
 exports.register = function(){
-    this.register_hook("rcpt","forward_to_user");
+    this.register_hook("rcpt","decide_action");
     this.register_hook("data","clean_body");
-    this.register_hook("data_post","forward_to_outside_entity");
-    this.register_hook("data_post","finish_forward_to_user");
+    this.register_hook("data_post","perform_action");
     plugin = this;
     readConfig();
 };
