@@ -50,16 +50,14 @@ var fs = require('fs');
 var edb = new SwarmConnector();
 var jwt = require('jsonwebtoken');
 var cfg;
-var publicKey;
-var privateKey;
+var encriptionKey;
 var plugin;
 
 
 
 function readConfig(){
     cfg = plugin.config.get('operando.ini',readConfig);
-    publicKey = fs.readFileSync(cfg.main.publicKey);
-    privateKey= fs.readFileSync(cfg.main.privateKey);
+    encriptionKey = fs.readFileSync(cfg.main.encriptionKey);
     plugin.loginfo("Operando configuration: ",cfg);
 }
 
@@ -77,15 +75,12 @@ exports.decide_action = function (next,connection) {
     var alias = connection.transaction.rcpt_to[0].user+"@"+connection.transaction.rcpt_to[0].host;
     var sender = connection.transaction.mail_from.original.slice(1,connection.transaction.mail_from.original.length-1)
     connection.relaying = false;
-
-
-    jwt.verify(connection.transaction.rcpt_to[0].user, publicKey, ['RS256'], function (err, conversation) {
+    jwt.verify(connection.transaction.rcpt_to[0].user.split("reply_anonymously_to_sender_")[1], encriptionKey, ['HS256'], function (err, conversation) {
         if (!err) {
             plugin.loginfo('Delivering to outside entity');
             conversation = JSON.parse(new Buffer(conversation, 'base64').toString());
             var to = conversation.sender;
             var from = conversation.alias;
-            connection.relaying = true;
 
             connection.results.add(plugin, {
                 "action":"relayOutside",
@@ -94,6 +89,7 @@ exports.decide_action = function (next,connection) {
                 "replyTo": from
             });
 
+            connection.relaying = true;
             next()
         } else if(!edb.connected()){
             next(DENYSOFT)
@@ -105,18 +101,18 @@ exports.decide_action = function (next,connection) {
                         "alias": alias,
                         "sender": sender
                     })).toString('base64');
-                    var token = jwt.sign(conversation, privateKey, {algorithm: "RS256"});
+                    var token = jwt.sign(conversation, encriptionKey, {algorithm: "HS256"});
                     var newSender = sender.split("@").join("_at_") + "_via_plusprivacy@plusprivacy.com"; //needs to come from plusprivacy.com so that we chan perform DKIM signing
                     connection.results.add(plugin, {
                         "action":"relayToUser",
                         "to": realEmail,
                         "from": newSender,
-                        "replyTo": token+"@plusprivacy.com>"
+                        "replyTo": "reply_anonymously_to_sender_"+token+"@plusprivacy.com"
                     });
                     connection.relaying = true;
                     next()
                 }else {
-                    next(DENIDISCONNECT)
+                    next(DENYDISCONNECT)
                 }
             })
         }
@@ -149,7 +145,7 @@ exports.perform_action = function (next, connection) {
     var decision = connection.results.get('forward_emails');
     if(decision.action==="relayOutside"){
         changeTo(decision.to);
-        changeFrom(decision.from, true);
+        changeFrom(decision.from,true);
         removeHeaders();
         addReplyTo(decision.replyTo);
     }else{
