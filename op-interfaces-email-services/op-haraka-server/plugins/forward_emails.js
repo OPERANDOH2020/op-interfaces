@@ -92,19 +92,19 @@ exports.forward_to_user = function(next,connection){
                 connection.results.add(plugin, {
                     "to": realEmail,
                     "from": newSender,
-                    "X-REPLY-ID": token+"@plusprivacy.com>"
+                    "replyTo": token+"@plusprivacy.com>"
                 });
                 connection.relaying = true;
             }
             next()
         })
     }
-}
+};
 
 exports.forward_to_outside_entity = function(next,connection){
     var forward_to_user_details = connection.results.get('forward_emails');
     if(forward_to_user_details===undefined) {
-        jwt.verify(connection.transaction.header.get('X-REPLY-ID'), publicKey, ['RS256'], function (err, conversation) {
+        jwt.verify(connection.transaction.rcpt_to[0].user, publicKey, ['RS256'], function (err, conversation) {
             if (err) {
                 next(DENIDISCONNECT)
             } else {
@@ -149,12 +149,12 @@ exports.clean_body = function (next, connection) {
 exports.finish_forward_to_user = function (next, connection) {
     var plugin = this;
     var forward_to_user_details = connection.results.get('forward_emails');
-    if(forward_to_user_details!==undefined) {
+    if(forward_to_user_details!==undefined){
         plugin.loginfo("Relay to user");
         changeTo(connection,forward_to_user_details.to);
         changeFrom(connection,forward_to_user_details.from, true);
         removeHeaders(connection);
-        addReplyTo(connection,"replies@plusprivacy.com",forward_to_user_details['X-REPLY-ID']);
+        addReplyTo(connection,forward_to_user_details.replyTo);
     }
     next();
 };
@@ -176,7 +176,6 @@ function changeTo(connection,newTo) {
 
 function changeFrom(connection,newFrom,displayOriginal) {
     var original = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host;
-
     connection.transaction.mail_from.original = '<' + newFrom + '>';
     connection.transaction.mail_from.user = newFrom.split('@')[0];
     connection.transaction.mail_from.host = newFrom.split('@')[1];
@@ -192,13 +191,10 @@ function changeFrom(connection,newFrom,displayOriginal) {
     }
 }
 
-function addReplyTo(connection,replyTo,replyId) {
+function addReplyTo(connection,replyTo) {
     plugin.loginfo("New Reply-To :"+replyTo);
     connection.transaction.header.remove("Reply-To");
     connection.transaction.header.add("Reply-To", "<"+replyTo+">"); //the user will send the reply to this address
-    if(replyId) {
-        connection.transaction.header.add("X-REPLY-ID", replyId)
-    }
 }
 
 function removeHeaders(connection){
@@ -207,7 +203,6 @@ function removeHeaders(connection){
     connection.transaction.header.remove('DKIM-Signature');
     connection.transaction.header.remove('DomainKey-Signature');
     connection.transaction.header.remove('Message-ID');
-    connection.transaction.header.remove('X-REPLY-ID')
 }
 
 
