@@ -78,7 +78,7 @@ exports.decide_action = function (next,connection) {
     jwt.verify(connection.transaction.rcpt_to[0].user.split("reply_anonymously_to_sender_")[1], encriptionKey, ['HS256'], function (err, conversation) {
         if (!err) {
             plugin.loginfo('Delivering to outside entity');
-            conversation = JSON.parse(new Buffer(conversation, 'base64').toString());
+            conversation = JSON.parse(conversation);
             var to = conversation.sender;
             var from = conversation.alias;
 
@@ -97,10 +97,10 @@ exports.decide_action = function (next,connection) {
             edb.getRealEmail(alias.toLowerCase(), function (err, realEmail) {
                 if (realEmail) {
                     plugin.loginfo("Delivering to user");
-                    var conversation = Buffer.from(JSON.stringify({
+                    var conversation = JSON.stringify({
                         "alias": alias,
                         "sender": sender
-                    })).toString('base64');
+                    });
                     var token = jwt.sign(conversation, encriptionKey, {algorithm: "HS256"});
                     var newSender = sender.split("@").join("_at_") + "_via_plusprivacy@plusprivacy.com"; //needs to come from plusprivacy.com so that we chan perform DKIM signing
                     connection.results.add(plugin, {
