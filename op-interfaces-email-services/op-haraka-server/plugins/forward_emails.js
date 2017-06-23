@@ -78,7 +78,6 @@ exports.decide_action = function (next,connection) {
     jwt.verify(connection.transaction.rcpt_to[0].user.split("reply_anonymously_to_sender_")[1], encriptionKey, ['HS256'], function (err, conversation) {
         if (!err) {
             plugin.loginfo('Delivering to outside entity');
-            conversation = JSON.parse(conversation);
             var to = conversation.sender;
             var from = conversation.alias;
 
@@ -88,7 +87,6 @@ exports.decide_action = function (next,connection) {
                 "from": from,
                 "replyTo": from
             });
-
             connection.relaying = true;
             next()
         } else if(!edb.connected()){
@@ -96,19 +94,32 @@ exports.decide_action = function (next,connection) {
         } else{
             edb.getRealEmail(alias.toLowerCase(), function (err, realEmail) {
                 if (realEmail) {
-                    plugin.loginfo("Delivering to user");
+
                     var conversation = JSON.stringify({
                         "alias": alias,
                         "sender": sender
                     });
                     var token = jwt.sign(conversation, encriptionKey, {algorithm: "HS256"});
-                    var newSender = sender.split("@").join("_at_") + "_via_plusprivacy@plusprivacy.com"; //needs to come from plusprivacy.com so that we chan perform DKIM signing
-                    connection.results.add(plugin, {
-                        "action":"relayToUser",
-                        "to": realEmail,
-                        "from": newSender,
-                        "replyTo": "reply_anonymously_to_sender_"+token+"@plusprivacy.com"
-                    });
+
+                    if(alias.toLowerCase().match('support@plusprivacy.com')||alias.toLowerCase().match('contact@plusprivacy.com')){
+                        plugin.loginfo('Forward email');
+                        connection.results.add(plugin, {
+                            "action":"forwardEmail",
+                            "to": realEmail,
+                            "replyTo":"reply_anonymously_to_sender_"+token+"@plusprivacy.com"
+                        });
+                    }else{
+                        plugin.loginfo("Delivering to user");
+
+                        var newSender = sender.split("@").join("_at_") + "_via_plusprivacy@plusprivacy.com"; //needs to come from plusprivacy.com so that we chan perform DKIM signing
+                        connection.results.add(plugin, {
+                            "action":"relayToUser",
+                            "to": realEmail,
+                            "from": newSender,
+                            "replyTo": "reply_anonymously_to_sender_"+token+"@plusprivacy.com"
+                        });
+                    }
+
                     connection.relaying = true;
                     next()
                 }else {
@@ -143,32 +154,48 @@ exports.clean_body = function (next, connection) {
 exports.perform_action = function (next, connection) {
     var plugin = this;
     var decision = connection.results.get('forward_emails');
-    if(decision.action==="relayOutside"){
-        changeTo(decision.to);
-        changeFrom(decision.from,true);
-        removeHeaders();
-        addReplyTo(decision.replyTo);
-    }else{
-        changeTo(decision.to);
-        changeFrom(decision.from);
-        removeHeaders();
-        addReplyTo(decision.replyTo);
+
+    switch(decision.action){
+        case "relayOutside":
+            changeTo(decision.to);
+            changeFrom(decision.from);
+            removeHeaders();
+            addReplyTo(decision.replyTo);
+            break
+        case "relayToUser":
+            changeTo(decision.to);
+            changeFrom(decision.from,true);
+            removeHeaders();
+            addReplyTo(decision.replyTo);
+            break
+        case "forwardEmail":
+            changeTo(decision.to,true);
+            addReplyTo(decision.replyTo)
     }
+
     next();
 
 
-    function changeTo(newTo) {
+    function changeTo(newTo,keepHeader) {
         plugin.loginfo("New to: "+newTo);
         connection.transaction.rcpt_to.pop();
-        connection.transaction.header.remove('to');
         if (Array.isArray(newTo)){
             newTo.forEach(function(t){
-                connection.transaction.header.add('to', t);
                 connection.transaction.rcpt_to.push(new address('<' + t + '>'));
             })
         }else{
-            connection.transaction.header.add('to', newTo);
             connection.transaction.rcpt_to.push(new address('<' + newTo + '>'));
+        }
+
+        if(!keepHeader) {
+            connection.transaction.header.remove('to');
+            if (Array.isArray(newTo)) {
+                newTo.forEach(function (t) {
+                    connection.transaction.header.add('to', t);
+                })
+            } else {
+                connection.transaction.header.add('to', newTo);
+            }
         }
     }
 
