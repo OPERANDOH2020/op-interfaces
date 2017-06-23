@@ -110,7 +110,6 @@ exports.decide_action = function (next,connection) {
                         });
                     }else{
                         plugin.loginfo("Delivering to user");
-
                         var newSender = sender.split("@").join("_at_") + "_via_plusprivacy@plusprivacy.com"; //needs to come from plusprivacy.com so that we chan perform DKIM signing
                         connection.results.add(plugin, {
                             "action":"relayToUser",
@@ -199,6 +198,7 @@ exports.perform_action = function (next, connection) {
         }
     }
 
+
     function changeFrom(newFrom,displayOriginal) {
         var original = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host;
         connection.transaction.mail_from.original = '<' + newFrom + '>';
@@ -207,10 +207,10 @@ exports.perform_action = function (next, connection) {
 
         connection.transaction.remove_header('From');
         plugin.loginfo("New from: "+newFrom);
-        if(!displayOriginal) {
+        if(!displayOriginal || connection.transaction.header.get('to').match('yahoo')) {
             connection.transaction.add_header('From', newFrom);
         }else{
-            var fromMessage = original+" via plusprivacy.com"+"' <"+newFrom+">";
+            var fromMessage = original+" via plusprivacy.com"+" <"+newFrom+">";
             plugin.loginfo(fromMessage);
             connection.transaction.add_header('From',fromMessage );
         }
