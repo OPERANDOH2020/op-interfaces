@@ -138,13 +138,13 @@ exports.clean_body = function (next, connection) {
 	        var body = body_buffer.toString()
 	        var originalFrom = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host
             var filteredBody = body.split(originalFrom).join(decision.from);
-            return Buffer.from(filteredBody,encoding);
+            return Buffer.from(filteredBody,"utf8");
         })
 	    connection.transaction.add_body_filter('text/plain',function(content_type,encoding,body_buffer){
             var body = body_buffer.toString()
             var originalFrom = connection.transaction.mail_from.user+"@"+connection.transaction.mail_from.host
             var filteredBody = body.split(originalFrom).join(decision.from);
-            return Buffer.from(filteredBody,encoding);
+            return Buffer.from(filteredBody,"utf8");
         })
     }
     next();
