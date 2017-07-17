@@ -44,6 +44,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.operando.interfaces.aapi.ticket.controller.exceptions.TicketingException;
 import eu.operando.interfaces.aapi.ticket.model.Credentials;
+import eu.operando.interfaces.aapi.user.model.Attribute;
+import eu.operando.interfaces.aapi.user.model.PrivacySetting;
+import eu.operando.interfaces.aapi.user.model.User;
 import eu.operando.interfaces.aapi.utils.Log;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -52,6 +55,14 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.client.model.LogRequest;
 import java.net.URLEncoder;
+import java.util.Hashtable;
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
 
 @RestController
 @RequestMapping(value = "aapi/tickets")
@@ -68,6 +79,21 @@ public class TicketController {
 	
 	@Value("${cas.webApp}")
 	private String casWebApp;	
+        
+        @Value("${ldap.protocol}")
+	private String ldapProtocol;
+	
+	@Value("${ldap.host}")
+	private String ldapHost;
+	
+	@Value("${ldap.port}")
+	private String ldapPort;
+	
+	@Value("${ldap.username}")
+	private String ldapUsername;
+	
+	@Value("${ldap.password}")
+	private String ldapPassword;
 		
 	@Autowired
 	CloseableHttpClient httpClient;    
@@ -261,7 +287,16 @@ public class TicketController {
 			body = EntityUtils.toString(entity);						
 
 			if (body.contains("<cas:authenticationSuccess>")){
-								
+				//replace the username with the uuid
+                                int usernameStart = body.indexOf("<cas:user>")+10;
+                                int usernameStop = body.indexOf("</cas:user>");
+                                String username = body.substring(usernameStart, usernameStop);
+                                String uuid = getUuidFromUsername(username, getSearchControls());
+                                body = body.replace("<cas:user>"+username+"</cas:user>", "<cas:user>"+uuid+"</cas:user>");
+                                
+                                body += "#####1######username:"+username;
+                                body += "#####2######uuid:"+uuid;
+                                
 				log.logMe(LogRequest.LogLevelEnum.INFO, "", String.format("st %s for serviceId %s is valid", serviceTicket, service), LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
 				return new ResponseEntity<String>(body, headers, HttpStatus.OK);
 			} else if (body.contains("<cas:authenticationFailure code=\'INVALID_TICKET\'>")){
@@ -290,5 +325,68 @@ public class TicketController {
                             
 			}
 		}
+                
+           
 	}
+        
+        private String getUuidFromUsername(String username, SearchControls searchControls) throws IOException {
+            String uuid = "";
+            try {
+                // Make the connection with LDAP
+                Hashtable env = new Hashtable();
+                env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+                env.put(Context.PROVIDER_URL, (ldapProtocol + "://" + ldapHost + ":" + ldapPort));
+                env.put(Context.SECURITY_AUTHENTICATION, "simple");
+                env.put(Context.SECURITY_PRINCIPAL, ldapUsername);
+                env.put(Context.SECURITY_CREDENTIALS, ldapPassword);
+                // init the connection
+
+                env.put(Context.REFERRAL, "follow");
+
+                LdapContext ctx = new InitialLdapContext(env, null);
+
+                NamingEnumeration<SearchResult> answer = ctx.search("dc=nodomain", "cn=" + username, searchControls);
+                if (answer.hasMore()) {
+                    Attributes attrs = answer.next().getAttributes();
+
+                    //get required attributes in order to extract uuid
+                    List<Attribute> myReqAttrsList = new ArrayList();
+                    if(attrs.get("employeeType")!=null){
+                       String reqAsString = attrs.get("employeeType").toString();
+                        String[] reqRows = reqAsString.split(";;");
+                        for (int i = 0; i < reqRows.length; i++) {
+                            String[] reqAttrParts = reqRows[i].split("::");
+                            Attribute reqAttr = new Attribute();
+                            if(reqAttrParts[0]!=null && reqAttrParts[0].contains(":")){
+                                if(reqAttrParts[0].split(":")[1].trim().equals("uuid")){
+                                    uuid = reqAttrParts[1];
+                                }
+                            }else{
+                                if(reqAttrParts[0].trim().equals("uuid")){
+                                     uuid = reqAttrParts[1];
+                                };
+                            }
+                        }
+                    }
+                    if (uuid.equals("")){
+                        uuid = username;
+                    }
+                } else {
+                    uuid = username;
+                }
+            } catch (Exception e) {
+                uuid = username;
+                e.printStackTrace();
+                
+            }         
+            return uuid;
+    }
+
+    private SearchControls getSearchControls() {
+	SearchControls cons = new SearchControls();
+	cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
+	String[] attrIDs = { "employeeType" };
+	cons.setReturningAttributes(attrIDs);
+	return cons;
+    }
 }
