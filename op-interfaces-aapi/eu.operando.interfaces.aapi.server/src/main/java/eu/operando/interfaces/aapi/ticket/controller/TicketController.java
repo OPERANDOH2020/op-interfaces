@@ -278,7 +278,8 @@ public class TicketController {
 			// Get CAS's server response HEADERS
 			HttpHeaders headers = new HttpHeaders();
 			for (Header header : response.getAllHeaders()) {
-				headers.add(header.getName(), header.getValue());
+				if(!header.getName().equalsIgnoreCase("Content-Length"))
+                                    headers.add(header.getName(), header.getValue());
 			}
 			
 			// Get CAS's server response BODY
