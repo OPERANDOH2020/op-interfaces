@@ -294,9 +294,6 @@ public class TicketController {
                                 String uuid = getUuidFromUsername(username, getSearchControls());
                                 body = body.replace("<cas:user>"+username+"</cas:user>", "<cas:user>"+uuid+"</cas:user>");
                                 
-                                body += "#####1######username:"+username;
-                                body += "#####2######uuid:"+uuid;
-                                
 				log.logMe(LogRequest.LogLevelEnum.INFO, "", String.format("st %s for serviceId %s is valid", serviceTicket, service), LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
 				return new ResponseEntity<String>(body, headers, HttpStatus.OK);
 			} else if (body.contains("<cas:authenticationFailure code=\'INVALID_TICKET\'>")){
