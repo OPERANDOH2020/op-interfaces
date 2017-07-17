@@ -292,7 +292,7 @@ public class TicketController {
                                 int usernameStop = body.indexOf("</cas:user>");
                                 String username = body.substring(usernameStart, usernameStop);
                                 String uuid = getUuidFromUsername(username, getSearchControls());
-                                body = body.replace("<cas:user>"+username+"</cas:user>", "<cas:user>"+uuid+"</cas:user>");
+                                body = body.replace(username, uuid);
                                 
 				log.logMe(LogRequest.LogLevelEnum.INFO, "", String.format("st %s for serviceId %s is valid", serviceTicket, service), LogRequest.LogPriorityEnum.NORMAL.toString(), "op-interfaces-aapi");
 				return new ResponseEntity<String>(body, headers, HttpStatus.OK);
