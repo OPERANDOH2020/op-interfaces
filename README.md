@@ -1,5 +1,14 @@
 # op-interfaces
-For the modules in the interfaces container
+For the modules in the interfaces container:
+
+B2C:
+* Email Services (ES)
+* User Agent Middleware (UAM)
+
+G2C:
+* Authentication API (AAPI)
+* Online Service Provider API (OSP API or OAPI)
+* Regulator API (RAPI)
 
 # Dependencies
 Dependency Name|Description|Link|Module|Test-only?
