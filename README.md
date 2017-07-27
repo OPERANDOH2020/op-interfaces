@@ -10,7 +10,17 @@ G2C:
 * Online Service Provider API (OSP API or OAPI)
 * Regulator API (RAPI)
 
-# Dependencies
+## Functional Description of Modules
+### B2C
+#### Email Services (ES)
+#### User Agent Middleware (UAM)
+### G2C
+#### Authentication API (AAPI)
+#### Online Service Provider API (OAPI)
+#### Regulator API (RAPI)
+
+
+## Dependencies
 Dependency Name|Description|Link|Module|Test-only?
 ---------------|-----------|----|------|----------
 Java|A general-purpose computer programming language|https://java.com/en/download/|RAPI, OAPI|
