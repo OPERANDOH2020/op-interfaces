@@ -17,6 +17,11 @@ G2C:
 ### G2C
 #### Authentication API (AAPI)
 #### Online Service Provider API (OAPI)
+The OAPI module facilitates OSP-PSP communication for additional features beyond the fundamental communication such as data access. It acts as an abstraction layer, which adds a level of separation between external entities and the PA internal services. It should delegate inbound requests from an OSP to the relevant core modules. If necessary in the future, it will also handle outbound communication from the PSP to the OSP.
+In deployments where the PA and the OSP are tightly integrated, it will be possible to extend the OAPI to support bespoke workflows.
+
+There are two workflows handled by the OAPI -- requests for reports, and requests for Big Data extracts. Each can be done according to the specifications described in the Swagger documentation.
+In each workflow any incoming request is directed to the relevant interface (Reports, Big Data Analytics), which interprets the request. The JSON from the body is deserialised into a Java object, and the service ticket string – provided to the caller by the Authentication API (AAPI) – is read from a custom header.
 #### Regulator API (RAPI)
 
 
