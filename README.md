@@ -10,6 +10,10 @@ G2C:
 * Online Service Provider API (OSP API or OAPI)
 * Regulator API (RAPI)
 
+## Reporting an issue
+
+## Contributing to the code
+
 ## Functional Description of Modules
 ### B2C
 #### Email Services (ES)
@@ -29,6 +33,34 @@ Via the RAPI, agencies will be able to submit new and updated regulations to the
 
 There are two workflows handled by the RAPI – adding or updating a regulation, and requesting a compliance report. Either can be done according to the specifications described in the Swagger documentation.
 In both workflows any incoming request is directed to the relevant interface (Regulations or Reports) by the Jersey library. The interface interprets the incoming HTTP request, any JSON from the body is deserialised into a Java object, and the service ticket string – provided to the caller by the Authentication API (AAPI) – is read from a custom header.
+
+## Installation Instructions
+### B2C
+#### Email Services (ES)
+#### User Agent Middleware (UAM)
+### G2C
+#### Authentication API (AAPI)
+#### Online Service Provider API (OAPI)
+#### Regulator API (RAPI)
+
+## Usage Instructions
+### B2C
+#### Email Services (ES)
+#### User Agent Middleware (UAM)
+### G2C
+#### Authentication API (AAPI)
+#### Online Service Provider API (OAPI)
+#### Regulator API (RAPI)
+
+## Future Plans
+### B2C
+#### Email Services (ES)
+#### User Agent Middleware (UAM)
+### G2C
+#### Authentication API (AAPI)
+#### Online Service Provider API (OAPI)
+#### Regulator API (RAPI)
+
 ## Dependencies
 Dependency Name|Description|Link|Module|Test-only?
 ---------------|-----------|----|------|----------
