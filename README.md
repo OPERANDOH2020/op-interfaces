@@ -22,9 +22,13 @@ In deployments where the PA and the OSP are tightly integrated, it will be possi
 
 There are two workflows handled by the OAPI -- requests for reports, and requests for Big Data extracts. Each can be done according to the specifications described in the Swagger documentation.
 In each workflow any incoming request is directed to the relevant interface (Reports, Big Data Analytics), which interprets the request. The JSON from the body is deserialised into a Java object, and the service ticket string – provided to the caller by the Authentication API (AAPI) – is read from a custom header.
+
 #### Regulator API (RAPI)
+The Regulator API (RAPI) is intended to facilitate compliance with privacy laws, and for regulators to audit and pro-actively supervise OSPs.
+Via the RAPI, agencies will be able to submit new and updated regulations to the platform in order to trigger changes to UPPs for immediate compliance, and to trigger compliance checks against an OSP’s registered workflows. They will also be able to request reports detailing an OSP’s compliance with statements in their privacy policy, and with regulations which have been submitted via the RAPI at an earlier date.
 
-
+There are two workflows handled by the RAPI – adding or updating a regulation, and requesting a compliance report. Either can be done according to the specifications described in the Swagger documentation.
+In both workflows any incoming request is directed to the relevant interface (Regulations or Reports) by the Jersey library. The interface interprets the incoming HTTP request, any JSON from the body is deserialised into a Java object, and the service ticket string – provided to the caller by the Authentication API (AAPI) – is read from a custom header.
 ## Dependencies
 Dependency Name|Description|Link|Module|Test-only?
 ---------------|-----------|----|------|----------
