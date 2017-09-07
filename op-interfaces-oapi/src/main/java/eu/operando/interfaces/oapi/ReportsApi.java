@@ -7,19 +7,26 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import eu.operando.interfaces.oapi.factories.ReportsApiServiceFactory;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Path("/reports")
-
+@RestController
+@RequestMapping(value = "/reports")
 @Produces({ MediaType.APPLICATION_JSON })
-@io.swagger.annotations.Api(description = "the reports API")
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
 public class ReportsApi
 {
 	private final ReportsApiService delegate = ReportsApiServiceFactory.getReportsApi();
@@ -27,29 +34,31 @@ public class ReportsApi
 	@GET
 	@Path("/{report-id}")
 	@Produces({ MediaType.APPLICATION_JSON })
-	@io.swagger.annotations.ApiOperation(
-		value = "Get a report.",
-		notes = "Called by a regulator to obtain a report matching the given ID. Intended (at the moment) to return a compliance report relating to an OSP. ",
-		response = String.class,
-		tags = { "reports" })
-	@io.swagger.annotations.ApiResponses(
+	@RequestMapping(value= "/{reportId}", method = RequestMethod.GET)
+	@ApiOperation(value = "", notes = "Called by a regulator to obtain a report matching the given ID. Intended (at the moment) to return a compliance report relating to an OSP.", response = String.class)
+	@ApiResponses(
 		value = {
-			@io.swagger.annotations.ApiResponse(
+			@ApiResponse(
 				code = 200,
-				message = "The request was successful. The report is returned in the response body in the requested format.",
-				response = String.class),
-			@io.swagger.annotations.ApiResponse(
+				message = "The request was successful. The report is returned in the response body in the requested format."),
+			@ApiResponse(
 				code = 401,
-				message = "The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
-				response = String.class),
-			@io.swagger.annotations.ApiResponse(
+				message = "The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body."),
+			@ApiResponse(
 				code = 403,
-				message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.",
-				response = String.class) })
+				message = "The user is authenticated with the OPERANDO system, but is not allowed to perform the requested action.")
+			})
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "serviceTicket", value = "Ticket proving that the caller is allowed to use this service", required = true, dataType = "string", paramType = "header"),
+		@ApiImplicitParam(name = "reportId", value = "The unique identifier of a report", required = true, dataType = "string", paramType = "path"),
+		@ApiImplicitParam(name = "format", value = "The requested format of the report (e.g. pdf, html)", required = true, dataType = "string", paramType = "query"),
+		@ApiImplicitParam(name = "uriInfo", value = "", required = false, dataType = "UriInfo", paramType = "context")
+	})
 public Response reportsReportIdGet(
-			@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam(value = "service-ticket") String serviceTicket,
-			@ApiParam(value = "the unique identifier of a report.", required = true) @PathParam("report-id") String reportId,
-			@ApiParam(value = "the requested format of the report (e.g. pdf, html)", required = true) @QueryParam("format") String format, @Context UriInfo uriInfo)
+			@HeaderParam("service-ticket") String serviceTicket,
+			@PathParam("report-id")String reportId,
+			@QueryParam("format") String format, 
+			@Context UriInfo uriInfo)
 	{
 		MultivaluedMap<String, String> optionalParameters = uriInfo.getQueryParameters();
 		return delegate.reportsGetReport(serviceTicket, reportId, format, optionalParameters);

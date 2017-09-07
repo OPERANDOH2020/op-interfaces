@@ -11,6 +11,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import eu.operando.AuthenticationWrapper;
 import eu.operando.UnableToGetDataException;
@@ -18,13 +21,16 @@ import eu.operando.api.AuthenticationService;
 import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.api.model.AnalyticsReport;
 import eu.operando.interfaces.oapi.factories.BigDataAnalyticsApiServiceFactory;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Path("/bda")
-
+@RestController
+@RequestMapping(value="/bda")
 @Produces({ MediaType.APPLICATION_JSON })
-@io.swagger.annotations.Api(description = "the bda API")
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-08-31T09:45:10.086Z")
 public class BigDataAnalyticsApi
 {
 	final Logger LOGGER;
@@ -46,39 +52,37 @@ public class BigDataAnalyticsApi
 	@GET
 	@Path("/jobs/{job-id}/reports/latest")
 	@Produces({ MediaType.APPLICATION_JSON })
-	@io.swagger.annotations.ApiOperation(
+	@RequestMapping(value = "/jobs/{jobId}/reports/latest", method = RequestMethod.GET)
+	@ApiOperation(
 		value = "", 
-		notes = "", 
-		response = AnalyticsReport.class, 
-		tags = { "big data analytics" }
+		notes = "provides a link to download a report", 
+		response = AnalyticsReport.class
 	)
-	@io.swagger.annotations.ApiResponses(value = {
-		@io.swagger.annotations.ApiResponse(
+	@ApiResponses(value = {
+		@ApiResponse(
 			code = 200, 
-			message = "Successful response", 
-			response = AnalyticsReport.class
+			message = "Successful response"
 		),
-		@io.swagger.annotations.ApiResponse(
+		@ApiResponse(
 			code = 401,
-			message = "Error - The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
-			response = AnalyticsReport.class
+			message = "Error - The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body."
 		),
-		@io.swagger.annotations.ApiResponse(
+		@ApiResponse(
 			code = 404,
-			message = "Error - The specified job could not be found.",
-			response = AnalyticsReport.class
+			message = "Error - The specified job could not be found."
 		),
-		@io.swagger.annotations.ApiResponse(
+		@ApiResponse(
 			code = 500,
-			message = "Error - An internal error has occured.",
-			response = AnalyticsReport.class
+			message = "Error - An internal error has occured."
 		) 
 	})
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "serviceTicket", value = "Ticket proving that the caller is allowed to use this service", dataType = "string", required = true, paramType= "header"),
+		@ApiImplicitParam(name= "jobId", value = "Identification of the job to get the status about", dataType = "string", required = true, paramType="path")
+	})
 	public Response getBdaReport(
-		@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam("service-ticket") 
-			String serviceTicket,
-		@ApiParam(value = "Identification of the job to get the status about", required = true) @PathParam("job-id") 
-			String jobId
+			@HeaderParam("service-ticket") String serviceTicket,
+			@PathParam("job-id") String jobId
 	){
 		Response response;
 		try{
