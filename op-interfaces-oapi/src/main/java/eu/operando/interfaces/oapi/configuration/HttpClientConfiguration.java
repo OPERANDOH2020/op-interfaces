@@ -1,4 +1,4 @@
-package eu.operando.interfaces.aapi.configuration;
+package eu.operando.interfaces.oapi.configuration;
 
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;

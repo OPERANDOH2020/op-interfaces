@@ -11,7 +11,7 @@
  *  #    {Constantinos Alexandris} {UPRC}
  *  # Initially developed in the context of OPERANDO EU project www.operando.eu 
  *******************************************************************************/
-package eu.operando.interfaces.aapi.configuration;
+package eu.operando.interfaces.oapi.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -37,9 +37,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "eu.operando.interfaces.aapi")
+@ComponentScan(basePackages = "eu.operando.interfaces.oapi")
 @EnableSwagger2
-@SwaggerDefinition(basePath="/authenticationservice")
+@SwaggerDefinition(basePath="/OAPI")
 class SwaggerConfiguration extends WebMvcConfigurerAdapter {
 
 	@Override
@@ -80,7 +80,8 @@ class SwaggerConfiguration extends WebMvcConfigurerAdapter {
 
 	private ApiInfo apiInfo() {
 		ApiInfo apiInfo = new ApiInfo(
-				"OPERANDO's Authentication Service's API (AAPI)",
+				// TODO update this
+				"OPERANDO's Authentication Service's API (OAPI)",
 				"A Restful API provided by OPERANDO's AS for authentication/authorization",
 				"1.0.0",
 				"termsOfService = \"share and care\"",

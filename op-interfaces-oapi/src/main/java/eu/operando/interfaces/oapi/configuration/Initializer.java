@@ -11,7 +11,7 @@
  *  #    {Constantinos Alexandris} {UPRC}
  *  # Initially developed in the context of OPERANDO EU project www.operando.eu 
  *******************************************************************************/
-package eu.operando.interfaces.aapi.configuration;
+package eu.operando.interfaces.oapi.configuration;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 

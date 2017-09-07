@@ -11,7 +11,7 @@
  *  #    {Constantinos Alexandris} {UPRC}
  *  # Initially developed in the context of OPERANDO EU project www.operando.eu 
  *******************************************************************************/
-package eu.operando.interfaces.aapi.configuration;
+package eu.operando.interfaces.oapi.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,8 +20,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@ComponentScan(basePackages = "eu.operando.interfaces.aapi")
-@PropertySource("classpath:aapi-config.properties")
+@ComponentScan(basePackages = "eu.operando.interfaces.oapi")
+@PropertySource("classpath:config.properties")
 class BaseConfiguration {
 
 	//To resolve ${} in @Value
