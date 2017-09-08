@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Path("/bda")
 @RestController
@@ -52,7 +53,7 @@ public class BigDataAnalyticsApi
 	@GET
 	@Path("/jobs/{job-id}/reports/latest")
 	@Produces({ MediaType.APPLICATION_JSON })
-	@RequestMapping(value = "/jobs/{jobId}/reports/latest", method = RequestMethod.GET)
+	@RequestMapping(value = "/jobs/{job-id}/reports/latest", method = RequestMethod.GET)
 	@ApiOperation(
 		value = "", 
 		notes = "provides a link to download a report", 
@@ -77,12 +78,12 @@ public class BigDataAnalyticsApi
 		) 
 	})
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "serviceTicket", value = "Ticket proving that the caller is allowed to use this service", dataType = "string", required = true, paramType= "header"),
-		@ApiImplicitParam(name= "jobId", value = "Identification of the job to get the status about", dataType = "string", required = true, paramType="path")
+		@ApiImplicitParam(name = "service-ticket", value = "Ticket proving that the caller is allowed to use this service", dataType = "string", required = true, paramType= "header"),
+		@ApiImplicitParam(name= "job-id", value = "Identification of the job to get the status about", dataType = "string", required = true, paramType="path")
 	})
 	public Response getBdaReport(
-			@HeaderParam("service-ticket") String serviceTicket,
-			@PathParam("job-id") String jobId
+			@ApiIgnore @HeaderParam("service-ticket") String serviceTicket,
+			@ApiIgnore @PathParam("job-id") String jobId
 	){
 		Response response;
 		try{
