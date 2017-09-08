@@ -19,7 +19,7 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
 	 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class[] { BaseConfiguration.class, HttpClientConfiguration.class };
+        return new Class[] { };
     }
   
     @Override
@@ -31,7 +31,4 @@ public class Initializer extends AbstractAnnotationConfigDispatcherServletInitia
     protected String[] getServletMappings() {
         return new String[] { "/*" };
     }
-    
-    
-    
 }

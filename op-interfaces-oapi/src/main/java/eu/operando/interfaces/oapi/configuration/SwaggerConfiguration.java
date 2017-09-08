@@ -23,7 +23,6 @@ import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import io.swagger.annotations.SwaggerDefinition;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -39,7 +38,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableWebMvc
 @ComponentScan(basePackages = "eu.operando.interfaces.oapi")
 @EnableSwagger2
-@SwaggerDefinition(basePath="/OAPI")
 class SwaggerConfiguration extends WebMvcConfigurerAdapter {
 
 	@Override
@@ -73,8 +71,9 @@ class SwaggerConfiguration extends WebMvcConfigurerAdapter {
 		return new Docket(DocumentationType.SWAGGER_2)  
 				.select()                                  
 				.apis(RequestHandlerSelectors.any())              
-				.paths(PathSelectors.any())                          
+				.paths(PathSelectors.any())
 				.build()
+				.pathMapping("/osp/")
 				.apiInfo(apiInfo());                                           
 	}
 
