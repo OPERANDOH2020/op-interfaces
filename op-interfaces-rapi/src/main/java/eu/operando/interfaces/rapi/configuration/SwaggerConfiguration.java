@@ -23,7 +23,6 @@ import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import io.swagger.annotations.SwaggerDefinition;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -39,7 +38,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableWebMvc
 @ComponentScan(basePackages = "eu.operando.interfaces.rapi")
 @EnableSwagger2
-@SwaggerDefinition(basePath="/RAPI")
 class SwaggerConfiguration extends WebMvcConfigurerAdapter {
 
 	@Override
@@ -75,18 +73,19 @@ class SwaggerConfiguration extends WebMvcConfigurerAdapter {
 				.apis(RequestHandlerSelectors.any())              
 				.paths(PathSelectors.any())                          
 				.build()
+				.pathMapping("/regulator/")
 				.apiInfo(apiInfo());                                           
 	}
 
 	private ApiInfo apiInfo() {
 		ApiInfo apiInfo = new ApiInfo(
 				// TODO update this
-				"OPERANDO's Authentication Service's API (AAPI)",
-				"A Restful API provided by OPERANDO's AS for authentication/authorization",
+				"OPERANDO's Regulator API (RAPI)",
+				"A Restful API provided by OPERANDO's Regulator service",
 				"1.0.0",
 				"termsOfService = \"share and care\"",
-				"@Contact(name = \"Patsakis-Costas\", email = \"kpatsak@gmail.com\", url = \"\")",
-				"license = @License(name = \"Apache 2.0\", url = \"http://www.apache.org\"",          
+				null,
+				null,          
 				null);        
 		return apiInfo;
 	}
