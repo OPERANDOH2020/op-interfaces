@@ -11,17 +11,26 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import eu.operando.UnableToGetDataException;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.api.model.ComplianceReport;
 import eu.operando.interfaces.rapi.factories.ComplianceReportsServiceFactory;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Path("/osps/{osp-id}/compliance-report")
 @Produces({ MediaType.APPLICATION_JSON })
-@io.swagger.annotations.Api(description = "the compliance report API")
+@RestController
+@RequestMapping(value = "/osps/{osp-id}/compliance-report")
 public class ComplianceReportApi
 {
 
@@ -42,22 +51,25 @@ public class ComplianceReportApi
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	@io.swagger.annotations.ApiOperation(value = "Get the compliance report for an OSP.", response = ComplianceReport.class)
-	@io.swagger.annotations.ApiResponses(
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	@ApiOperation(value = "", response = ComplianceReport.class, notes = "Called by a regulator to obtain a compliance report relating to the specified OSP.")
+	@ApiResponses(
 		value = {
-			@io.swagger.annotations.ApiResponse(
+			@ApiResponse(
 				code = 200,
-				message = "The compliance report for the OSP is returned as a JSON object.",
-				response = ComplianceReport.class),
-			@io.swagger.annotations.ApiResponse(
+				message = "The compliance report for the OSP is returned as a JSON object."),
+			@ApiResponse(
 				code = 401,
-				message = "Error - The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body.",
-				response = ComplianceReport.class),
-			@io.swagger.annotations.ApiResponse(code = 404, message = "Error - The OSP could not be found.", response = ComplianceReport.class),
-			@io.swagger.annotations.ApiResponse(code = 500, message = "Error - An internal error has occured.", response = ComplianceReport.class) })
+				message = "Error - The user is not authenticated with the OPERANDO system. Check that the service ticket provided by the authentication service is correctly included in the message body."),
+			@ApiResponse(code = 404, message = "Error - The OSP could not be found."),
+			@ApiResponse(code = 500, message = "Error - An internal error has occured.") })
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "service-ticket", value = "Ticket proving that the caller is allowed to use this service", required = true, dataType = "string", paramType = "header"),
+		@ApiImplicitParam(name = "osp-id", value = "The unique identifier of an online service provider.", required = true, dataType = "string", paramType = "path")
+	})
 	public Response complianceReportGet(
-			@ApiParam(value = "Ticket proving that the caller is allowed to use this service", required = true) @HeaderParam("service-ticket") String serviceTicket,
-			@ApiParam(value = "The unique identifier of an online service provider.", required = true) @PathParam("osp-id") String ospId)
+		@ApiIgnore @HeaderParam("service-ticket") String serviceTicket,
+		@ApiIgnore @PathParam("osp-id") String ospId)
 	{
 		Response response;
 		try
