@@ -88,7 +88,7 @@ public class RegulationsApi
 	public Response regulationsRegIdPut(
 			@ApiIgnore @HeaderParam("service-Ticket") String serviceTicket,
 			@ApiIgnore PrivacyRegulationInput regulation,
-			@ApiIgnore @PathParam("reg-Id") String regId)
+			@ApiIgnore @PathParam("reg-id") String regId)
 	{
 		return delegate.processExistingRegulation(serviceTicket, regulation, regId);
 	}
