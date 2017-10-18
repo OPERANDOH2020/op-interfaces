@@ -16,7 +16,6 @@ import eu.operando.moduleclients.ClientPolicyComputation;
 import eu.operando.moduleclients.ClientPolicyDb;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
-// TODO - remove dependencies on jax-rs; this class should just deal with logic.
 public class RegulationsApiServiceImpl implements RegulationsApiService
 {
 	private static final Logger LOGGER = LogManager.getLogger(RegulationsApiServiceImpl.class);

@@ -13,8 +13,5 @@
 			<source>src/main/docker/docker-config.yml</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
-		<!-- after several tries I was not able to define a context with context.xml, 
-			therefore I will name the app with the path <file> <source>src/main/resources/server.xml</source> 
-			<outputDirectory>/usr/local/tomcat/conf</outputDirectory> </file> -->
 	</files>
 </assembly>
