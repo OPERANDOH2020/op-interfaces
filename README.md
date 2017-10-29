@@ -26,6 +26,18 @@ N.B. The copyright for any code will be owned by the OPERANDOH2020 organisation,
 #### User Agent Middleware (UAM)
 ### G2C
 #### Authentication API (AAPI)
+The Authentication Service is the initial control point for security control, based on a ticketing system. As such, the Authentication Service can validate a ticket, and map users to specific roles, providing fine-grained role-based access control (RBAC) guaranteeing that only the agreed roles and/or users will have access to the user data.
+The Authentication Service (AS) operates at the PA core container, which implements the business logic of the PA and the privacy services. It is the main component that responsible for the correct adherence of all aspects of the online authentication procedure. 
+With the use of this component:
+ * Users are able to use their real or substitute credentials gaining direct access into a service
+ * OSPs and Regulators are also able to use their digital identities, which are properly validated
+ * Users are able to interact with OPERANDO through the use of remote agents such as browser add-ons and mobile apps, which are properly authenticated from the AS component
+
+The AS component provides the following core functionality:
+* Validation of users with identity providers
+* Authentication of users with the proper enforcement of world-wide accepted protocols (i.e. OAuth, OpenID, etc.)
+* Management of user credentials and client applications
+
 #### Online Service Provider API (OAPI)
 The OAPI module facilitates OSP-PSP communication for additional features beyond the fundamental communication such as data access. It acts as an abstraction layer, which adds a level of separation between external entities and the PA internal services. It should delegate inbound requests from an OSP to the relevant core modules. If necessary in the future, it will also handle outbound communication from the PSP to the OSP.
 In deployments where the PA and the OSP are tightly integrated, it will be possible to extend the OAPI to support bespoke workflows.
@@ -46,6 +58,19 @@ In both workflows any incoming request is directed to the relevant interface (Re
 #### User Agent Middleware (UAM)
 ### G2C
 #### Authentication API (AAPI)
+The source code of the AAPI module can be found at the official project GitHub here:
+https://github.com/OPERANDOH2020/op-interfaces/tree/master/op-interfaces-aapi
+In order to build the source code, the steps below should be followed:
+* Checkout the project from Github.
+* Navigate to the root folder of the project.
+* Build the project using the maven command "mvn package".
+The generated war(authentication.war) file is the one that will be deployed in the application server.
+In order to run the aapi module, the generated war file (authentication.war) has to be copied under the deployment directory of the corresponding application server (e.g. the “webapps” folder in Tomcat AS). 
+The module will start running as soon as the application server is restarted. 
+While deploying the AAPI module, two configuration files should be properly adjusted. Particularly:
+* aapi-config.properties: Contains information for the connection to CAS server and the LDAP directory.
+* Log4j.properties: Contains information for the local logging component that is integrated in the AAPI module (using the log4j Apache Logging Services)
+
 #### Online Service Provider API (OAPI)
 To compile and package the source code into a .war file:
  * Download and install Java from https://java.com/en/download/
@@ -84,6 +109,13 @@ To compile and package the source code into a .war file:
 #### User Agent Middleware (UAM)
 ### G2C
 #### Authentication API (AAPI)
+The AAPI module provides complete documentation of the available API through the implemented Swagger user interface. At the moment this interface can be accessible here:
+http://aapi.integration.operando.esilab.org:8135/operando/interfaces/aapi/swagger-ui.html#/
+
+AAPI contains two basic cores:
+* User Controller is responsible for the user management (registration, deletion, modification and retrieval of a user). 
+* Ticket Controller is responsible for all the authentication mechanisms developed in order to ensure the secure communication of the modules and specifically the authentication ticket generation and validation (TGT/ST generation and validation).
+
 
 #### Online Service Provider API (OAPI)
 After installation, you can run the OAPI as follows:
@@ -119,6 +151,7 @@ This endpoint returns a compliance report for the OSP specified in the path. Whe
 #### User Agent Middleware (UAM)
 ### G2C
 #### Authentication API (AAPI)
+Users will be able to login by using both a user-friendly username and a unique identifier inside the Operando ecosystem.
 
 #### Online Service Provider API (OAPI)
 Interactive Swagger API documentation will be added to the module, to make understanding the interfaces easier.
