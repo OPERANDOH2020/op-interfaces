@@ -60,6 +60,7 @@ In both workflows any incoming request is directed to the relevant interface (Re
 #### Authentication API (AAPI)
 The source code of the AAPI module can be found at the official project GitHub here:
 https://github.com/OPERANDOH2020/op-interfaces/tree/master/op-interfaces-aapi
+
 In order to build the source code, the steps below should be followed:
 * Checkout the project from Github.
 * Navigate to the root folder of the project.
