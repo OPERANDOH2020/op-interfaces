@@ -67,31 +67,14 @@ public class ComplianceReportApi
 		@ApiImplicitParam(name = "service-ticket", value = "Ticket proving that the caller is allowed to use this service", required = true, dataType = "string", paramType = "header"),
 		@ApiImplicitParam(name = "osp-id", value = "The unique identifier of an online service provider.", required = true, dataType = "string", paramType = "path")
 	})
-	public Response complianceReportGet(
-		@ApiIgnore @HeaderParam("service-ticket") String serviceTicket,
-		@ApiIgnore @PathParam("osp-id") String ospId)
+	public Response complianceReportGet(@ApiIgnore @HeaderParam("service-ticket") String serviceTicket, @ApiIgnore @PathParam("osp-id") String ospId) throws UnableToGetDataException
 	{
-		Response response;
-		try
+		if (!authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID))
 		{
-			if (authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID))
-			{
-				response = getReportAndCreateResponse(ospId);
-			}
-			else
-			{
-				response = Response.status(Status.UNAUTHORIZED)
-					.build();
-			}
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
-		catch (UnableToGetDataException e)
-		{
-			LOGGER.error("Error authenticating Service Ticket for Compliance Report Api: " + e.toString());
-			response = Response.serverError()
-					.build();
-		}
-
-		return response;
+				
+		return getReportAndCreateResponse(ospId);
 	}
 
 	private Response getReportAndCreateResponse(String ospId)

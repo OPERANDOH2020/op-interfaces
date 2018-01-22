@@ -72,17 +72,13 @@ public class ComplianceReportApiTests
 		assertEquals("If the OSP is not authenticated, the CRAPI should return an unauthorised code.", Status.UNAUTHORIZED.getStatusCode(), statusCodeResponse);
 	}
 
-	@Test
+	@Test(expected = UnableToGetDataException.class)
 	public void testGetComplianceReport_Authentication_ReturnInternalErrorCodeIfCantAuthenticate() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		UnableToGetDataException exceptionToThrow = new UnableToGetDataException(new OperandoCommunicationException(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND));
 		setUpServices(exceptionToThrow);
 
-		Response response = api.complianceReportGet("A123", "B987");
-
-		int statusCodeResponse = response.getStatus();
-		assertEquals("If the authentication server returns an error, the CRAPI should return an internal error code.", Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-				statusCodeResponse);
+		api.complianceReportGet("A123", "B987");
 	}
 
 	@Test
