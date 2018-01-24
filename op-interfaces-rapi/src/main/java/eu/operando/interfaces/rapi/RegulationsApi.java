@@ -8,11 +8,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.operando.UnableToGetDataException;
+import eu.operando.api.AuthenticationService;
+import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.api.model.DtoPrivacyRegulation;
 import eu.operando.api.model.PrivacyRegulation;
 import eu.operando.api.model.PrivacyRegulationInput;
@@ -30,7 +34,17 @@ import springfox.documentation.annotations.ApiIgnore;
 @Produces({ MediaType.APPLICATION_JSON })
 public class RegulationsApi
 {
-	private final RegulationsApiService delegate = RegulationsApiServiceFactory.getRegulationsApi();
+	private static final String SERVICE_ID_PROCESS_NEW_REGULATION = "POST/regulator/regulations";
+	private static final String SERVICE_ID_PROCESS_EXISTING_REGULATION = "PUT/regulator/regulations/{reg-id}";
+	
+	private AuthenticationService authenticationDelegate;
+	private RegulationsApiService regulationDelegate;
+		
+	public RegulationsApi()
+	{
+		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(Config.PROPERTIES_FILE_RAPI);
+		regulationDelegate = RegulationsApiServiceFactory.getRegulationsApi();
+	}	
 
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -57,8 +71,14 @@ public class RegulationsApi
 	public Response regulationsPost(
 			@ApiIgnore @HeaderParam("service-ticket") String serviceTicket,
 			@ApiIgnore PrivacyRegulationInput regulation)
+					throws UnableToGetDataException
 	{
-		return delegate.processNewRegulation(serviceTicket, regulation);
+		if (!authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID_PROCESS_NEW_REGULATION))
+		{
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		return regulationDelegate.processNewRegulation(serviceTicket, regulation);
 	}
 
 	@PUT
@@ -89,7 +109,13 @@ public class RegulationsApi
 			@ApiIgnore @HeaderParam("service-Ticket") String serviceTicket,
 			@ApiIgnore PrivacyRegulationInput regulation,
 			@ApiIgnore @PathParam("reg-id") String regId)
+					throws UnableToGetDataException
 	{
-		return delegate.processExistingRegulation(serviceTicket, regulation, regId);
+		if (!authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID_PROCESS_EXISTING_REGULATION))
+		{
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		return regulationDelegate.processExistingRegulation(serviceTicket, regulation, regId);
 	}
 }

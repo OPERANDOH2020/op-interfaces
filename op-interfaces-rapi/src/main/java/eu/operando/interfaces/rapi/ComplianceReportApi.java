@@ -36,7 +36,6 @@ public class ComplianceReportApi
 
 	final Logger LOGGER;
 	
-	private static final String PROPERTIES_FILE_RAPI = "config.properties";
 	private static final String SERVICE_ID = "GET/osps/{osp-id}/compliance-report";
 
 	private AuthenticationService authenticationDelegate;
@@ -44,7 +43,7 @@ public class ComplianceReportApi
 
 	public ComplianceReportApi()
 	{
-		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(PROPERTIES_FILE_RAPI);
+		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(Config.PROPERTIES_FILE_RAPI);
 		reportDelegate = ComplianceReportsServiceFactory.getComplienceReportApiService();
 		LOGGER = LogManager.getLogger(ComplianceReportApi.class);
 	}

@@ -41,7 +41,7 @@ public class ComplianceReportApiTests
 	private ComplianceReportApi api = new ComplianceReportApi();
 
 	@Test
-	public void testGetComplianceReport_Authentication_DelegatedToAuthenticationService() throws OperandoCommunicationException, UnableToGetDataException
+	public void testGetComplianceReport_AuthenticationDelegateInvoked() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		String serviceTicket = "A123";
 		setUpServices(true);
@@ -52,7 +52,7 @@ public class ComplianceReportApiTests
 	}
 
 	@Test
-	public void testGetComplianceReport_Authentication_OtherModulesNotCalledIfNotAuthenticated() throws OperandoCommunicationException, UnableToGetDataException
+	public void testGetComplianceReport_NotAuthenticated_DelegateNotCalled() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		setUpServices(false);
 
@@ -62,7 +62,7 @@ public class ComplianceReportApiTests
 	}
 
 	@Test
-	public void testGetComplianceReport_Authentication_ReturnUnauthorisedCodeIfNotAuthenticated() throws OperandoCommunicationException, UnableToGetDataException
+	public void testGetComplianceReport_NotAuthenticated_ReturnUnauthorisedCode() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		setUpServices(false);
 
@@ -73,7 +73,7 @@ public class ComplianceReportApiTests
 	}
 
 	@Test(expected = UnableToGetDataException.class)
-	public void testGetComplianceReport_Authentication_ReturnInternalErrorCodeIfCantAuthenticate() throws OperandoCommunicationException, UnableToGetDataException
+	public void testGetComplianceReport_CannotAuthenticate_ThrowException() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		UnableToGetDataException exceptionToThrow = new UnableToGetDataException(new OperandoCommunicationException(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND));
 		setUpServices(exceptionToThrow);
