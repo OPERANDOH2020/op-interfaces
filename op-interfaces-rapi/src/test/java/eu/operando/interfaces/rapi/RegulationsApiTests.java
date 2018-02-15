@@ -107,7 +107,7 @@ public class RegulationsApiTests
 		api.regulationsPost(serviceTicket, regulation);
 
 		// Verify
-		verify(regulationsDelegate).processNewRegulation(serviceTicket, regulation);
+		verify(regulationsDelegate).processNewRegulation(regulation);
 	}
 	
 	@Test
@@ -187,6 +187,6 @@ public class RegulationsApiTests
 		api.regulationsRegIdPut(serviceTicket, regulation, regId);
 
 		// Verify
-		verify(regulationsDelegate).processExistingRegulation(serviceTicket, regulation, regId);
+		verify(regulationsDelegate).processExistingRegulation(regulation, regId);
 	}
 }

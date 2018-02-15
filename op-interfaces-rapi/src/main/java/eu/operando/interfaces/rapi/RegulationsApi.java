@@ -78,7 +78,7 @@ public class RegulationsApi
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		return regulationDelegate.processNewRegulation(serviceTicket, regulation);
+		return regulationDelegate.processNewRegulation(regulation);
 	}
 
 	@PUT
@@ -116,6 +116,6 @@ public class RegulationsApi
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		return regulationDelegate.processExistingRegulation(serviceTicket, regulation, regId);
+		return regulationDelegate.processExistingRegulation(regulation, regId);
 	}
 }
