@@ -79,6 +79,6 @@ public class ReportsApi
 		}
 		
 		MultivaluedMap<String, String> optionalParameters = uriInfo.getQueryParameters();
-		return reportsDelegate.reportsGetReport(reportId, format, optionalParameters);
+		return reportsDelegate.getReport(reportId, format, optionalParameters);
 	}
 }

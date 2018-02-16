@@ -20,7 +20,7 @@ public class ReportsServiceImpl extends ReportsService
 	}
 
 	@Override
-	public Response reportsGetReport(String reportId, String format, MultivaluedMap<String, String> parametersOptional)
+	public Response getReport(String reportId, String format, MultivaluedMap<String, String> parametersOptional)
 	{
 		Status statusToReturn = null;
 		String encodedReportToReturn = "";

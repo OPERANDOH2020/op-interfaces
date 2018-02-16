@@ -44,25 +44,25 @@ public class ReportsServiceImplTests
 	private ReportsServiceImpl implementation;
 
 	@Test
-	public void testReportsGetReport_ClientAskedToGetReport() throws OperandoCommunicationException
+	public void testGetReport_ClientAskedToGetReport() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponseFromOtherModules(null, null);
 
 		// Exercise
-		implementation.reportsGetReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		verify(clientReportGenerator).getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 	}
 
 	@Test
-	public void testReportsGetReport_ClientThrowsHttpExceptionServerError_UnavailableCodeReturned() throws OperandoCommunicationException
+	public void testGetReport_ClientThrowsHttpExceptionServerError_UnavailableCodeReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponseFromOtherModules(CommunicationError.ERROR_FROM_OTHER_MODULE, null);
 
-		Response responseToReturn = implementation.reportsGetReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseToReturn = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		int statusCodeResponse = responseToReturn.getStatus();
@@ -71,12 +71,12 @@ public class ReportsServiceImplTests
 	}
 
 	@Test
-	public void testReportsGetReport_ClientThrowsHttpExceptionNotFound_NotFoundCodeReturned() throws OperandoCommunicationException
+	public void testGetReport_ClientThrowsHttpExceptionNotFound_NotFoundCodeReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponseFromOtherModules(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND, null);
 
-		Response responseToReturn = implementation.reportsGetReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseToReturn = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		int statusCodeResponse = responseToReturn.getStatus();
@@ -85,12 +85,12 @@ public class ReportsServiceImplTests
 	}
 
 	@Test
-	public void testReportsGetReport_ClientReturnsReport_ResponseReturnedWithOkCode() throws OperandoCommunicationException
+	public void testGetReport_ClientReturnsReport_ResponseReturnedWithOkCode() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponseFromOtherModules(null, REPORT_FROM_CLIENT);
 
-		Response responseToReturn = implementation.reportsGetReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseToReturn = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		int statusCodeResponse = responseToReturn.getStatus();
@@ -98,13 +98,13 @@ public class ReportsServiceImplTests
 	}
 
 	@Test
-	public void testReportsGetReport_ReportGeneratorReturnsReport_ResponseContainsReturnedReport() throws OperandoCommunicationException
+	public void testGetReport_ReportGeneratorReturnsReport_ResponseContainsReturnedReport() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponseFromOtherModules(null, REPORT_FROM_CLIENT);
 
 		// Exercise
-		Response responseFromReportGenerator = implementation.reportsGetReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		Response responseFromReportGenerator = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
 		Object objectInBody = responseFromReportGenerator.getEntity();
