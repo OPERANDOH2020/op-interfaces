@@ -3,19 +3,19 @@ package eu.operando.interfaces.rapi.impl;
 import eu.operando.OperandoCommunicationException;
 import eu.operando.api.model.PrivacyRegulation;
 import eu.operando.api.model.PrivacyRegulationInput;
-import eu.operando.interfaces.rapi.RegulationsApiService;
+import eu.operando.interfaces.rapi.RegulationsService;
 import eu.operando.moduleclients.ClientOspEnforcement;
 import eu.operando.moduleclients.ClientPolicyComputation;
 import eu.operando.moduleclients.ClientPolicyDb;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
-public class RegulationsApiServiceImpl implements RegulationsApiService
+public class RegulationsServiceImpl implements RegulationsService
 {	
 	private ClientPolicyDb clientPolicyDb = null;
 	private ClientPolicyComputation clientPolicyComputation = null;
 	private ClientOspEnforcement clientOspEnforcement = null;
 
-	public RegulationsApiServiceImpl(ClientPolicyDb clientPolicyDb,
+	public RegulationsServiceImpl(ClientPolicyDb clientPolicyDb,
 			ClientPolicyComputation clientPolicyComputation, ClientOspEnforcement clientOspEnforcement)
 	{
 		this.clientPolicyDb = clientPolicyDb;

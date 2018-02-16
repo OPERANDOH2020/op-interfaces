@@ -1,14 +1,14 @@
 package eu.operando.interfaces.rapi.factories;
 
 import eu.operando.Utils;
-import eu.operando.interfaces.rapi.RegulationsApiService;
-import eu.operando.interfaces.rapi.impl.RegulationsApiServiceImpl;
+import eu.operando.interfaces.rapi.RegulationsService;
+import eu.operando.interfaces.rapi.impl.RegulationsServiceImpl;
 import eu.operando.moduleclients.ClientOspEnforcement;
 import eu.operando.moduleclients.ClientPolicyComputation;
 import eu.operando.moduleclients.ClientPolicyDb;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
-public class RegulationsApiServiceFactory
+public class RegulationsServiceFactory
 {
 	// Location of properties file.
 	private static final String PROPERTIES_FILE_RAPI = "config.properties";
@@ -18,9 +18,9 @@ public class RegulationsApiServiceFactory
 	private static final String PROPERTY_NAME_ORIGIN_POLICY_DB = "originPolicyDb";
 	private static final String PROPERTY_NAME_ORIGIN_POLICY_COMPUTATION = "originPolicyComputation";
 
-	private static RegulationsApiService service;
+	private static RegulationsService service;
 
-	public static RegulationsApiService getRegulationsApi()
+	public static RegulationsService getRegulationsApi()
 	{
 		if (service == null)
 		{
@@ -29,7 +29,7 @@ public class RegulationsApiServiceFactory
 		return service;
 	}
 
-	private static RegulationsApiService configureService()
+	private static RegulationsService configureService()
 	{
 		// Property file property values.
 		//String serviceIdRegulationsApi = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_SERVICE_ID_REGULATIONS_API);
@@ -43,6 +43,6 @@ public class RegulationsApiServiceFactory
 		ClientOspEnforcement clientOspEnforcement = new ClientOspEnforcement(originOspEnforcement);
 		
 		// Configure the service.
-		return new RegulationsApiServiceImpl(clientPolicyDb, clientPolicyComputation, clientOspEnforcement);
+		return new RegulationsServiceImpl(clientPolicyDb, clientPolicyComputation, clientOspEnforcement);
 	}
 }

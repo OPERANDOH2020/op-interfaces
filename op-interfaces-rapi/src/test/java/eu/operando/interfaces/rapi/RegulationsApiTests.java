@@ -30,7 +30,7 @@ public class RegulationsApiTests
 	private AuthenticationService authenticationDelegate;
 	
 	@Mock
-	private RegulationsApiService regulationsDelegate;
+	private RegulationsService regulationsDelegate;
 	
 	@InjectMocks
 	private RegulationsApi api = new RegulationsApi();

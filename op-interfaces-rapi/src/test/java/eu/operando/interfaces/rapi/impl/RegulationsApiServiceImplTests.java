@@ -35,7 +35,7 @@ public class RegulationsApiServiceImplTests
 	private ClientOspEnforcement clientOspEnforcement;
 
 	@InjectMocks
-	private RegulationsApiServiceImpl implementation;
+	private RegulationsServiceImpl implementation;
 
 	@Test
 	public void testProcessNewRegulation_RegulationSentToPdb() throws OperandoCommunicationException

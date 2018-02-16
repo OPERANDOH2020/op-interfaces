@@ -20,7 +20,7 @@ import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.api.model.DtoPrivacyRegulation;
 import eu.operando.api.model.PrivacyRegulation;
 import eu.operando.api.model.PrivacyRegulationInput;
-import eu.operando.interfaces.rapi.factories.RegulationsApiServiceFactory;
+import eu.operando.interfaces.rapi.factories.RegulationsServiceFactory;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -38,12 +38,12 @@ public class RegulationsApi
 	private static final String SERVICE_ID_PROCESS_EXISTING_REGULATION = "PUT/regulator/regulations/{reg-id}";
 	
 	private AuthenticationService authenticationDelegate;
-	private RegulationsApiService regulationDelegate;
+	private RegulationsService regulationDelegate;
 		
 	public RegulationsApi()
 	{
 		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(Config.PROPERTIES_FILE_RAPI);
-		regulationDelegate = RegulationsApiServiceFactory.getRegulationsApi();
+		regulationDelegate = RegulationsServiceFactory.getRegulationsApi();
 	}	
 
 	@POST
