@@ -77,8 +77,10 @@ public class RegulationsApi
 		{
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
+
+		boolean success = regulationDelegate.processNewRegulation(regulation);
 		
-		return regulationDelegate.processNewRegulation(regulation);
+		return createResponse(success);
 	}
 
 	@PUT
@@ -115,7 +117,15 @@ public class RegulationsApi
 		{
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
+
+		boolean success = regulationDelegate.processExistingRegulation(regulation, regId);
 		
-		return regulationDelegate.processExistingRegulation(regulation, regId);
+		return createResponse(success);
+	}
+
+	private Response createResponse(boolean success)
+	{
+		Status statusToReturn = success ? Status.ACCEPTED : Status.SERVICE_UNAVAILABLE;
+		return Response.status(statusToReturn).build();
 	}
 }

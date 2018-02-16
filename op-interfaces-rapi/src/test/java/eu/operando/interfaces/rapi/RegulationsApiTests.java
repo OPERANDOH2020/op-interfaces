@@ -109,6 +109,38 @@ public class RegulationsApiTests
 		// Verify
 		verify(regulationsDelegate).processNewRegulation(regulation);
 	}
+
+	@Test
+	public void testRegulationsPost_Authenticated_RegulationDelegateReturnsFalse_UnavailableCodeReturned() throws OperandoCommunicationException, UnableToGetDataException
+	{
+		// Set up
+		String serviceTicket = "st";
+		when(authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID_PROCESS_NEW_REGULATION)).thenReturn(true);
+		PrivacyRegulationInput regulation = new PrivacyRegulationInput();
+		when(regulationsDelegate.processNewRegulation(regulation)).thenReturn(false);
+
+		// Exercise
+		Response response = api.regulationsPost(serviceTicket, regulation);
+
+		// Verify
+		assertEquals("When the regulation service returns false, an unavailable code should be returned.", Status.SERVICE_UNAVAILABLE, response.getStatusInfo());
+	}
+
+	@Test
+	public void testRegulationsPost_Authenticated_RegulationDelegateReturnsTrue_AcceptedCodeReturned() throws OperandoCommunicationException, UnableToGetDataException
+	{
+		// Set up
+		String serviceTicket = "st";
+		when(authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID_PROCESS_NEW_REGULATION)).thenReturn(true);
+		PrivacyRegulationInput regulation = new PrivacyRegulationInput();
+		when(regulationsDelegate.processNewRegulation(regulation)).thenReturn(true);
+
+		// Exercise
+		Response response = api.regulationsPost(serviceTicket, regulation);
+
+		// Verify
+		assertEquals("When the regulation service returns false, an unavailable code should be returned.", Status.ACCEPTED, response.getStatusInfo());
+	}
 	
 	@Test
 	public void testRegulationsRegIdPut_AuthenticationDelegateInvoked() throws OperandoCommunicationException, UnableToGetDataException
@@ -188,5 +220,39 @@ public class RegulationsApiTests
 
 		// Verify
 		verify(regulationsDelegate).processExistingRegulation(regulation, regId);
+	}
+
+	@Test
+	public void testRegulationsRegIdPut_Authenticated_RegulationDelegateReturnsFalse_UnavailableCodeReturned() throws OperandoCommunicationException, UnableToGetDataException
+	{
+		// Set up
+		String serviceTicket = "st";
+		when(authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID_PROCESS_EXISTING_REGULATION)).thenReturn(true);
+		PrivacyRegulationInput regulation = new PrivacyRegulationInput();
+		String regId = "reg1";
+		when(regulationsDelegate.processExistingRegulation(regulation, regId)).thenReturn(false);
+
+		// Exercise
+		Response response = api.regulationsRegIdPut(serviceTicket, regulation, regId);
+
+		// Verify
+		assertEquals("When the regulation service returns false, an unavailable code should be returned.", Status.SERVICE_UNAVAILABLE, response.getStatusInfo());
+	}
+
+	@Test
+	public void testRegulationsRegIdPut_Authenticated_RegulationDelegateReturnsTrue_AcceptedCodeReturned() throws OperandoCommunicationException, UnableToGetDataException
+	{
+		// Set up
+		String serviceTicket = "st";
+		when(authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID_PROCESS_EXISTING_REGULATION)).thenReturn(true);
+		PrivacyRegulationInput regulation = new PrivacyRegulationInput();
+		String regId = "reg1";
+		when(regulationsDelegate.processExistingRegulation(regulation, regId)).thenReturn(true);
+
+		// Exercise
+		Response response = api.regulationsRegIdPut(serviceTicket, regulation, regId);
+
+		// Verify
+		assertEquals("When the regulation service returns false, an unavailable code should be returned.", Status.ACCEPTED, response.getStatusInfo());
 	}
 }
