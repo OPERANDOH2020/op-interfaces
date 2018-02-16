@@ -11,11 +11,15 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.operando.UnableToGetDataException;
+import eu.operando.api.AuthenticationService;
+import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.interfaces.oapi.factories.ReportsServiceFactory;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -30,7 +34,16 @@ import springfox.documentation.annotations.ApiIgnore;
 @Produces({ MediaType.APPLICATION_JSON })
 public class ReportsApi
 {
-	private final ReportsService delegate = ReportsServiceFactory.getReportsService();
+	public static final String SERVICE_ID_GET_REPORT = "/operando/webui/reports/";
+	
+	private AuthenticationService authenticationDelegate;
+	private ReportsService reportsDelegate;
+	
+	public ReportsApi()
+	{
+		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(Config.PROPERTIES_FILE_OAPI);
+		reportsDelegate = ReportsServiceFactory.getReportsService();
+	}
 
 	@GET
 	@Path("/{report-id}")
@@ -54,13 +67,18 @@ public class ReportsApi
 		@ApiImplicitParam(name = "report-id", value = "The unique identifier of a report", required = true, dataType = "string", paramType = "path"),
 		@ApiImplicitParam(name = "format", value = "The requested format of the report (e.g. pdf, html)", required = true, dataType = "string", paramType = "query"),
 	})
-public Response reportsReportIdGet(
+	public Response reportsReportIdGet(
 			@ApiIgnore @HeaderParam("service-ticket") String serviceTicket,
 			@ApiIgnore @PathParam("report-id")String reportId,
 			@ApiIgnore @QueryParam("format") String format, 
-			@ApiIgnore @Context UriInfo uriInfo)
+			@ApiIgnore @Context UriInfo uriInfo) throws UnableToGetDataException
 	{
+		if (!authenticationDelegate.isAuthenticatedForService(serviceTicket, SERVICE_ID_GET_REPORT))
+		{
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
 		MultivaluedMap<String, String> optionalParameters = uriInfo.getQueryParameters();
-		return delegate.reportsGetReport(serviceTicket, reportId, format, optionalParameters);
+		return reportsDelegate.reportsGetReport(reportId, format, optionalParameters);
 	}
 }
