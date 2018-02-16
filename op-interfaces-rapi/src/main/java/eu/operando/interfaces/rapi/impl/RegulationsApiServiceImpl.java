@@ -48,11 +48,9 @@ public class RegulationsApiServiceImpl implements RegulationsApiService
 	 */
 	private Response forwardRegulationAndBuildResponse(PrivacyRegulationInput regulation, String regId)
 	{
-		// Check that the caller is authenticated with the platform.
-		boolean newRegulation = regId == null;
 		Status statusToReturn = null;
 		
-		boolean success = forwardRegulationToInterestedModules(regulation, regId, newRegulation);
+		boolean success = forwardRegulationToInterestedModules(regulation, regId);
 		if (success)
 		{
 			// Let caller know that the request was processed as expected.
@@ -65,12 +63,11 @@ public class RegulationsApiServiceImpl implements RegulationsApiService
 		}
 
 		// Return the response.
-		return Response.status(statusToReturn)
-			.build();
+		return Response.status(statusToReturn).build();
 	}
 
-	private boolean forwardRegulationToInterestedModules(PrivacyRegulationInput regulation, String regId, boolean newRegulation)
-	{
+	private boolean forwardRegulationToInterestedModules(PrivacyRegulationInput regulation, String regId)
+	{		
 		// Keep track of the status of the requests.
 		boolean successfulRequestToPdb = false;
 		boolean successfulRequestToPc = false;
@@ -82,8 +79,7 @@ public class RegulationsApiServiceImpl implements RegulationsApiService
 		successfulRequestToPdb = regulationFromPolicyDb != null;
 		if (successfulRequestToPdb)
 		{
-			// If the response from the PDB is good, then send the regulation to the PC and OSE, using the regId to determine if the regulation is
-			// new.
+			boolean newRegulation = regId == null;
 			if (newRegulation)
 			{
 				successfulRequestToPc = clientPolicyComputation.sendNewRegulationToPolicyComputation(regulationFromPolicyDb);
@@ -105,8 +101,6 @@ public class RegulationsApiServiceImpl implements RegulationsApiService
 	 * 
 	 * @param regulationBody
 	 *        The regulation to send.
-	 * @param newRegulation
-	 *        Whether the regulation is new.
 	 * @param regId
 	 *        the ID of the regulation. Should be null if the regulation doesn't have an ID.
 	 * @return the privacy regulation in the response body, if possible.
