@@ -7,9 +7,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -55,7 +52,7 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testProcessNewRegulation_PostToPdbUnsuccessful_RegulationNotSentToPcOrOse() throws OperandoCommunicationException
+	public void testProcessNewRegulation_SendToPdbUnsuccessful_RegulationNotSentToPcOrOse() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(false, false, false);
@@ -69,22 +66,20 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testProcessNewRegulation_PostToPdbUnsuccessful_UnavailableResponseReturned() throws OperandoCommunicationException
+	public void testProcessNewRegulation_SendToPdbUnsuccessful_ReturnFalse() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(false, false, false);
 
 		// Exercise
-		Response responseToRegulator = implementation.processNewRegulation(new PrivacyRegulationInput());
-		int statusCodeResponse = responseToRegulator.getStatus();
+		boolean success = implementation.processNewRegulation(new PrivacyRegulationInput());
 
 		// Verify
-		assertEquals("When posting to the PDB is unsuccessful, an unavailable status should be set on the response.", Status.SERVICE_UNAVAILABLE.getStatusCode(),
-				statusCodeResponse);
+		assertEquals("When sending to the PDB is unsuccessful, the service should return false.", false, success);
 	}
 
 	@Test
-	public void testProcessNewRegulation_PostToPdbSuccessful_RegulationSentToPcAndOse() throws OperandoCommunicationException
+	public void testProcessNewRegulation_SendToPdbSuccessful_RegulationSentToPcAndOse() throws OperandoCommunicationException
 	{
 		// Set up
 		PrivacyRegulation privacyRegulationFromPdb = new PrivacyRegulation("", "", "", null, "", null);
@@ -99,64 +94,57 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testProcessNewRegulation_PostToPdbSuccessful_PcAndOseRejectRegulation_UnavailableResponseReturned() throws OperandoCommunicationException
+	public void testProcessNewRegulation_SendToPdbSuccessful_PcAndOseRejectRegulation_FalseReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, false, false);
 
 		// Exercise
-		Response response = implementation.processNewRegulation(new PrivacyRegulationInput());
+		boolean success = implementation.processNewRegulation(new PrivacyRegulationInput());
 
 		// Verify
-		int status = response.getStatus();
-		assertEquals("When neither PC nor OSE returns a success code, the RAPI should return an unavailable status code.", Status.SERVICE_UNAVAILABLE.getStatusCode(),
-				status);
+		assertEquals("When both sending to PC and sending to OSE are unsucessful, the service should return false.", false, success);
 	}
 
 	@Test
-	public void testProcessNewRegulation_PostToPdbSuccessful_PcRejectsRegulation_OseAcceptsRegulation_UnavailableResponseReturned()
+	public void testProcessNewRegulation_SendToPdbSuccessful_PcRejectsRegulation_OseAcceptsRegulation_FalseReturned()
 			throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, false, true);
 
 		// Exercise
-		Response response = implementation.processNewRegulation( new PrivacyRegulationInput());
+		boolean success = implementation.processNewRegulation(new PrivacyRegulationInput());
 
 		// Verify
-		int status = response.getStatus();
-		assertEquals("When the PC does not return a success code, the RAPI should return an unavailable status code.", Status.SERVICE_UNAVAILABLE.getStatusCode(),
-				status);
+		assertEquals("When sending to PC is unsuccessful, the service should return false.", false, success);
 	}
 
 	@Test
-	public void testProcessNewRegulation_PostToPdbSuccessful_PcAcceptsRegulation_OseRejectsRegulation_UnavailableResponseReturned()
+	public void testProcessNewRegulation_SendToPdbSuccessful_PcAcceptsRegulation_OseRejectsRegulation_FalseResponseReturned()
 			throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, true, false);
 
 		// Exercise
-		Response response = implementation.processNewRegulation(new PrivacyRegulationInput());
+		boolean success = implementation.processNewRegulation(new PrivacyRegulationInput());
 
 		// Verify
-		int status = response.getStatus();
-		assertEquals("When the OSE does not return a success code, the RAPI should return an unavailable status code.", Status.SERVICE_UNAVAILABLE.getStatusCode(),
-				status);
+		assertEquals("When sending to OSE is unsuccessful, the service should return false.", false, success);
 	}
 
 	@Test
-	public void testProcessNewRegulation_PostToPdbSuccessful_PcAndOseAcceptRegulation_AcceptResponseReturned() throws OperandoCommunicationException
+	public void testProcessNewRegulation_SendToPdbSuccessful_PcAndOseAcceptRegulation_TrueReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForNewRegulation(true, true, true);
 
 		// Exercise
-		Response response = implementation.processNewRegulation(new PrivacyRegulationInput());
+		boolean success = implementation.processNewRegulation(new PrivacyRegulationInput());
 
 		// Verify
-		int status = response.getStatus();
-		assertEquals("When all modules return success codes, the RAPI should return an accepted status code.", Status.ACCEPTED.getStatusCode(), status);
+		assertEquals("When sending to all modules is sucessful, the service should return true.", true, success);
 	}
 
 	/**
@@ -220,7 +208,7 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testProcessExistingRegulation_PutToPdbUnsuccessful_RegulationNotSentToPcOrOse() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_SendToPdbUnsuccessful_RegulationNotSentToPcOrOse() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(false, false, false);
@@ -234,22 +222,20 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testProcessExistingRegulation_PutToPdbUnsuccessful_UnavailableResponseReturned() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_SendToPdbUnsuccessful_FalseReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(false, false, false);
 
 		// Exercise
-		Response responseToRegulator = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
-		int statusCodeResponse = responseToRegulator.getStatus();
+		boolean success = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
-		assertEquals("When putting to the PDB is unsuccessful, an unavailable status should be set on the response.", Status.SERVICE_UNAVAILABLE.getStatusCode(),
-				statusCodeResponse);
+		assertEquals("When sending to the PDB is unsuccessful, the service should return false.", false, success);
 	}
 
 	@Test
-	public void testProcessExistingRegulation_PutToPdbSuccessful_RegulationSentToPcAndOse() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_SendToPdbSuccessful_RegulationSentToPcAndOse() throws OperandoCommunicationException
 	{
 		// Set up
 		PrivacyRegulation privacyRegulationFromPdb = new PrivacyRegulation("", "", "", null, "", null);
@@ -264,64 +250,57 @@ public class RegulationsApiServiceImplTests
 	}
 
 	@Test
-	public void testProcessExistingRegulation_PutToPdbSuccessful_PcAndOseRejectRegulation_UnavailableResponseReturned() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_SendToPdbSuccessful_PcAndOseRejectRegulation_FalseReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, false, false);
 
 		// Exercise
-		Response response = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
+		boolean success = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
-		int status = response.getStatus();
-		assertEquals("When neither PC nor OSE returns a success code, the RAPI should return an unavailable status code.", Status.SERVICE_UNAVAILABLE.getStatusCode(),
-				status);
+		assertEquals("When both sending to PC and sending to OSE are unsuccessful, the service should return false.", false, success);
 	}
 
 	@Test
-	public void testProcessExistingRegulation_PutToPdbSuccessful_PcRejectsRegulation_OseAcceptsRegulation_UnavailableResponseReturned()
+	public void testProcessExistingRegulation_SendToPdbSuccessful_PcRejectsRegulation_OseAcceptsRegulation_FalseReturned()
 			throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, false, true);
 
 		// Exercise
-		Response response = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
+		boolean success = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
-		int status = response.getStatus();
-		assertEquals("When the PC does not return a success code, the RAPI should return an unavailable status code.", Status.SERVICE_UNAVAILABLE.getStatusCode(),
-				status);
+		assertEquals("When sending to PC is unsucessful, the service should return false.", false, success);
 	}
 
 	@Test
-	public void testProcessExistingRegulation_PutToPdbSuccessful_PcAcceptsRegulation_OseRejectsRegulation_UnavailableResponseReturned()
+	public void testProcessExistingRegulation_SendToPdbSuccessful_PcAcceptsRegulation_OseRejectsRegulation_FalseReturned()
 			throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, true, false);
 
 		// Exercise
-		Response response = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
+		boolean success = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
-		int status = response.getStatus();
-		assertEquals("When the OSE does not return a success code, the RAPI should return an unavailable status code.", Status.SERVICE_UNAVAILABLE.getStatusCode(),
-				status);
+		assertEquals("When sending to OSE is unsuccessful, the service should return false.", false, success);
 	}
 
 	@Test
-	public void testProcessExistingRegulation_PutToPdbSuccessful_PcAndOseAcceptRegulation_AcceptResponseReturned() throws OperandoCommunicationException
+	public void testProcessExistingRegulation_SendToPdbSuccessful_PcAndOseAcceptRegulation_TrueReturned() throws OperandoCommunicationException
 	{
 		// Set up
 		setUpResponsesFromOtherModulesForExistingRegulation(true, true, true);
 
 		// Exercise
-		Response response = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
+		boolean success = implementation.processExistingRegulation(new PrivacyRegulationInput(), REGULATION_ID);
 
 		// Verify
-		int status = response.getStatus();
-		assertEquals("When all modules return success codes, the RAPI should return an accepted status code.", Status.ACCEPTED.getStatusCode(), status);
+		assertEquals("When sending to all modules is successful, the service should return true.", true, success);
 	}
 
 	/**
