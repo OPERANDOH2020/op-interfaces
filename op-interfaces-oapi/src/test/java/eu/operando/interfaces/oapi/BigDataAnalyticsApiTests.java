@@ -1,4 +1,4 @@
-package eu.operando.interfaces.oapi.impl;
+package eu.operando.interfaces.oapi;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
