@@ -7,7 +7,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -25,7 +24,7 @@ import eu.operando.moduleclients.ClientAuthenticationApiOperandoService;
 import eu.operando.moduleclients.ClientReportGenerator;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ReportsApiServiceImplTests
+public class ReportsServiceImplTests
 {
 	// Variables to test.
 	private static final String SERVICE_ID_GET_REPORT = "/operando/webui/reports/";
@@ -48,7 +47,7 @@ public class ReportsApiServiceImplTests
 	private ClientReportGenerator clientReportGenerator;
 
 	@InjectMocks
-	private ReportsApiServiceImpl implementation;
+	private ReportsServiceImpl implementation;
 
 	@Test
 	public void testReportsReportIdGet_CorrectParametersSentToAuthenticationService() throws OperandoCommunicationException

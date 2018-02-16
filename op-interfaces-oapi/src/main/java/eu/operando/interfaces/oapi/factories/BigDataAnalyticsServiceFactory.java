@@ -2,14 +2,14 @@ package eu.operando.interfaces.oapi.factories;
 
 import eu.operando.CredentialsOperando;
 import eu.operando.Utils;
-import eu.operando.interfaces.oapi.BigDataAnalyticsApiService;
+import eu.operando.interfaces.oapi.BigDataAnalyticsService;
 import eu.operando.interfaces.oapi.impl.BigDataAnalyticsApiServiceImpl;
 import eu.operando.moduleclients.ClientAuthenticationApiOperandoClient;
 import eu.operando.moduleclients.ClientBigDataAnalytics;
 import eu.operando.moduleclients.RequestBuilderAuthenticationApi;
 import eu.operando.moduleclients.http.HttpRequestBuilderAuthenticationApi;
 
-public class BigDataAnalyticsApiServiceFactory
+public class BigDataAnalyticsServiceFactory
 {
 	// Location of properties file.
 	private static final String PROPERTIES_FILE_OAPI = "config.properties";
@@ -20,9 +20,9 @@ public class BigDataAnalyticsApiServiceFactory
 	private static final String PROPERTY_NAME_USERNAME_OAPI = "usernameOapi";
 	private static final String PROPERTY_NAME_PASSWORD_OAPI = "passwordOapi";
 	
-	private static BigDataAnalyticsApiService service;
+	private static BigDataAnalyticsService service;
 
-	public static BigDataAnalyticsApiService getBdaApi()
+	public static BigDataAnalyticsService getBdaService()
 	{
 		if (service == null)
 		{
@@ -31,7 +31,7 @@ public class BigDataAnalyticsApiServiceFactory
 		return service;
 	}
 
-	private static BigDataAnalyticsApiService configureService()
+	private static BigDataAnalyticsService configureService()
 	{
 		// String serviceIdRegulationsApi = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_SERVICE_ID_REGULATIONS_API);
 		String originBda = Utils.loadPropertyString(PROPERTIES_FILE_OAPI, PROPERTY_NAME_ORIGIN_BIG_DATA_ANALYTICS);

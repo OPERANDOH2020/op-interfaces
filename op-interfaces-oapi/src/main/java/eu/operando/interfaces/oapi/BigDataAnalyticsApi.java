@@ -20,7 +20,7 @@ import eu.operando.UnableToGetDataException;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.factories.AuthenticationServiceFactory;
 import eu.operando.api.model.AnalyticsReport;
-import eu.operando.interfaces.oapi.factories.BigDataAnalyticsApiServiceFactory;
+import eu.operando.interfaces.oapi.factories.BigDataAnalyticsServiceFactory;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -42,11 +42,11 @@ public class BigDataAnalyticsApi
 	private static final String PROPERTIES_FILE_OAPI = "config.properties";
 	
 	private AuthenticationService authenticationDelegate;
-	private BigDataAnalyticsApiService bigDataDelegate;
+	private BigDataAnalyticsService bigDataDelegate;
 
 	public BigDataAnalyticsApi(){
 		authenticationDelegate = AuthenticationServiceFactory.getAuthenticationService(PROPERTIES_FILE_OAPI);
-		bigDataDelegate = BigDataAnalyticsApiServiceFactory.getBdaApi();
+		bigDataDelegate = BigDataAnalyticsServiceFactory.getBdaService();
 		LOGGER = LogManager.getLogger(BigDataAnalyticsApi.class);
 	}
 	

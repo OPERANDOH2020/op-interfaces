@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.operando.interfaces.oapi.factories.ReportsApiServiceFactory;
+import eu.operando.interfaces.oapi.factories.ReportsServiceFactory;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -30,7 +30,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @Produces({ MediaType.APPLICATION_JSON })
 public class ReportsApi
 {
-	private final ReportsApiService delegate = ReportsApiServiceFactory.getReportsApi();
+	private final ReportsService delegate = ReportsServiceFactory.getReportsService();
 
 	@GET
 	@Path("/{report-id}")

@@ -10,10 +10,10 @@ import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.UnableToGetDataException;
 import eu.operando.api.model.AnalyticsReport;
 import eu.operando.interfaces.oapi.BigDataAnalyticsApi;
-import eu.operando.interfaces.oapi.BigDataAnalyticsApiService;
+import eu.operando.interfaces.oapi.BigDataAnalyticsService;
 import eu.operando.moduleclients.ClientBigDataAnalytics;
 
-public class BigDataAnalyticsApiServiceImpl extends BigDataAnalyticsApiService
+public class BigDataAnalyticsApiServiceImpl extends BigDataAnalyticsService
 {
 	final Logger LOGGER;
 	

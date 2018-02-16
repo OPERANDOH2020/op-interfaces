@@ -6,18 +6,18 @@ import javax.ws.rs.core.Response.Status;
 
 import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
-import eu.operando.interfaces.oapi.ReportsApiService;
+import eu.operando.interfaces.oapi.ReportsService;
 import eu.operando.moduleclients.ClientAuthenticationApiOperandoService;
 import eu.operando.moduleclients.ClientReportGenerator;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
-public class ReportsApiServiceImpl extends ReportsApiService
+public class ReportsServiceImpl extends ReportsService
 {
 	private ClientAuthenticationApiOperandoService clientAuthenticationService = null;
 	private ClientReportGenerator clientReportGenerator = null;
 	private static final String SERVICE_ID_GET_REPORT = "/operando/webui/reports/";
 
-	public ReportsApiServiceImpl(ClientAuthenticationApiOperandoService clientAuthenticationService, ClientReportGenerator clientReportGenerator)
+	public ReportsServiceImpl(ClientAuthenticationApiOperandoService clientAuthenticationService, ClientReportGenerator clientReportGenerator)
 	{
 		this.clientAuthenticationService = clientAuthenticationService;
 		this.clientReportGenerator = clientReportGenerator;

@@ -1,13 +1,13 @@
 package eu.operando.interfaces.oapi.factories;
 
 import eu.operando.Utils;
-import eu.operando.interfaces.oapi.ReportsApiService;
-import eu.operando.interfaces.oapi.impl.ReportsApiServiceImpl;
+import eu.operando.interfaces.oapi.ReportsService;
+import eu.operando.interfaces.oapi.impl.ReportsServiceImpl;
 import eu.operando.moduleclients.ClientAuthenticationApiOperandoService;
 import eu.operando.moduleclients.ClientReportGenerator;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-07-12T14:06:26.001Z")
-public class ReportsApiServiceFactory
+public class ReportsServiceFactory
 {
 	// Location of properties file.
 	private static final String PROPERTIES_FILE_RAPI = "config.properties";
@@ -17,9 +17,9 @@ public class ReportsApiServiceFactory
 	private static final String PROPERTY_NAME_ORIGIN_REPORT_GENERATOR = "originReportGenerator";
 	private static final String PROPERTY_NAME_SERVICE_ID_GET_REPORT = "serviceIdGetReport";
 
-	private static ReportsApiService service = null;
+	private static ReportsService service = null;
 
-	public static ReportsApiService getReportsApi()
+	public static ReportsService getReportsService()
 	{
 		if (service == null)
 		{
@@ -29,7 +29,7 @@ public class ReportsApiServiceFactory
 		return service;
 	}
 	
-	private static ReportsApiService configureService()
+	private static ReportsService configureService()
 	{
 		// Properties file property values.
 		String originAuthenticationApi = Utils.loadPropertyString(PROPERTIES_FILE_RAPI, PROPERTY_NAME_ORIGIN_AUTHENTICATION_API);
@@ -39,6 +39,6 @@ public class ReportsApiServiceFactory
 		ClientAuthenticationApiOperandoService clientAuthenticationService = new ClientAuthenticationApiOperandoService(originAuthenticationApi);
 		ClientReportGenerator clientReportGenerator = new ClientReportGenerator(originReportGenerator);
 		
-		return new ReportsApiServiceImpl(clientAuthenticationService, clientReportGenerator);
+		return new ReportsServiceImpl(clientAuthenticationService, clientReportGenerator);
 	}
 }

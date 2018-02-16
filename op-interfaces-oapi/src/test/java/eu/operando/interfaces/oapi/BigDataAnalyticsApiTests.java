@@ -22,7 +22,7 @@ import eu.operando.UnableToGetDataException;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.model.AnalyticsReport;
 import eu.operando.interfaces.oapi.BigDataAnalyticsApi;
-import eu.operando.interfaces.oapi.BigDataAnalyticsApiService;
+import eu.operando.interfaces.oapi.BigDataAnalyticsService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BigDataAnalyticsApiTests {
@@ -33,7 +33,7 @@ public class BigDataAnalyticsApiTests {
 	private AuthenticationService authenticationDelegate;
 	
 	@Mock
-	private BigDataAnalyticsApiService bigDataDelegate;
+	private BigDataAnalyticsService bigDataDelegate;
 	
 	@InjectMocks
 	private BigDataAnalyticsApi api = new BigDataAnalyticsApi();
