@@ -1,17 +1,18 @@
 package eu.operando.interfaces.oapi.impl;
 
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -43,94 +44,52 @@ public class ReportsServiceImplTests
 	@InjectMocks
 	private ReportsServiceImpl implementation;
 
+	@Rule
+	public final ExpectedException exception = ExpectedException.none();
+
 	@Test
-	public void testGetReport_ClientAskedToGetReport() throws OperandoCommunicationException
+	public void testGetReport_ClientThrowsOperandoCommunicationExceptionError_SameExceptionThrown() throws OperandoCommunicationException
 	{
 		// Set up
-		setUpResponseFromOtherModules(null, null);
+		OperandoCommunicationException communicationException = new OperandoCommunicationException(CommunicationError.ERROR_FROM_OTHER_MODULE);
+		when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenThrow(communicationException);
 
+		exception.expect(OperandoCommunicationException.class);
+		exception.expect(hasProperty("communitcationError", is(CommunicationError.ERROR_FROM_OTHER_MODULE)));
+		
 		// Exercise
 		implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
-		// Verify
-		verify(clientReportGenerator).getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		// Verify -- expect exception
 	}
 
 	@Test
-	public void testGetReport_ClientThrowsHttpExceptionServerError_UnavailableCodeReturned() throws OperandoCommunicationException
+	public void testGetReport_ClientThrowsOperandoCommunicationExceptionNotFound_SameExceptionThrown() throws OperandoCommunicationException
 	{
 		// Set up
-		setUpResponseFromOtherModules(CommunicationError.ERROR_FROM_OTHER_MODULE, null);
+		OperandoCommunicationException communicationException = new OperandoCommunicationException(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
+		when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenThrow(communicationException);
 
-		Response responseToReturn = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		exception.expect(OperandoCommunicationException.class);
+		exception.expect(hasProperty("communitcationError", is(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND)));
+		
+		// Exercise
+		implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
-		// Verify
-		int statusCodeResponse = responseToReturn.getStatus();
-		assertEquals("If the client returns an OperandoCommunicationException with ERROR_FROM_OTHER_MODULE status, the RAPI should return an unavailable code.",
-				Status.SERVICE_UNAVAILABLE.getStatusCode(), statusCodeResponse);
-	}
-
-	@Test
-	public void testGetReport_ClientThrowsHttpExceptionNotFound_NotFoundCodeReturned() throws OperandoCommunicationException
-	{
-		// Set up
-		setUpResponseFromOtherModules(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND, null);
-
-		Response responseToReturn = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
-
-		// Verify
-		int statusCodeResponse = responseToReturn.getStatus();
-		assertEquals("If the client returns an OperandoCommunicationException with ERROR_FROM_OTHER_MODULE status, the RAPI should return a NOT_FOUND code.",
-				Status.NOT_FOUND.getStatusCode(), statusCodeResponse);
-	}
-
-	@Test
-	public void testGetReport_ClientReturnsReport_ResponseReturnedWithOkCode() throws OperandoCommunicationException
-	{
-		// Set up
-		setUpResponseFromOtherModules(null, REPORT_FROM_CLIENT);
-
-		Response responseToReturn = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
-
-		// Verify
-		int statusCodeResponse = responseToReturn.getStatus();
-		assertEquals("In the event of successful report retrieval, the RAPI should return an OK code.", Status.OK.getStatusCode(), statusCodeResponse);
+		// Verify -- expect exception
 	}
 
 	@Test
 	public void testGetReport_ReportGeneratorReturnsReport_ResponseContainsReturnedReport() throws OperandoCommunicationException
 	{
 		// Set up
-		setUpResponseFromOtherModules(null, REPORT_FROM_CLIENT);
+		when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenReturn(REPORT_FROM_CLIENT);
 
 		// Exercise
-		Response responseFromReportGenerator = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
+		String encodedReport = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);
 
 		// Verify
-		Object objectInBody = responseFromReportGenerator.getEntity();
-		assertEquals("In the event of successful report retrieval, the RAPI should return the report it gets from elsewhere in the platform.", REPORT_FROM_CLIENT,
-				objectInBody);
-	}
-
-	/**
-	 * @param reportFromClient
-	 *        the report that should be returned by the client.
-	 * @param statusCodeHttpException
-	 *        the status on the HTTP Exception that is thrown when getReport is called.
-	 * @throws OperandoCommunicationException
-	 */
-	@SuppressWarnings("unchecked")
-	private void setUpResponseFromOtherModules(CommunicationError errorOnOperandoCommunicationExceptionFromClient, String reportFromClient)
-			throws OperandoCommunicationException
-	{
-		if (errorOnOperandoCommunicationExceptionFromClient != null)
-		{
-			OperandoCommunicationException communicationException = new OperandoCommunicationException(errorOnOperandoCommunicationExceptionFromClient);
-			when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenThrow(communicationException);
-		}
-		if (reportFromClient != null)
-		{
-			when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenReturn(reportFromClient);
-		}
+		assertEquals("In the event of successful report retrieval, the RAPI should return the report it gets from elsewhere in the platform.",
+				REPORT_FROM_CLIENT, encodedReport);
 	}
 }
