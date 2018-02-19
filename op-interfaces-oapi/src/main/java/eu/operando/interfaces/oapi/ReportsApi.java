@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.operando.OperandoCommunicationException;
+import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.UnableToGetDataException;
 import eu.operando.api.AuthenticationService;
 import eu.operando.api.factories.AuthenticationServiceFactory;
@@ -78,7 +80,46 @@ public class ReportsApi
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		MultivaluedMap<String, String> optionalParameters = uriInfo.getQueryParameters();
-		return reportsDelegate.getReport(reportId, format, optionalParameters);
+		Response response;
+		try
+		{
+			MultivaluedMap<String, String> optionalParameters = uriInfo.getQueryParameters();
+			String report = reportsDelegate.getReport(reportId, format, optionalParameters);
+			
+			response = Response.ok().entity(report).build();
+		}
+		catch (OperandoCommunicationException e)
+		{
+			e.printStackTrace();
+			Status status = determineStatusToReturnFromOperandoCommunicationException(e);
+			
+			response = Response.status(status).build();
+		}
+		
+		return response;
+	}
+
+	/**
+	 * Takes in an OperandoCommunicationException Exception, and determines what status the RAPI should return based on this exception.
+	 * 
+	 * @param e
+	 *        An exception detailing an error returned when trying to get the requested report.
+	 * @return The status that should be returned to the caller of the RAPI.
+	 */
+	private Status determineStatusToReturnFromOperandoCommunicationException(OperandoCommunicationException e)
+	{
+		Status statusToReturn;
+		
+		CommunicationError error = e.getCommunitcationError();
+		if (error == CommunicationError.REQUESTED_RESOURCE_NOT_FOUND)
+		{
+			statusToReturn = Status.NOT_FOUND;
+		}
+		else
+		{
+			statusToReturn = Status.SERVICE_UNAVAILABLE;
+			e.printStackTrace();
+		}
+		return statusToReturn;
 	}
 }
