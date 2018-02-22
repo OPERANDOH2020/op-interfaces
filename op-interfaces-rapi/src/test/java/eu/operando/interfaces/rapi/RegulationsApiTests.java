@@ -51,6 +51,7 @@ public class RegulationsApiTests
 	}
 
 	@Test(expected = UnableToGetDataException.class)
+	@SuppressWarnings("unchecked")
 	public void testRegulationsPost_CannotAuthenticate_ThrowException() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		// Set up
@@ -159,6 +160,7 @@ public class RegulationsApiTests
 	}
 
 	@Test(expected = UnableToGetDataException.class)
+	@SuppressWarnings("unchecked")
 	public void testRegulationsRegIdPut_CannotAuthenticate_ThrowException() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		// Set up

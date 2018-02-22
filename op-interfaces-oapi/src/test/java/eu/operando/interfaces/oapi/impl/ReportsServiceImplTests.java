@@ -3,7 +3,6 @@ package eu.operando.interfaces.oapi.impl;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +14,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -52,7 +52,7 @@ public class ReportsServiceImplTests
 	{
 		// Set up
 		OperandoCommunicationException communicationException = new OperandoCommunicationException(CommunicationError.ERROR_FROM_OTHER_MODULE);
-		when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenThrow(communicationException);
+		when(clientReportGenerator.getReport(anyString(), anyString(), Matchers.<MultivaluedMap<String, String>>any())).thenThrow(communicationException);
 
 		exception.expect(OperandoCommunicationException.class);
 		exception.expect(hasProperty("communitcationError", is(CommunicationError.ERROR_FROM_OTHER_MODULE)));
@@ -68,7 +68,7 @@ public class ReportsServiceImplTests
 	{
 		// Set up
 		OperandoCommunicationException communicationException = new OperandoCommunicationException(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND);
-		when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenThrow(communicationException);
+		when(clientReportGenerator.getReport(anyString(), anyString(), Matchers.<MultivaluedMap<String, String>>any())).thenThrow(communicationException);
 
 		exception.expect(OperandoCommunicationException.class);
 		exception.expect(hasProperty("communitcationError", is(CommunicationError.REQUESTED_RESOURCE_NOT_FOUND)));
@@ -83,7 +83,7 @@ public class ReportsServiceImplTests
 	public void testGetReport_ReportGeneratorReturnsReport_ResponseContainsReturnedReport() throws OperandoCommunicationException
 	{
 		// Set up
-		when(clientReportGenerator.getReport(anyString(), anyString(), any(MultivaluedMap.class))).thenReturn(REPORT_FROM_CLIENT);
+		when(clientReportGenerator.getReport(anyString(), anyString(), Matchers.<MultivaluedMap<String, String>>any())).thenReturn(REPORT_FROM_CLIENT);
 
 		// Exercise
 		String encodedReport = implementation.getReport(REPORT_ID, FORMAT, PARAMETERS_OPTIONAL);

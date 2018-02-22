@@ -55,6 +55,7 @@ public class ReportsApiTests
 	}
 
 	@Test(expected = UnableToGetDataException.class)
+	@SuppressWarnings("unchecked")
 	public void testReportsReportIdGet_CannotAuthenticate_ThrowException() throws OperandoCommunicationException, UnableToGetDataException
 	{
 		// Set up
