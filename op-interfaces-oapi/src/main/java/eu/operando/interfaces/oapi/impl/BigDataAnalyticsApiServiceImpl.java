@@ -9,7 +9,6 @@ import eu.operando.OperandoCommunicationException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
 import eu.operando.UnableToGetDataException;
 import eu.operando.api.model.AnalyticsReport;
-import eu.operando.interfaces.oapi.BigDataAnalyticsApi;
 import eu.operando.interfaces.oapi.BigDataAnalyticsService;
 import eu.operando.moduleclients.ClientBigDataAnalytics;
 

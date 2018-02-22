@@ -9,7 +9,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.glassfish.jersey.internal.inject.UriInfoInjectee;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;

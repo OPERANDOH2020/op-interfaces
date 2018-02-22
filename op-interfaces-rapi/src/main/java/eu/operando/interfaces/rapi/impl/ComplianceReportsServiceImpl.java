@@ -4,11 +4,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import eu.operando.OperandoCommunicationException;
-import eu.operando.UnableToGetDataException;
 import eu.operando.OperandoCommunicationException.CommunicationError;
+import eu.operando.UnableToGetDataException;
 import eu.operando.api.model.ComplianceReport;
 import eu.operando.api.model.PrivacyPolicy;
-import eu.operando.interfaces.rapi.ComplianceReportApi;
 import eu.operando.interfaces.rapi.ComplianceReportsService;
 import eu.operando.moduleclients.ClientPolicyDb;
 
