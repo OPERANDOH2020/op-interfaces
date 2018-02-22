@@ -79,7 +79,6 @@ class SwaggerConfiguration extends WebMvcConfigurerAdapter {
 
 	private ApiInfo apiInfo() {
 		ApiInfo apiInfo = new ApiInfo(
-				// TODO update this
 				"OPERANDO's Regulator API (RAPI)",
 				"A Restful API provided by OPERANDO's Regulator service",
 				"1.0.0",
