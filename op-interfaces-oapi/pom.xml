@@ -139,12 +139,12 @@
 	<properties>
 		<springframework.version>4.0.6.RELEASE</springframework.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<as.baseurl>http://localhost:8080</as.baseurl>
-		<bda.baseurl>http://localhost:8080</bda.baseurl>
-		<ldb.baseurl>http://localhost:8080</ldb.baseurl>
-		<rm.baseurl>http://localhost:8080</rm.baseurl>
-		<dan.baseurl>http://localhost:8080</dan.baseurl>
-		<aapi.oapiusername>operando</aapi.oapiusername>
+		<as.baseurl>http://integration.operando.esilab.org:8135/operando/interfaces/aapi</as.baseurl>
+		<bda.baseurl>http://integration.operando.esilab.org:8098/operando/core/bigdata/</bda.baseurl>
+		<dan.baseurl>http://integration.operando.esilab.org:8111/operando/pdr/dan</dan.baseurl>
+		<ldb.baseurl>http://integration.operando.esilab.org:8090/operando/core/ldb</ldb.baseurl>
+        <rm.baseurl>http://integration.operando.esilab.org:8102/operando/core/rm</rm.baseurl>
+   		<aapi.oapiusername>operando</aapi.oapiusername>
 		<aapi.oapipassword>1234</aapi.oapipassword>
 		<!-- added to support docker image creation -->
 		<docker.registry.name>localhost:5000/</docker.registry.name><!-- leave 
