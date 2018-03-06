@@ -3,6 +3,7 @@ package eu.operando.interfaces.rapi.impl;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -340,12 +341,12 @@ public class RegulationsApiServiceImplTests
 	{
 		if (pdbSuccessful)
 		{
-			when(clientPolicyDb.updateExistingRegulationOnPolicyDb(anyString(), any(PrivacyRegulationInput.class))).thenReturn(regulationFromPdb);
+			when(clientPolicyDb.getRegulation(anyString())).thenReturn(regulationFromPdb);
 		}
 		else
 		{
-			when(clientPolicyDb.updateExistingRegulationOnPolicyDb(anyString(), any(PrivacyRegulationInput.class)))
-				.thenThrow(new OperandoCommunicationException(CommunicationError.ERROR_FROM_OTHER_MODULE));
+			doThrow(new OperandoCommunicationException(CommunicationError.ERROR_FROM_OTHER_MODULE))
+				.when(clientPolicyDb).updateExistingRegulationOnPolicyDb(anyString(), any(PrivacyRegulationInput.class));
 		}
 
 		when(clientPolicyComputation.sendExistingRegulationToPolicyComputation(any(PrivacyRegulation.class))).thenReturn(successFromPc);

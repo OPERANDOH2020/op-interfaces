@@ -87,7 +87,8 @@ public class RegulationsServiceImpl implements RegulationsService
 			}
 			else
 			{
-				regulationFromPolicyDb = clientPolicyDb.updateExistingRegulationOnPolicyDb(regId, regulation);
+				clientPolicyDb.updateExistingRegulationOnPolicyDb(regId, regulation);
+				regulationFromPolicyDb = clientPolicyDb.getRegulation(regId);
 			}
 		}
 		catch (OperandoCommunicationException e)
